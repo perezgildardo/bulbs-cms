@@ -51,7 +51,12 @@ exports.findById = function(req, res) {
 exports.findAll = function(req, res) {
     db.collection('content', function(err, collection) {
         collection.find().toArray(function(err, items) {
-            res.send(items);
+            res.send({
+                count: items.length,
+                results: items,
+                next: null,
+                previous: null
+            });
         });
     });
 };

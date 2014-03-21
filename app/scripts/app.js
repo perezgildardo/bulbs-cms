@@ -25,7 +25,7 @@ angular.module('bulbsCmsApp', [
     $routeProvider
       .when('/cms/app/list/:queue/', {
         templateUrl: '/views/contentlist.html',
-        controller: 'ContentlistCtrl'
+        controller: 'ContentListCtrl'
       })
       .when('/cms/app/edit/:id/', {
         templateUrl: '/views/contentedit.html',
@@ -42,7 +42,46 @@ angular.module('bulbsCmsApp', [
     STATIC_URL + "**"]);*/
 
   })
+  .config(['$httpProvider', function($httpProvider) {
+    // NOTE: this probably isn't quite the right place for this:
+    $httpProvider.defaults.withCredentials = true;
+  }])
   .run(function($rootScope, $http, $cookies){
     // set the CSRF token here
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
   });
+
+// https://github.com/angular/angular.js/issues/992
+angular.module('ngResource').config([
+  '$provide', '$httpProvider',
+  function($provide, $httpProvider) {
+    $provide.decorator('$resource', function($delegate) {
+        return function() {
+            if (arguments.length > 0) {  // URL
+                arguments[0] = arguments[0].replace(/\/$/, '\\/');
+            }
+
+            if (arguments.length > 2) {  // Actions
+                angular.forEach(arguments[2], function(action) {
+                    if (action && action.url) {
+                        action.url = action.url.replace(/\/$/, '\\/');
+                    }
+                });
+            }
+
+            return $delegate.apply($delegate, arguments);
+        };
+    });
+
+    $provide.factory('resourceEnforceSlashInterceptor', function() {
+        return {
+            request: function(config) {
+                config.url = config.url.replace(/[\/\\]+$/, '/');
+                return config;
+            }
+        };
+    });
+
+    $httpProvider.interceptors.push('resourceEnforceSlashInterceptor');
+  }
+]);

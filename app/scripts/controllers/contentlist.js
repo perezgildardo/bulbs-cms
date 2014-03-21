@@ -1,14 +1,15 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('ContentlistCtrl', function ($scope, $http, $timeout, $location, $routeParams, $window, $, _, Contentlist) {
+  .controller('ContentListCtrl', function ($scope, $http, $timeout, $location, $routeParams, $window, $, _, ContentApi) {
 
     //set title
     $window.document.title = 'AVCMS | Content';
 
     $scope.search = $location.search().search;
     $scope.queue = $routeParams.queue || 'all';
-    $scope.articles = [{'id': -1, 'title': 'Loading'}];
+    $scope.pageNumber = $routeParams.pageNumber || '1';
+    $scope.contentPage = {};
     $scope.myStuff = false;
 
     function updateIsMyStuff(){
@@ -20,7 +21,7 @@ angular.module('bulbsCmsApp')
         if(typeof(authors) === 'string'){
           authors = [authors];
         }
-        if(authors.length === 1 && authors[0] === $window.current_user){
+        if(authors.length === 1 && authors[0] === $window.currentUser){
           $scope.myStuff = true;
         }else{
           $scope.myStuff = false;
@@ -43,7 +44,7 @@ angular.module('bulbsCmsApp')
     $('#meOnly').on('switch-change', function (e,data) {
         var value = data.value;
         if(value === true){
-          $location.search().authors = [$window.current_user];
+          $location.search().authors = [$window.currentUser];
           $scope.getContent();
         } else if (value === false){
           delete $location.search().authors;
@@ -51,15 +52,12 @@ angular.module('bulbsCmsApp')
         }
       });
 
-    var url = '/cms/api/v1/content/';
-    if($scope.queue !== 'all'){ url = '/cms/api/v1/content/?status=' + $scope.queue; }
-    Contentlist.setUrl(url);
-    var getContentCallback = function($scope, data){
-        $scope.articles = data.results;
-        $scope.totalItems = data.count;
-      };
     $scope.getContent = function(){
-        Contentlist.getContent($scope, getContentCallback);
+        $scope.contentPage = ContentApi.Content.query({
+          status: $scope.queue,
+          page: $scope.pageNumber,
+          ordering: $scope.ordering
+        });
       };
     $scope.getContent();
 

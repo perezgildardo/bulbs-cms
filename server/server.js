@@ -2,10 +2,16 @@
 // http://coenraets.org/blog/2012/10/creating-a-rest-api-using-node-js-express-and-mongodb/
 
 var express = require('express'),
+    cors = require('cors'),
     contentApi = require('./contentapi');
  
 var app = express();
  
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:9069"
+}));
+
 app.configure(function () {
     app.use(express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
     app.use(express.bodyParser());

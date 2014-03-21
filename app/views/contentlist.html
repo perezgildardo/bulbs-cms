@@ -11,7 +11,7 @@
     </div>
 
     <div class="navbar-btn navbar-right">
-        <label class="btn btn-text btn-sm" for="meOnly">&nbsp; Show my articles only: </label>
+        <label class="btn btn-text btn-sm" for="meOnly">&nbsp; Show my content only: </label>
         <div class="btn btn-text" style="padding: 3px 0;"><input id="meOnly" type="checkbox" data-on-color="default" /></div>
         <a href="#contentListAccordion" data-parent="#contentListAccordion" class="expcol btn btn-text" state="0"><i class="fa fa-plus-circle"></i> Expand all</a>
     </div>
@@ -25,69 +25,69 @@
 
 <div class="row">
     <table class="panel-group col-xs-12 table table-condensed table-bordered table-striped" id="contentListAccordion">
-        <tr class="panel panel-default" ng-repeat="article in articles | filter:text_filter">
+        <tr class="panel panel-default" ng-repeat="content in contentPage.results">
             <td>
-                <div class="panel-heading row" data-toggle="collapse" href="#collapse-{{ article.id }}">
+                <div class="panel-heading row" data-toggle="collapse" href="#collapse-{{ content.id }}">
                     <div class="heading col-xs-12 col-sm-8">
-                        <strong>{{ article.feature_type }}</strong><br>
-                        <a class="panel-title collapsed" ng-bind-html="article.title | truncateByWords:15"></a></div>
+                        <strong>{{ content.feature_type }}</strong><br>
+                        <a class="panel-title collapsed" ng-bind-html="content.title | truncateByWords:15"></a></div>
                     <div class="published col-xs-12 col-sm-4">
-                        <div class="publish-widget small" ng-hide="article.id == -1">
-                            <span ng-show="article.authors">By {{ article.authors.0.first_name | truncateByCharacters: 1 }} {{ article.authors.0.last_name }}
-                            <span ng-show="article.authors.length > 1">and {{ article.authors.length - 1}} others</span> &middot; </span>
+                        <div class="publish-widget small" ng-hide="content.id == -1">
+                            <span ng-show="content.authors">By {{ content.authors.0.first_name | truncateByCharacters: 1 }} {{ content.authors.0.last_name }}
+                            <span ng-show="content.authors.length > 1">and {{ content.authors.length - 1}} others</span> &middot; </span>
 
 
-                            <a class="text-success" ng-show="article.status == 'Published'" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" >{{ article.published|date:"EEE',' M/d/yy' at ' h:mm a" }}</a>
+                            <a class="text-success" ng-show="content.status == 'Published'" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" >{{ content.published|date:"EEE',' M/d/yy' at ' h:mm a" }}</a>
 
-                            <a class="text-info" ng-hide="article.published" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" >Draft</a>
+                            <a class="text-info" ng-hide="content.published" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" >Draft</a>
 
-                            <a class="text-info" ng-show="article.status == 'Scheduled'" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" ><strong>Scheduled</strong> for {{ article.published|date:"EEE M/d/yy 'at' h:mm a" }}</a>
+                            <a class="text-info" ng-show="content.status == 'Scheduled'" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" ><strong>Scheduled</strong> for {{ content.published|date:"EEE M/d/yy 'at' h:mm a" }}</a>
 
 
                         </div>
                     </div>
                 </div>
-                <div id="collapse-{{ article.id }}" class="panel-collapse collapse">
+                <div id="collapse-{{ content.id }}" class="panel-collapse collapse">
                     <div class="panel-body">
                         <div class="pull-left col-sm-3 col-xs-12">
-                            <a class="thumbnail" href="/cms/app/edit/{{article.id}}">
-                                <img ng-if="article.image.id" ng-src="http://img.onionstatic.com/avclub/{{ article.image.id }}/16x9/400.jpg" alt="{{ article.image.alt }}" />
-                                <span ng-if="!article.image.id" class="no-image text-large"><i class="fa-exclamation-triangle fa"></i><span>No image selected.</span></span>
+                            <a class="thumbnail" href="/cms/app/edit/{{ content.id }}">
+                                <img ng-if="content.image.id" ng-src="http://img.onionstatic.com/avclub/{{ content.image.id }}/16x9/400.jpg" alt="{{ content.image.alt }}" />
+                                <span ng-if="!content.image.id" class="no-image text-large"><i class="fa-exclamation-triangle fa"></i><span>No image selected.</span></span>
                             </a>
                         </div>
                         <div class="pull-right col-sm-9 col-xs-12">
                             <div class="pull-right col-xs-5 col-med-7 col-lg-3">
                                 <h6>Actions</h6>
-                                <div class="form-group"><a class="form-control btn btn-success" href="/cms/app/edit/{{article.id}}">Edit article&nbsp;&nbsp;<i class="fa fa-pencil"></i></a></div>
-                                <div class="form-group"><a class="form-control btn btn-primary" ng-show="article.id > -1" target="_blank" href="/r/{{article.id}}">Preview&nbsp;&nbsp;<i class="fa fa-share"></i></a></div>
+                                <div class="form-group"><a class="form-control btn btn-success" href="/cms/app/edit/{{content.id}}">Edit content&nbsp;&nbsp;<i class="fa fa-pencil"></i></a></div>
+                                <div class="form-group"><a class="form-control btn btn-primary" ng-show="content.id > -1" target="_blank" href="/r/{{content.id}}">Preview&nbsp;&nbsp;<i class="fa fa-share"></i></a></div>
 
-                                <div class="form-group"><a class="form-control btn btn-primary" ng-show="article.id > -1" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate">Edit publish time&nbsp;&nbsp;<i class="fa fa-calendar"></i></a></div>
+                                <div class="form-group"><a class="form-control btn btn-primary" ng-show="content.id > -1" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate">Edit publish time&nbsp;&nbsp;<i class="fa fa-calendar"></i></a></div>
 
-                                <div class="form-group"><a class="form-control btn btn-warning" href="#" ng-show="article.published" confirmed-click="pubUnpublish(article);" ng-confirm-click="Are you sure you want to unpublish this article?">Unpublish</a></div>
+                                <div class="form-group"><a class="form-control btn btn-warning" href="#" ng-show="content.published" confirmed-click="pubUnpublish(content);" ng-confirm-click="Are you sure you want to unpublish this content?">Unpublish</a></div>
 
-                                <div class="form-group"><a class="form-control btn btn-danger" href="#" ng-hide="article.published" ng-click="trashContent(article.id);">Delete&nbsp;&nbsp;<i class="fa fa-trash"></i></a></div>
+                                <div class="form-group"><a class="form-control btn btn-danger" href="#" ng-hide="content.published" ng-click="trashContent(content.id);">Delete&nbsp;&nbsp;<i class="fa fa-trash"></i></a></div>
                             </div>
                             <dl class="pull-left col-xs-7 col-med-4 col-lg-9">
                                 <dt>Status</dt>
                                 <dd>
-                                    <a class="text-success" ng-show="article.status == 'Published'" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" >{{ article.published|date:"EEE',' M/d/yy' at ' h:mm a" }}</a>
+                                    <a class="text-success" ng-show="content.status == 'Published'" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" >{{ content.published|date:"EEE',' M/d/yy' at ' h:mm a" }}</a>
 
-                                    <a class="text-info" ng-hide="article.published" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" >Draft</a>
+                                    <a class="text-info" ng-hide="content.published" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" >Draft</a>
 
-                                    <a class="text-info" ng-show="article.status == 'Scheduled'" ng-click="openPubTimeModal(article);" data-toggle="modal" data-target="#chooseDate" ><strong>Scheduled</strong> for {{ article.published|date:"EEE M/d/yy 'at' h:mm a" }}</a>
+                                    <a class="text-info" ng-show="content.status == 'Scheduled'" ng-click="openPubTimeModal(content);" data-toggle="modal" data-target="#chooseDate" ><strong>Scheduled</strong> for {{ content.published|date:"EEE M/d/yy 'at' h:mm a" }}</a>
                                 </dd>
 
-                                <dt ng-show="article.authors">Author<span ng-show="article.authors.length > 1">s</span></dt>
-                                <dd class="author"><span ng-repeat="author in article.authors">{{ author.first_name }} {{ author.last_name }}<span ng-show="!$last">, </span></span></dd>
+                                <dt ng-show="content.authors">Author<span ng-show="content.authors.length > 1">s</span></dt>
+                                <dd class="author"><span ng-repeat="author in content.authors">{{ author.first_name }} {{ author.last_name }}<span ng-show="!$last">, </span></span></dd>
 
-                                <dt ng-show="article.feature_type">Feature type</dt>
-                                <dd class="feature-type">{{ article.feature_type }}</dd>
+                                <dt ng-show="content.feature_type">Feature type</dt>
+                                <dd class="feature-type">{{ content.feature_type }}</dd>
 
-                                <dt ng-show="article.tags">Tags</dt>
-                                <dd class="section"><span ng-repeat="tag in article.tags">{{ tag.name | truncateByWords:3 }}<span ng-show="!$last">, </span></span></dd>
+                                <dt ng-show"content.tags">Tags</dt>
+                                <dd class="section"><span ng-repeat="tag in content.tags">{{ tag.name | truncateByWords:3 }}<span ng-show="!$last">, </span></span></dd>
 
-                                <dt ng-show="article.id">Article ID</dt>
-                                <dd>{{ article.id }}</dd>
+                                <dt ng-show="content.id">Article ID</dt>
+                                <dd>{{ content.id }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
     </table>
 </div>
 <div class="row">
-    <pagination max-size="10" total-items="totalItems" page="currentPage" items-per-page="20" on-select-page="go_to_page(page);" boundary-links="true"></pagination>
+    <pagination max-size="10" total-items="totalItems" page="currentPage" items-per-page="20" on-select-page="goToPage(page);" boundary-links="true"></pagination>
 </div>
 <publish-content></publish-content>
 <trash-content></trash-content>
