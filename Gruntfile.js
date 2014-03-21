@@ -360,9 +360,30 @@ module.exports = function (grunt) {
         }
       }
     },
-
+    express: {
+      options: {
+        // Override defaults here
+      },
+      dev: {
+        options: {
+          script: 'server/server.js'
+        }
+      },
+      prod: {
+        options: {
+          script: 'server/server.js',
+          node_env: 'production'
+        }
+      },
+      test: {
+        options: {
+          script: 'server/server.js'
+        }
+      }
+    }
   });
 
+  grunt.loadNpmTasks('grunt-express-server');
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
