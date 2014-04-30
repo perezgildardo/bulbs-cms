@@ -38,6 +38,9 @@ angular.module('bulbsCmsApp.mockApi').run([
     // things
     $httpBackend.whenGET(/^\/cms\/api\/v1\/things.*/).respond(mockApiData['things.list']);
 
+    // change log
+    $httpBackend.whenGET(/^\/cms\/api\/v1\/log.*/).respond(mockApiData['changelog']);
+
     // promotions contentlist
     var contentlist = {
       count: 5,
@@ -310,5 +313,47 @@ angular.module('bulbsCmsApp.mockApi').run([
       {'id': 4, 'name': 'Quizzes'},
       {'id': 5, 'name': 'Business'}
     ]
-  }
+  },
+  "changelog": [
+    {
+      id: 5,
+      action_time: "2014-04-28T06:51:39.427Z",
+      content_type: 15,
+      object_id: "1",
+      user: 1,
+      change_message: "Published"
+    },
+    {
+      id: 4,
+      action_time: "2014-04-28T06:51:39.427Z",
+      content_type: 15,
+      object_id: "1",
+      user: 1,
+      change_message: "Scheduled"
+    },
+    {
+      id: 3,
+      action_time: "2014-04-28T06:51:21.550Z",
+      content_type: 15,
+      object_id: "1",
+      user: 1,
+      change_message: "Waiting for Editor"
+    },
+    {
+      id: 2,
+      action_time: "2014-04-28T06:51:09.732Z",
+      content_type: 15,
+      object_id: "1",
+      user: 1,
+      change_message: "Saved"
+    },
+    {
+      id: 1,
+      action_time: "2014-04-28T06:47:49.576Z",
+      content_type: 15,
+      object_id: "1",
+      user: 1,
+      change_message: "Created"
+    }
+  ]
 });
