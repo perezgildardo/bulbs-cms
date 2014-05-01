@@ -7,6 +7,7 @@ angular.module('bulbsCmsApp')
 
     ContentApi.all('log').getList({content: article.id}).then(function (data) {
       $scope.changelog = data;
+      $scope.changelog.reverse();
       var userIds = _.unique(_.pluck(data, 'user'));
       for(var i in userIds){
         ContentApi.one('user', userIds[i]).get().then(function (data) {
