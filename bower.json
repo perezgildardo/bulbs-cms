@@ -21,7 +21,7 @@
     "jcrop": "0.9.12",
     "urlify": "theonion/urlify",
     "angular-bootstrap-datetimepicker": "~0.2.2",
-    "onion-editor": "^0.1.8",
+    "onion-editor": "theonion/editor#558a28e23cc417cf63d6db8cca263ed439b277b4",
     "restangular": "~1.4.0"
   },
   "devDependencies": {
