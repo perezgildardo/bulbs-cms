@@ -18,7 +18,9 @@ angular.module('bulbsCmsApp')
             return;
         }
         ngModel.$render = function() {
-          console.log("model value", ngModel.$viewValue);
+        
+
+
           editor.setContent(ngModel.$viewValue || '');
         }
         // Write data to the model

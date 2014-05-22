@@ -174,14 +174,8 @@ angular.module('bulbsCmsApp')
 
       var data = $scope.article;
 
-      $scope.article.title = $scope.editors.content_title_editor.getContent();
       if ($scope.article.status !== 'Published') {
         $scope.article.slug = $window.URLify($scope.article.title, 50);
-      }
-      $scope.article.subhead = $scope.editors.content_subhead_editor.getContent();
-
-      if ($scope.editors.content_body_editor) {
-        $scope.article.body = $scope.editors.content_body_editor.getContent();
       }
 
       //because media_items get saved to a different API,
@@ -310,24 +304,6 @@ angular.module('bulbsCmsApp')
 
     $('#extra-info-modal').on('shown.bs.modal', function () { $window.picturefill(); });
 
-    $scope.initEditor = function (name, id, options, articleField) {
-      $scope.editors = $scope.editors || {};
-      $scope.editors[name] = new window.Editor(options);
-      angular.element(id + ' .editor').bind('input', function () {
-        $scope.article[articleField] = $scope.editors[name].getContent();
-      });
-
-
-    };
-
-    //exporting this to global so editor snippets can self-instantiate
-    $window.initEditor = $scope.initEditor;
-
-    $scope.$on('$destroy', function () {
-      for (var editor in $scope.editors) {
-        $scope.editors[editor].destroy();
-      }
-    });
 
     $scope.addRating = function (type) {
       $scope.article.ratings.push({
