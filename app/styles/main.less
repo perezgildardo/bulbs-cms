@@ -30,11 +30,9 @@ body { background-color: #F1F1F1; padding-top: 55px; }
 
     &.form-horizontal .control-group, &.form-horizontal legend { margin-bottom: 10px } }
 
-#logo { width: 35px; height: 35px; padding: 5px;
+#logo { height: auto; padding: 7px 8px;
 
-    img { width: 100%; height: 100%; } }
-
-.navbar-brand { padding: 0px; margin-left: 15px; }
+    img { max-height: 20px; } }
 
 #button-area { position: fixed; right: 25px; top: 25px; display: block; }
 
@@ -146,7 +144,25 @@ td.author { max-width: 150px; }
         button.go{ width: 100%; margin-top: 5px; } } }
 
 /* navbar */
-nav.navbar ul li:not(:first-child){ border-left: 1px solid #F1F1F1; }
+nav.navbar {
+
+    .navbar-toggle { margin-right: 1px; border: 0; border-radius: 0; padding: 10px; }
+
+    ul li {
+
+        &:not(:first-child){ border-left: 1px solid #F1F1F1; }
+
+        i { padding-right: 4px; margin-left: -4px; } }
+
+    .navbar-brand { padding: 0px; margin-left: 0; } }
+
+.navbar-save { font-size: inherit; line-height: inherit; margin: 1px;
+
+    &.visible-xs-inline { border-radius: 0; } }
+
+@media (min-width: 768px) { #save-article-btn { width: 100px; margin-right: 18px; margin-left: 3px; } }
+
+.changeable span { border-bottom: 1px dotted #777 !important; }
 
 .filterwidget { position: relative; }
 
@@ -256,7 +272,7 @@ nav.navbar ul li:not(:first-child){ border-left: 1px solid #F1F1F1; }
 
     .panel-body { margin-bottom: 0; }
 
-    .article { position: relative; 
+    .article { position: relative;
 
         h1.h5 { margin-top: 0; clear: both; padding-top: 5px; } }
 
@@ -264,7 +280,7 @@ nav.navbar ul li:not(:first-child){ border-left: 1px solid #F1F1F1; }
 
     .media { border-bottom: 1px solid #ccc; padding: 10px 10px 10px 0; }
 
-    .move-up, .move-down { margin: 0; position: absolute; right: 10px; z-index: 10; cursor: pointer; 
+    .move-up, .move-down { margin: 0; position: absolute; right: 10px; z-index: 10; cursor: pointer;
 
         &:hover { color: lighten(#428BCA,20%); } }
 
@@ -290,6 +306,21 @@ nav.navbar ul li:not(:first-child){ border-left: 1px solid #F1F1F1; }
 
         .sidebar-articles-container { width: 100% } } }
 
-.save-button { opacity: 0.8; margin-bottom:10px; 
+.save-button { opacity: 0.8; margin-bottom:10px;
 
     &:hover { opacity: 1; } }
+
+.btn-clean { opacity: 0.5; }
+
+// workaround for https://github.com/twbs/bootstrap/issues/10263
+@media screen and (max-width: 768px) {
+    .visible-xs-inline {
+        display: inline-block !important;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .visible-xs-inline {
+        display: none !important;
+    }
+}
