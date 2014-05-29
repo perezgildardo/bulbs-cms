@@ -34,7 +34,8 @@ angular.module('bulbsCmsApp')
           }
 
           if (file.type.indexOf('video/') !== 0) {
-            deferred.reject("You must upload a video file.");
+            alert("You must upload a video file.");
+            return;
           }
         } else {
           return;
