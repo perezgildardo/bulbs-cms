@@ -6,12 +6,14 @@ angular.module('bulbsCmsApp')
     $location, $timeout, $interval, $compile, $q, $modal,
     $, _, keypress,
     IfExistsElse, Localstoragebackup, ContentApi, ReviewApi, Login,
-    routes)
+    Zencoder, routes)
   {
     $scope.PARTIALS_URL = routes.PARTIALS_URL;
     $scope.CONTENT_PARTIALS_URL = routes.CONTENT_PARTIALS_URL;
     $scope.MEDIA_ITEM_PARTIALS_URL = routes.MEDIA_ITEM_PARTIALS_URL;
     $scope.CACHEBUSTER = routes.CACHEBUSTER;
+
+    $scope.onVideoFileUpload = Zencoder.onVideoFileUpload;
 
     var getArticleCallback = function (data) {
       $window.article = $scope.article = data;
