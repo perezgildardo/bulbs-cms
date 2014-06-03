@@ -5,7 +5,6 @@ angular.module('bulbsCmsApp')
 
     /* Gab configuration out of .  */
 
-
     return {
       require: 'ngModel',
       replace: true,
@@ -13,7 +12,6 @@ angular.module('bulbsCmsApp')
       templateUrl: routes.PARTIALS_URL + 'editor.html',
       link: function(scope, element, attrs, ngModel) {
 
-        console.log(attrs.role);
         if (!ngModel) {
             return;
         }
@@ -29,16 +27,15 @@ angular.module('bulbsCmsApp')
         }
 
         // Set up onion editor stuff
+        var options = {
+          multiline: (attrs.role === "multiline"),
+        }
+        if (attrs.inlineObjects) {
+          options.inlineObjects = attrs.inlineObjects;
+        }
 
-        var isMultiline = (attrs.role === "multiline");
 
-
-
-        var editor = new OnionEditor($(".editor", element)[0], {
-          content: ngModel.$viewValue,
-          multiline: isMultiline
-          
-        });
+        var editor = new OnionEditor($(".editor", element)[0], options);
         scope.$watch(ngModel, function() {
             editor.setContent(ngModel.$viewValue);
         });
