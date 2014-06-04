@@ -4,53 +4,56 @@ angular.module('bulbsCmsApp')
   .service('Zencoder', function Zencoder($http, $q, $, $window) {
     var newVideoUrl = '/video/new';
     var fileInputId = '#bulbs-cms-hidden-video-file-input'
-    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" style="position: absolute; left:-99999px;" name="video" />'
-
-    console.log("Zencoder")
+    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />'
 
     this.onVideoFileUpload = function(){
-      //attach this via ng-click to any element
-      console.log("onVideoFileUpload")
-      console.log(this)
-
-      var deferred = $q.defer();
+      var clickDeferred = $q.defer();
 
       angular.element(fileInputId).remove();
       var fileInput = angular.element(inputTemplate);
+      var file;
       angular.element('body').append(fileInput);
       fileInput.click();
       fileInput.unbind('change');
       fileInput.bind('change', function(elem){
-        var fileInput = $("#s3upload-file-input")[0];
-        var file;
-
-        if(fileInput.files.length !== 0) {
-          file = fileInput.files[0];
+        if(this.files.length !== 0) {
+          file = this.files[0];
 
           // We have a file upload limit of 1024MB
           if (file.size > (1024 * 1024 * 1024)) {
-            alert("Upload file cannot be larger than 1024MB.");
-            return;
+            clickDeferred.reject("Upload file cannot be larger than 1024MB.");
           }
 
           if (file.type.indexOf('video/') !== 0) {
-            alert("You must upload a video file.");
-            return;
+            clickDeferred.reject("You must upload a video file.");
           }
         } else {
-          return;
+          clickDeferred.reject("Please select a file.")
         }
+
+        getNewVideoUploadCredentials(file)
+          .then(uploadToS3)
+          .then(encode, angular.noop, function(uploadPercentComplete){ clickDeferred.notify(uploadPercentComplete) })
+          .then(
+            function(videoObject){
+              clickDeferred.resolve(videoObject);
+            },
+            function(error){
+              clickDeferred.reject(error);
+            }
+          );
+
       });
 
-      return deferred.promise;
-
-
+      return clickDeferred.promise;
 
     }
 
-    $window.getNewVideoUploadCredentials = function(videoName) {
-      var data = {name: videoName}
+    function getNewVideoUploadCredentials(file) {
+      var data = {name: file.name}
       data = $.param(data);
+
+      var newVideoDeferred = $q.defer();
 
       $http({
         method: 'POST',
@@ -58,11 +61,72 @@ angular.module('bulbsCmsApp')
         data: data,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
       }).success(function(data){
-        console.log(data);
+        newVideoDeferred.resolve({
+          file: file,
+          attrs: data
+        })
       }).error(function(data){
-        console.log(data);
+        newVideoDeferred.reject(data);
       });
+
+      return newVideoDeferred.promise;
     };
 
+    function uploadToS3(videoObject) {
+      var s3deferred = $q.defer();
+
+      var formData = new FormData();
+
+      formData.append('key', videoObject.attrs.key);
+      formData.append('AWSAccessKeyId', videoObject.attrs.AWSAccessKeyId);
+      formData.append('acl', videoObject.attrs.acl);
+      formData.append('success_action_status', videoObject.attrs.success_action_status);
+      formData.append('policy', videoObject.attrs.policy);
+      formData.append('signature', videoObject.attrs.signature);
+      formData.append('file', videoObject.file);
+
+      //todo: use a vanilla XMLHttpRequest in heyea
+      $.ajax(videoObject.attrs.upload_endpoint, {
+        processData: false,
+        contentType: false,
+        data: formData,
+        type: "POST",
+        xhr: function() {
+          var req = $.ajaxSettings.xhr();
+          if (req) {
+            req.upload.addEventListener('progress', function(e) {
+              var percent = (e.loaded / e.total ) * 100;
+              s3deferred.notify(percent);
+            }, false);
+          }
+          return req;
+        },
+        success: function(data) {
+          s3deferred.resolve(videoObject);
+        },
+        error: function(data){
+          s3deferred.reject(data);
+        }
+      });
+
+      return s3deferred.promise;
+
+    }
+
+    function encode(videoObject) {
+      var encodeDeferred = $q.defer();
+
+      $http({
+        method: 'POST',
+        url: '/video/' + videoObject.attrs.id + '/encode'
+      }).success(function(data){
+        videoObject['encode'] = data;
+        encodeDeferred.resolve(videoObject);
+      }).error(function(data){
+        encodeDeferred.reject(data);
+      });
+
+      return encodeDeferred.promise;
+    }
 
   });

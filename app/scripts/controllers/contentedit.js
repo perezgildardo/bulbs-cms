@@ -13,8 +13,6 @@ angular.module('bulbsCmsApp')
     $scope.MEDIA_ITEM_PARTIALS_URL = routes.MEDIA_ITEM_PARTIALS_URL;
     $scope.CACHEBUSTER = routes.CACHEBUSTER;
 
-    $scope.onVideoFileUpload = Zencoder.onVideoFileUpload;
-
     var getArticleCallback = function (data) {
       $window.article = $scope.article = data;
       if ($location.search().rating_type && (!data.ratings || data.ratings.length === 0)) {
@@ -370,6 +368,20 @@ angular.module('bulbsCmsApp')
         $window.history.back();
       }, 1500);
     };
+
+    $scope.onVideoFileUpload = function (event) {
+      var element = event.target;
+      Zencoder.onVideoFileUpload().then(
+        function(success){
+          console.log(success);
+          $scope.article.video = success.attrs.id;
+        },
+        angular.noop,
+        function(progress){
+          console.log(progress);
+        }
+      );
+    }
 
 
     var backupInterval = (function(){
