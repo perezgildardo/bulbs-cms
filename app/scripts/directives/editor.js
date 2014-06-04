@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .directive('onionEditor', function (routes) {
+  .directive('onionEditor', function (routes, $, EDITOR_INLINE_OPTIONS) {
 
     /* Gab configuration out of .  */
 
@@ -25,19 +25,48 @@ angular.module('bulbsCmsApp')
           // If strip-br attribute is provided then we strip this out
           ngModel.$setViewValue(html);
         }
-
-        // Set up onion editor stuff
-        var options = {
-          multiline: (attrs.role === "multiline"),
+        if (attrs.role == "multiline") {
+          var defaultValue = "<p><br></p>";
+          var options = {
+            /* global options */
+            element: element[0],
+            toolbar: {
+              linkTools: $("#link-tools-template").html()
+            },
+            undoManager: new UndoManager(),
+            placeholder: "Write here",
+            editSource: true,
+            // NOT SURE WHAT TO DO ABOUT THIS....
+            avlink: {
+              thingsUrl: "/cms/api/v1/things/",
+              contentUrl:"/cms/api/v1/content/",
+              host: "avclub.com"
+            },
+            statsContainer: ".wordcount",
+            /* This probably deserves its own file */
+            inline: EDITOR_INLINE_OPTIONS
+          }
         }
-        if (attrs.inlineObjects) {
-          options.inlineObjects = attrs.inlineObjects;
+        else {
+          $(".document-tools, .embed-tools", element).hide();
+          var defaultValue = "";
+          var options = {
+            /* global options */
+            element: element[0],
+            placeholder: "Type your Headline",
+            allowNewline: false,
+            allowNbsp: false,
+            characterLimit: 200,
+            sanitize: {
+              elements: ['i', 'em'],
+              remove_contents: ['script', 'style', ],
+            }
+          }
         }
 
-
-        var editor = new OnionEditor($(".editor", element)[0], options);
+        var editor = new Editor(options);
         scope.$watch(ngModel, function() {
-            editor.setContent(ngModel.$viewValue);
+          editor.setContent(ngModel.$viewValue || defaultValue);
         });
       }
     };

@@ -5,7 +5,7 @@ Image
 This bridges the embed module that the editor exposes & our custom image implementation.
 
 */
-/*
+
 (function(global) {
    'use strict';
     var OnionCmsUI = OnionCmsUI  || function(editor, options) {
@@ -44,6 +44,8 @@ This bridges the embed module that the editor exposes & our custom image impleme
         editor.on("inline:insert:image", uploadImage);
 
         function uploadImage(options) {
+
+            //CHANGE THIS METHOD DO SOMETHING SET VIA OPTIONS
             global.uploadImage({onProgress: onProgress,
                                 onSuccess: onSuccess,
                                 onError: onError,
@@ -261,7 +263,7 @@ This bridges the embed module that the editor exposes & our custom image impleme
     }
     global.EditorModules.push(HR);
 })(this);
-*/
+
 /* prevents backspace from accidentally triggering a back event */
 
 $(document).unbind('keydown').bind('keydown', function (event) {

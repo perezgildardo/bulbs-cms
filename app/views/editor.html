@@ -1,5 +1,6 @@
 <div class="editor-wrapper">
-    <div class="editor"></div>{{ role }}
+    <div class="editorPlaceholder"></div>
+    <div class="editor" contenteditable="true"></div>{{ role }}
     <div class="document-tools toolbar fixed">
       <div class="toolbar-contents">
         <button data-command-name="linkPrompt"><span class="fa fa-link"></span><span class="btn-label">Link</span></button>
@@ -21,7 +22,7 @@
           <button data-command-name="image" title="Image">
               <span class="fa fa-picture-o"></span><span class="btn-label">Image</span>
           </button>
-          <button data-command-name="onion-video" title="AV Video">
+          <button data-command-name="onion-video" title="Video">
               <span class="fa fa-film"></span><span class="btn-label">AV Video</span>
           </button>
           <button data-command-name="youtube" title="Youtube">
@@ -30,15 +31,13 @@
           <button data-command-name="embed" title="Embed Something">
               <span class="fa fa-code"></span><span class="btn-label">Embed Something</span>
           </button>
-          <button data-command-name="articlelist" title="Related Article List">
-              <span class="fa fa-file"></span><span class="btn-label">Related Article List</span>
-          </button>
           <button data-command-name="hr" title="HR">
               <span class="fa fa-minus"></span><span class="btn-label">Horizontal Rule</span>
           </button>
         </div>
       </div>
     </div>
+    <div class="link-tools toolbar"></div>
     <div class="inline-tools toolbar" style="display: none;">
         <div class="top toolbar-contents">
             <div>
