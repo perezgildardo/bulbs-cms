@@ -5,24 +5,17 @@
       <sections-field article="article"></sections-field></div>
 
     <div class="content-edit-tags">
-      <tags-field article="article"></tags-field></div></div>
-</section>
+      <tags-field article="article"></tags-field></div></div></section>
 
 <section class="main-image row">
   <div class="clearfix well">
-    <bettyeditable image="article.image" ratio="16x9" placeholder-text="Optional Main Image" add-styles="fa fa-picture-o add-feature-image"/>
-  </div>
-</section>
+    <bettyeditable image="article.image" ratio="16x9" placeholder-text="Optional Main Image" add-styles="fa fa-picture-o add-feature-image"/></div></section>
 
 <section>
-    <onion-editor id="content-title" ng-model="article.title" role="singleline"></onion-editor>
-
-    <onion-editor id="content-subhead" ng-model="article.subhead" role="singleline"></onion-editor>
-
-</section>
+  <onion-editor id="content-title" ng-model="article.title" role="singleline"></onion-editor>
+  <onion-editor id="content-subhead" ng-model="article.subhead" role="singleline"></onion-editor></section>
 
 <section>
-    <authors-field article="article"></authors-field>
-</section>
+  <authors-field article="article"></authors-field></section>
 
 <onion-editor id="content-body" ng-model="article.body" role="multiline" inline-objects="{{PARTIALS_URL + 'inline.json'}}"/>
