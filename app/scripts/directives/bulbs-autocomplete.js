@@ -67,14 +67,12 @@ angular.module('bulbsCmsApp')
         function getAutocompletes(val) {
           $timeout.cancel(inputTimeout);
           inputCounter = 0;
-          console.log(scope.resourceUrl)
           $http({
             method: 'GET',
             url: scope.resourceUrl + val
           }).success(function (data) {
             var results = data.results || data;
             scope.autocomplete_list = results.splice(0, 5);
-            console.log(scope.autocomplete_list)
           }).error(function (data, status, headers, config) {
             if (status === 403) {
               Login.showLoginModal();
