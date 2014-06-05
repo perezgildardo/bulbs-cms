@@ -17,6 +17,9 @@
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-switch/build/css/bootstrap3/bootstrap-switch.css" />
     <link rel="stylesheet" href="bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css" />
+    <link rel="stylesheet" href="bower_components/pnotify/pnotify.core.css" />
+    <link rel="stylesheet" href="bower_components/pnotify/pnotify.buttons.css" />
+    <link rel="stylesheet" href="bower_components/pnotify/pnotify.history.css" />
     <!-- endbower -->
     <link rel="stylesheet" href="bower_components/jcrop/css/jquery.Jcrop.min.css" />
     <link rel="stylesheet" href="bower_components/nprogress/nprogress.css" />
@@ -80,6 +83,13 @@
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
     <script src="bower_components/restangular/dist/restangular.js"></script>
     <script src="bower_components/Keypress/keypress.js"></script>
+    <script src="bower_components/pnotify/pnotify.core.js"></script>
+    <script src="bower_components/pnotify/pnotify.buttons.js"></script>
+    <script src="bower_components/pnotify/pnotify.callbacks.js"></script>
+    <script src="bower_components/pnotify/pnotify.confirm.js"></script>
+    <script src="bower_components/pnotify/pnotify.desktop.js"></script>
+    <script src="bower_components/pnotify/pnotify.history.js"></script>
+    <script src="bower_components/pnotify/pnotify.nonblock.js"></script>
     <!-- endbower -->
     <script src="bower_components/jcrop/js/jquery.Jcrop.min.js"></script>
     <!-- endbuild -->
@@ -103,6 +113,7 @@
     <script src="scripts/directives/activenav.js"></script>
     <script src="scripts/directives/articlecontainer.js"></script>
     <script src="scripts/directives/bulbs-autocomplete.js"></script>
+    <script src="scripts/directives/bugreporter.js"></script>
     <script src="scripts/directives/bettyeditable.js"></script>
     <script src="scripts/directives/bettyimage.js"></script>
     <script src="scripts/directives/create-content.js"></script>
@@ -111,7 +122,9 @@
     <script src="scripts/directives/imagedrawer.js"></script>
     <script src="scripts/directives/listinput.js"></script>
     <script src="scripts/directives/video-upload.js"></script>
+    <script src="scripts/directives/logged-in-user.js"></script>
     <script src="scripts/directives/media-rating.js"></script>
+    <script src="scripts/directives/nav.js"></script>
     <script src="scripts/directives/responsive-image.js"></script>
     <script src="scripts/directives/save-button.js"></script>
     <script src="scripts/directives/slideshow-pane.js"></script>
@@ -128,12 +141,12 @@
     <script src="scripts/services/if-exists-else.js"></script>
     <script src="scripts/services/openimagecropmodal.js"></script>
     <script src="scripts/services/bulbsapi.js"></script>
+    <script src="scripts/services/currentuser.js"></script>
     <script src="scripts/services/contentapi.js"></script>
     <script src="scripts/services/reviewapi.js"></script>
     <script src="scripts/services/promotionapi.js"></script>
     <script src="scripts/services/adapi.js"></script>
     <script src="scripts/services/login.js"></script>
-    <script src="scripts/controllers/sendtoeditormodal.js"></script>
     <script src="scripts/filters/tzdate.js"></script>
     <script src="scripts/controllers/changelogmodal.js"></script>
     <script src="scripts/controllers/versionbrowsermodal.js"></script>
@@ -199,6 +212,8 @@
         angular.module('bulbsCmsApp').constant('promo_options', {
           upper_limits: {}
         });
+
+        angular.module('bulbsCmsApp').constant('navbar_options', {});
     </script>
 
     <script>
@@ -218,6 +233,7 @@
           $(this).attr("target", "_self");
         });
     </script>
+    <bug-reporter/>
 
 </body>
 </html>
