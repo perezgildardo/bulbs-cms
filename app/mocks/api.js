@@ -257,7 +257,7 @@ angular.module('bulbsCmsApp.mockApi').run([
       title: "This is a draft article",
       slug: "this-is-a-draft-article",
       feature_type: null,
-      body: "This is a draft article. It was written by First Last. It is a Feature Type article.",
+      body: "<p>This is a draft article. It was written by First Last. It is a Feature Type article.</p>",
       last_modified: "2015-04-08T15:35:15.118Z"
     }, {
       polymorphic_ctype: "content_content",
@@ -295,7 +295,7 @@ angular.module('bulbsCmsApp.mockApi').run([
       feature_type: "Feature Type 1",
       subhead: "",
       indexed: true,
-      body: "This is a body",
+      body: "<p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p>",
       client_pixel: null,
       sponsor_name: null
     }, {
@@ -348,7 +348,7 @@ angular.module('bulbsCmsApp.mockApi').run([
       description: "",
       subhead: "",
       indexed: true,
-      body: "This is a body",
+      body: "<p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p><p>This is a body</p>",
       client_pixel: null,
       sponsor_name: null
     }, {
