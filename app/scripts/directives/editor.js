@@ -13,14 +13,14 @@ angular.module('bulbsCmsApp')
       link: function(scope, element, attrs, ngModel) {
 
         if (!ngModel) {
-            return;
+          return;
         }
         ngModel.$render = function() {
           editor.setContent(ngModel.$viewValue || '');
         }
         // Write data to the model
         function read() {
-          var html = editor.getContent(); 
+          var html = editor.getContent();
           // When we clear the content editable the browser leaves a <br> behind
           // If strip-br attribute is provided then we strip this out
           ngModel.$setViewValue(html);
