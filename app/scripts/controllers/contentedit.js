@@ -84,60 +84,6 @@ angular.module('bulbsCmsApp')
       $(input).val('');
     };
 
-    $scope.removeTag = function (e) {
-      var tag = $(e.target).parents('[data-tag]').data('tag');
-      var name = tag.name;
-      var newtags = [];
-      for (var i in $scope.article.tags) {
-        if ($scope.article.tags[i].name !== name) {
-          newtags.push($scope.article.tags[i]);
-        }
-      }
-      $scope.article.tags = newtags;
-    };
-
-    $scope.removeAuthor = function (e) {
-      var author = $(e.target).parents('[data-author]').data('author');
-      var id = author.id;
-      var newauthors = [];
-      for (var i in $scope.article.authors) {
-        if ($scope.article.authors[i].id !== id) {
-          newauthors.push($scope.article.authors[i]);
-        }
-      }
-      $scope.article.authors = newauthors;
-    };
-
-    $scope.featureTypeDisplayFn = function (o) {
-      return o.name;
-    };
-
-    $scope.featureTypeCallback = function (o, input, freeForm) {
-      var fVal = freeForm ? o : o.name;
-      IfExistsElse.ifExistsElse(
-        ContentApi.all('things').getList({
-          type: 'feature_type',
-          q: fVal
-        }),
-        {name: fVal},
-        function (ft) { $scope.article.feature_type = ft.name; $('#feature-type-container').removeClass('newtag'); },
-        function (value) { $scope.article.feature_type = value.name; $('#feature-type-container').addClass('newtag'); },
-        function (data, status) { if (status === 403) { Login.showLoginModal(); } }
-      );
-    };
-
-    $scope.authorDisplayFn = function (o) {
-      return (o.first_name && o.last_name && o.first_name + ' ' + o.last_name) || 'username: ' + o.username;
-    };
-
-    $scope.authorCallback = function (o, input) {
-      for (var t in $scope.article.authors) {
-        if ($scope.article.authors[t].id === o.id) { return; }
-      }
-      $scope.article.authors.push(o);
-      $(input).val('');
-    };
-
     $scope.saveArticleDeferred = $q.defer();
     $scope.mediaItemCallbackCounter = undefined;
     $scope.$watch('mediaItemCallbackCounter', function () {
@@ -298,10 +244,6 @@ angular.module('bulbsCmsApp')
       $location.search('rating_type', null); //maybe just kill the whole query string with $location.url($location.path())
       $scope.saveArticleDeferred.resolve(resp);
     }
-
-    $scope.displayAuthorAutocomplete = function (obj) {
-      return obj.first_name + ' ' + obj.last_name;
-    };
 
     $scope.$watch('article', function(){
       if(angular.equals($scope.article, $scope.last_saved_article)){
