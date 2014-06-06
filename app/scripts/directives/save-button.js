@@ -9,17 +9,19 @@ angular.module('bulbsCmsApp')
       scope: {
         'getPromise': '&',
         'saveCbk': '&onSave',
-        'config': '=?'
+        'config': '=?',
+        'colors': '@?colorStyling'
       },
       link: function (scope, element, attrs) {
+        scope.colors_tmp = scope.colors;
 
         attrs.$observe('config', function (val) {
           if (!angular.isDefined(val)) {
             scope.config = {
               idle: '<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save',
               busy: 'Saving',
-              finished: 'Saved!',
-              error: 'Error!'
+              finished: 'Saved',
+              error: 'Error'
             };
           }
         });
@@ -30,20 +32,21 @@ angular.module('bulbsCmsApp')
 
         scope.save = function () {
           NProgress.start();
+          scope.colors = scope.colors_tmp;
           element
             .prop('disabled', true)
-            .removeClass('btn-danger')
             .html('<i class=\'fa fa-refresh fa-spin\'></i> ' + scope.config.busy);
 
           var save_promise = scope.getPromise();
 
-          var promise = save_promise.then(
+          var promise = save_promise
+          .then(
             function (result) {
               NProgress.done();
+              scope.colors = scope.colors_tmp;
               element
                 .prop('disabled', false)
-                .removeClass('btn-danger')
-                .html('<i class=\'fa fa-check\'></i> ' + scope.config.finished);
+                .html('<i class=\'glyphicon glyphicon-ok\'></i> ' + scope.config.finished);
 
               return $timeout(function () {
                 element.html(scope.config.idle);
@@ -51,13 +54,14 @@ angular.module('bulbsCmsApp')
               .then(function () {
                 return result;
               });
-            },
+            })
+          .catch(
             function (reason) {
               NProgress.done();
+              scope.colors = 'btn-danger';
               element
                 .prop('disabled', false)
-                .addClass('btn-danger')
-                .html('<i class=\'fa fa-frown-o\' style=\'color:red\'></i> ' + scope.config.error);
+                .html('<i class=\'glyphicon glyphicon-remove\'></i> ' + scope.config.error);
 
               return $q.reject(reason);
             });
