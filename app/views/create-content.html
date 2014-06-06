@@ -102,7 +102,6 @@
           <button class="btn btn-default pull-left" ng-show="panel == 2" ng-click="panel = 1;" aria-hidden="true">Back</button>
           <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Cancel</button>
           <button class="btn btn-primary next-pane" aria-hidden="true" ng-show="panel == 1" ng-click="panel = 2;">Next <span class="fa fa-angle-double-right"></span></button>
-          {{ newTitle }}
           <button type="button" class="btn btn-success go" ng-show="panel == 2" ng-class="{ disabled: !newTitle || newTitle.length === 0 }" ng-click="newArticle();">Create article </button>
         </div>
       </div>

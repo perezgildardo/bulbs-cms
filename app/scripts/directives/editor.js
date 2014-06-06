@@ -10,26 +10,19 @@ angular.module('bulbsCmsApp')
       replace: true,
       restrict: 'E',
       templateUrl: routes.PARTIALS_URL + 'editor.html',
+      scope: {ngModel:'='},
       link: function(scope, element, attrs, ngModel) {
 
         if (!ngModel) {
           return;
         }
-        ngModel.$render = function() {
-          editor.setContent(ngModel.$viewValue || '');
-        }
-        // Write data to the model
-        function read() {
-          var html = editor.getContent();
-          // When we clear the content editable the browser leaves a <br> behind
-          // If strip-br attribute is provided then we strip this out
-          ngModel.$setViewValue(html);
-        }
+
         if (attrs.role == "multiline") {
           var defaultValue = "<p><br></p>";
           var options = {
             /* global options */
             element: element[0],
+            onContentChange: read,
             toolbar: {
               linkTools: $("#link-tools-template").html()
             },
@@ -53,6 +46,7 @@ angular.module('bulbsCmsApp')
           var options = {
             /* global options */
             element: element[0],
+            onContentChange: read,
             placeholder: "Type your Headline",
             allowNewline: false,
             allowNbsp: false,
@@ -65,6 +59,18 @@ angular.module('bulbsCmsApp')
         }
 
         var editor = new Editor(options);
+
+        ngModel.$render = function() {
+          editor.setContent(ngModel.$viewValue || defaultValue);
+        }
+        // Write data to the model
+        function read() {
+          scope.$apply(function(){
+            var html = editor.getContent();
+            ngModel.$setViewValue(html);
+          });
+        }
+
         scope.$watch(ngModel, function() {
           editor.setContent(ngModel.$viewValue || defaultValue);
         });
