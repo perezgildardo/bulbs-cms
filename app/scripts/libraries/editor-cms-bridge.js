@@ -44,6 +44,8 @@ This bridges the embed module that the editor exposes & our custom image impleme
         editor.on("inline:insert:image", uploadImage);
 
         function uploadImage(options) {
+
+            //CHANGE THIS METHOD DO SOMETHING SET VIA OPTIONS
             global.uploadImage({onProgress: onProgress,
                                 onSuccess: onSuccess,
                                 onError: onError,

@@ -95,6 +95,8 @@
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/libraries/editor-cms-bridge.js"></script>
+
     <script src="scripts/app.js"></script>
 
     <script src="scripts/controllers/contentlist.js"></script>
@@ -130,11 +132,11 @@
     <script src="scripts/directives/slideshow-pane.js"></script>
     <script src="scripts/directives/targeting.js"></script>
     <script src="scripts/directives/titleimage.js"></script>
+    <script src="scripts/directives/editor.js"></script>
 
     <script src="scripts/filters/truncateByCharacters.js"></script>
     <script src="scripts/filters/truncateByWords.js"></script>
 
-    <script src="scripts/libraries/editor-cms-bridge.js"></script>
 
     <script src="scripts/modules/betty-cropper.js"></script>
 
@@ -155,6 +157,10 @@
     <script src="scripts/filters/user.js"></script>
     <script src="scripts/directives/status-filter.js"></script>
     <script src="scripts/services/zencoder.js"></script>
+    <script src="scripts/directives/authorsfield.js"></script>
+    <script src="scripts/directives/tagsfield.js"></script>
+    <script src="scripts/directives/featuretypefield.js"></script>
+    <script src="scripts/directives/sectionsfield.js"></script>
     <!-- endbuild -->
 
     <script src="bower_components/angular-mocks/angular-mocks.js"></script>
@@ -198,6 +204,81 @@
         angular.module('bulbsCmsApp').constant('TIMEZONE_LABEL', 'CST');
         angular.module('bulbsCmsApp').constant('AUTO_ADD_AUTHOR', true);
         angular.module('bulbsCmsApp').constant('DEFAULT_IMAGE_WIDTH', 1200);
+
+        /* THIS WILL GO AWAY in favor of the editor loading this info via json */
+        angular.module('bulbsCmsApp').constant('EDITOR_INLINE_OPTIONS', {
+              image: {
+                size: {
+                  "huge": ["original", "16x9", "1x1", "3x1"],
+                  "big": ["original", "16x9", "1x1", "3x1"],
+                  "medium": ["original", "16x9", "1x1", "3x1"],
+                  "small": ["original", "16x9", "1x1", "3x1"],
+                  "small-centered": ["original", "16x9", "1x1", "3x1"],
+                  "tiny": ["original", "16x9", "1x1", "3x1"],
+                },
+                defaults: {
+                  size: "big",
+                  crop: "original",
+                  image_id: 0,
+                  caption: "",
+                  url: ""
+                },
+                template:
+                  "<div data-type=\"image\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"> <div><noscript><img src=\"{{url}}\" ></noscript></div><span class=\"caption\">{{caption}}</span></div>"
+              },
+              embed: {
+                size: {
+                  "original": ["auto"],
+                  "big": ["16x9", "4x3"],
+                  "small": ["16x9", "4x3"]
+                },
+                defaults: {
+                  "size": "original",
+                  "crop": "auto",
+                  "caption": "",
+                  "source":"",
+                  "body":""
+                },
+                template:
+                  "<div data-type=\"embed\" data-crop=\"{{crop}}\" class=\"inline embed size-{{size}} crop-{{crop}}\" data-source=\"{{source}}\"><div>{{embed_code}}</div><span class=\"caption\">{{caption}}</span><a class=\"source\" target=\"_blank\" href=\"{{source}}\">Source</a></div>"
+              },
+              "onion-video": {
+                size: {
+                  "big": ["16x9"],
+                  "small": ["16x9"]
+                },
+                defaults: {
+                  "size": "big",
+                  "crop": "16x9",
+                  "caption": ""
+                },
+                template:
+                  "<div data-type=\"onion-video\" class=\"onion-video video inline size-{{size}} crop-{{crop}}\" data-video-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><iframe src=\"/videos/embed?id={{video_id}}\"></iframe></div>"
+              },
+              youtube: {
+                size: {
+                  "big": ["16x9", "4x3"],
+                  "small": ["16x9", "4x3"]
+                },
+                defaults: {
+                  size: "big",
+                  crop: "16x9",
+                  youtube_id: "foMQX9ZExsE",
+                  caption: ""
+                },
+                template:
+                  "<div data-type=\"youtube\" class=\"youtube inline size-{{size}} crop-{{crop}}\" data-youtube-id=\"{{youtube_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><div><img src=\"http://img.youtube.com/vi/{{youtube_id}}/hqdefault.jpg\"></div<span class=\"caption\">{{caption}}</span></div>"
+              },
+              hr: {
+                size: {
+                  "big": [],
+                },
+                defaults: {
+                  size:"big"
+                }
+              }
+            });
+
 
         // ****** CMS Plugins ****** \\
 
