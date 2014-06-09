@@ -8,6 +8,7 @@ angular.module('bulbsCmsApp')
       scope: {
         article: '='
       },
+      replace: true,
       link: function postLink(scope, element, attrs) {
         scope.name = 'feature_type';
         scope.label = 'Feature Type';
