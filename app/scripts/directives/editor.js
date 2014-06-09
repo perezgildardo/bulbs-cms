@@ -85,7 +85,7 @@ angular.module('bulbsCmsApp')
     };
 
   })
-  .directive('onionEditor', function (routes, $, Zencoder, EditorOptions) {
+  .directive('onionEditor', function (routes, $, Zencoder, EditorOptions, VIDEO_EMBED_URL) {
 
     /* Gab configuration out of .  */
 
@@ -122,7 +122,8 @@ angular.module('bulbsCmsApp')
             statsContainer: ".wordcount",
             /* This probably deserves its own file */
             inline: EditorOptions.getOptions(),
-            uploadVideo: Zencoder.onVideoFileUpload
+            uploadVideo: Zencoder.onVideoFileUpload,
+            videoEmbedUrl: VIDEO_EMBED_URL
           }
         }
         else {

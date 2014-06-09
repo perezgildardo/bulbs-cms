@@ -152,7 +152,7 @@ This bridges the embed module that the editor exposes & our custom image impleme
 
             function setVideoID(id) {
                 //insert image.
-                $("iframe", activeElement).attr("src", "/videos/embed?id=" + id);
+                $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
                 $(activeElement).attr('data-videoid', id)
             }
 
