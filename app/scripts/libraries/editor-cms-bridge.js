@@ -105,7 +105,7 @@ This bridges the embed module that the editor exposes & our custom image impleme
 
 (function(global) {
     'use strict';
-    var OnionVideo = OnionVideo || function(editor, options) {
+    var OnionVideo = OnionVideo || function(editor, instanceOptions) {
 
         editor.on("inline:edit:onion-video", editVideo);
         editor.on("inline:insert:onion-video", uploadVideo);
@@ -131,10 +131,10 @@ This bridges the embed module that the editor exposes & our custom image impleme
         }
 
         function uploadVideo(options) {
-            console.log("uploadvideo here", editor, options)
+            console.log("uploadvideo here", editor, instanceOptions, options)
             //return an identifier, for cancelling?
             var activeElement = options.onSuccess(options.block, {videoid:"NONE"});
-            editor.options.uploadVideo().then(
+            return instanceOptions.uploadVideo().then(
                 function(videoObject){
                     setVideoID(videoObject.attrs.id);
                 }, function(error){
