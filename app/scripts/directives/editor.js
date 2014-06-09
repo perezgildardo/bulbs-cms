@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .directive('onionEditor', function (routes, $, EDITOR_INLINE_OPTIONS) {
+  .directive('onionEditor', function (routes, $, Zencoder, EDITOR_INLINE_OPTIONS) {
 
     /* Gab configuration out of .  */
 
@@ -37,7 +37,8 @@ angular.module('bulbsCmsApp')
             },
             statsContainer: ".wordcount",
             /* This probably deserves its own file */
-            inline: EDITOR_INLINE_OPTIONS
+            inline: EDITOR_INLINE_OPTIONS,
+            uploadVideo: Zencoder.onVideoFileUpload
           }
         }
         else {

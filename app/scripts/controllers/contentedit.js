@@ -240,7 +240,6 @@ angular.module('bulbsCmsApp')
     }
 
     $scope.$watch('article', function(){
-      console.log("article watch!!")
       if(angular.equals($scope.article, $scope.last_saved_article)){
         $scope.articleIsDirty = false;
       }else{

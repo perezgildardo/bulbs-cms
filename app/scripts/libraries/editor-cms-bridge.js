@@ -131,14 +131,18 @@ This bridges the embed module that the editor exposes & our custom image impleme
         }
 
         function uploadVideo(options) {
+            console.log("uploadvideo here", editor, options)
             //return an identifier, for cancelling?
             var activeElement = options.onSuccess(options.block, {videoid:"NONE"});
-            global.uploadVideo(activeElement, {
-                onSuccess: setVideoID,
-                onProgess:onProgress,
-                onError:onError,
-                onCancel:onCancel
-            });
+            editor.options.uploadVideo().then(
+                function(videoObject){
+                    setVideoID(videoObject.attrs.id);
+                }, function(error){
+                    onError(error);
+                }, function(progress){
+                    onProgress(progress);
+                }
+            );
 
             // insert image status overlay.
 

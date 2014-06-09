@@ -375,7 +375,7 @@ angular.module('bulbsCmsApp.mockApi').run([
         id: "1"
       },
       absolute_url: "/article/article-1",
-      video: 1,
+      video: 10118,
       sponsor_image: null,
       status: "Published",
       published: "2001-09-03T16:20:00Z",
