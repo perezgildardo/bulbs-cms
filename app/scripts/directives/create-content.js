@@ -104,7 +104,7 @@ angular.module('bulbsCmsApp')
           $('.new-title').focus();
         });
 
-        $(element).find('.editor').on('keydown', function (e) {
+        $(element).on('keydown', '.editor', function (e) {
           if (e.keyCode === 13 && scope.newTitle) {
             $(element).find('.go').click();
           }
