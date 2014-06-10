@@ -122,6 +122,7 @@ angular.module('bulbsCmsApp')
             statsContainer: ".wordcount",
             /* This probably deserves its own file */
             inline: EditorOptions.getOptions(),
+            uploadImage: BettyCropper.upload,
             uploadVideo: Zencoder.onVideoFileUpload,
             videoEmbedUrl: VIDEO_EMBED_URL
           }
