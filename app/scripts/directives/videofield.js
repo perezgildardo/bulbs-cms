@@ -23,6 +23,7 @@ angular.module('bulbsCmsApp')
             angular.noop,
             function(progress){
               console.log(progress);
+              scope.uploadProgress = progress;
             }
           );
 
