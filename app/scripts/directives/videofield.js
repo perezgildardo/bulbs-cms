@@ -18,7 +18,7 @@ angular.module('bulbsCmsApp')
           Zencoder.onVideoFileUpload().then(
             function(success){
               console.log(success);
-              $scope.article.video = success.attrs.id;
+              scope.article.video = success.attrs.id;
             },
             angular.noop,
             function(progress){
