@@ -111,7 +111,7 @@ angular.module('bulbsCmsApp')
               linkTools: $("#link-tools-template").html()
             },
             undoManager: new UndoManager(),
-            placeholder: "Write here",
+            placeholder: attrs.placeholder ||  "Write here",
             editSource: true,
             // NOT SURE WHAT TO DO ABOUT THIS....
             avlink: {
@@ -134,7 +134,7 @@ angular.module('bulbsCmsApp')
             /* global options */
             element: element[0],
             onContentChange: read,
-            placeholder: "Type your Headline",
+            placeholder: attrs.placeholder ||  "Type your Headline",
             allowNewline: false,
             allowNbsp: false,
             characterLimit: 200,
