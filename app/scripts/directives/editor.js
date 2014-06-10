@@ -3,7 +3,7 @@
 angular.module('bulbsCmsApp')
   .provider('EditorOptions', function () {
     var _options = {
-      "onion-image": {
+      "image": {
         "size": ["huge", "big", "medium", "small", "tiny"],
         "crop": ["original", "16x9", "1x1", "3x1"],
         "defaults": {
@@ -14,7 +14,7 @@ angular.module('bulbsCmsApp')
           "url": ""
         },
         "template":
-          "<div data-type=\"onion-image\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"> <div></div><span class=\"caption\">{{caption}}</span></div>"
+          "<div data-type=\"onion\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"> <div></div><span class=\"caption\">{{caption}}</span></div>"
       },
       "onion-video": {
         "size": ["big", "small"],
