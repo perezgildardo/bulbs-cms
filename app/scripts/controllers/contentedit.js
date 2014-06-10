@@ -5,8 +5,7 @@ angular.module('bulbsCmsApp')
     $scope, $routeParams, $http, $window,
     $location, $timeout, $interval, $compile, $q, $modal,
     $, _, keypress,
-    IfExistsElse, Localstoragebackup, ContentApi, ReviewApi, Login,
-    Zencoder, routes)
+    IfExistsElse, Localstoragebackup, ContentApi, ReviewApi, Login, routes)
   {
     $scope.PARTIALS_URL = routes.PARTIALS_URL;
     $scope.CONTENT_PARTIALS_URL = routes.CONTENT_PARTIALS_URL;
@@ -285,20 +284,6 @@ angular.module('bulbsCmsApp')
         $window.history.back();
       }, 1500);
     };
-
-    $scope.onVideoFileUpload = function (event) {
-      var element = event.target;
-      Zencoder.onVideoFileUpload().then(
-        function(success){
-          console.log(success);
-          $scope.article.video = success.attrs.id;
-        },
-        angular.noop,
-        function(progress){
-          console.log(progress);
-        }
-      );
-    }
 
 
     var backupInterval = (function(){
