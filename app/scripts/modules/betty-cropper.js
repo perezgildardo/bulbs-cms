@@ -1,11 +1,31 @@
 angular.module('BettyCropper', [])
-  .service('BettyCropper', function BettyCropper($http, $interpolate, IMAGE_SERVER_URL, BC_API_KEY) {
+  .service('BettyCropper', function BettyCropper($http, $interpolate, $q, IMAGE_SERVER_URL, BC_API_KEY) {
+    this.upload = function (files) {
+      var uploadImageDeferred = $q.defer();
 
-    /*\
+      if (files.length != 1) {
+        uploadImageDeferred.reject('We need exactly one image!');
+        return;
+      }
+      var file = files[0];
+      if (file.type.indexOf('image/') != 0) {
+        uploadImageDeferred.reject('Not an image!');
+      }
 
-      Betty Cropper API
+      if (file.size > 6800000) {
+        uploadImageDeferred.reject('The file is too large!')
+      }
 
-    \*/
+      this.new(
+        file
+      ).success(function(success){
+        uploadImageDeferred.resolve(success);
+      }).error(function(error){
+        uploadImageDeferred.reject(error);
+      });
+
+      return uploadImageDeferred.promise;
+    }
 
     this.detail = function (id) {
       return $http({
@@ -65,12 +85,6 @@ angular.module('BettyCropper', [])
         data: selections
       });
     };
-
-    /*\
-
-      Convenience Methods
-
-    \*/
 
     this.url = function (id, crop, width, format) {
       var exp = $interpolate(

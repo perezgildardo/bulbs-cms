@@ -16,7 +16,7 @@ angular.module('bulbsCmsApp')
 
         $scope.imageData = null;
 
-        $scope.uploadSuccess = function(response){
+        function uploadSuccess(response){
           if (!$scope.image) {
             $scope.image = {
               id: null,
@@ -31,26 +31,19 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.upload = function(e){
-          if (this.files.length != 1) {
-            console.log('We need exactly one image!');
-            return;
-          }
-          var file = this.files[0];
-          if (file.type.indexOf('image/') != 0) {
-            console.log('Not an image!');
-            return;
-          }
-
-          if (file.size > 6800000) {
-            console.log('The file is too large!')
-          }
-
-          var imageData = new FormData();
-          imageData.append('image', file);
-
-          BettyCropper.new(
-            file
-          ).success($scope.uploadSuccess);
+          var files = this.files;
+          BettyCropper.upload(files).then(
+            function(success){
+              console.log(success);
+              uploadSuccess(success);
+            },
+            function(error){
+              console.log(error);
+            },
+            function(progress){
+              console.log(error);
+            }
+          );
         };
       },
       link: function (scope, element, attrs) {
