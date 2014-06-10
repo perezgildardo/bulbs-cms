@@ -14,7 +14,7 @@ angular.module('bulbsCmsApp')
           "url": ""
         },
         "template":
-          "<div data-type=\"onion-image\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"> <div><noscript><img src=\"{{url}}\" ></noscript></div><span class=\"caption\">{{caption}}</span></div>"
+          "<div data-type=\"onion-image\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"> <div></div><span class=\"caption\">{{caption}}</span></div>"
       },
       "onion-video": {
         "size": ["big", "small"],
@@ -25,10 +25,6 @@ angular.module('bulbsCmsApp')
         },
         "template":
           "<div data-type=\"onion-video\" class=\"onion-video video inline size-{{size}} crop-{{crop}}\" data-video-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><iframe src=\"/videos/embed?id={{video_id}}\"></iframe></div>"
-      },
-      "image": {
-        "template":
-          "<div data-type=\"image\" data-crop=\"{{crop}}\" class=\"inline embed size-{{size}} crop-{{crop}}\" data-url=\"{{source}}\"><img src=\"{{url}}\"></div>"
       },
       "embed": {
         "size": ["big", "small"],
@@ -51,24 +47,6 @@ angular.module('bulbsCmsApp')
         },
         "template":
         "<div data-type=\"youtube\" class=\"youtube inline size-{{size}} crop-{{crop}}\" data-youtube-id=\"{{youtube_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><div><img src=\"http://img.youtube.com/vi/{{youtube_id}}/hqdefault.jpg\"></div<span class=\"caption\">{{caption}}</span></div>"
-      },
-      "pullquote": {
-        "size": ["big", "small"],
-        "defaults": {
-          "size" : "big"
-        },
-        "template":"<div data-type=\"pullquote\" class=\"pullquote inline size-{{size}}\" data-size=\"{{size}}\">{{content}}</div>"
-      },
-      "article": {
-        "size": ["big", "small"],
-        "defaults": {
-          "size":"big"
-        },
-        "template": "<div data-type=\"article\"></div>"
-      },
-      "articlelist": {
-        "size": ["big", "small"],
-        "template":  "<div data-type=\"articlelist\" data-tag=\"{{tag}}\"></div>"
       }
     };
 
@@ -85,7 +63,7 @@ angular.module('bulbsCmsApp')
     };
 
   })
-  .directive('onionEditor', function (routes, $, Zencoder, EditorOptions, VIDEO_EMBED_URL) {
+  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, EditorOptions, VIDEO_EMBED_URL) {
 
     /* Gab configuration out of .  */
 
