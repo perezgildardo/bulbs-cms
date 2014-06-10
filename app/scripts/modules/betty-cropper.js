@@ -5,7 +5,6 @@ angular.module('BettyCropper', [])
 
       if (files.length != 1) {
         uploadImageDeferred.reject('We need exactly one image!');
-        return;
       }
       var file = files[0];
       if (file.type.indexOf('image/') != 0) {
@@ -16,9 +15,7 @@ angular.module('BettyCropper', [])
         uploadImageDeferred.reject('The file is too large!')
       }
 
-      this.new(
-        file
-      ).success(function(success){
+      newImage(file).success(function(success){
         uploadImageDeferred.resolve(success);
       }).error(function(error){
         uploadImageDeferred.reject(error);
@@ -56,7 +53,7 @@ angular.module('BettyCropper', [])
       });
     };
 
-    this.new = function (image, name, credit) {
+    function newImage (image, name, credit) {
       var imageData = new FormData();
       imageData.append('image', image);
       if (name) { imageData.append('name', name); }
