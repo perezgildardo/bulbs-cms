@@ -85,7 +85,7 @@ angular.module('bulbsCmsApp')
     };
 
   })
-  .directive('onionEditor', function (routes, $, Zencoder, EditorOptions, VIDEO_EMBED_URL) {
+  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, EditorOptions, VIDEO_EMBED_URL) {
 
     /* Gab configuration out of .  */
 

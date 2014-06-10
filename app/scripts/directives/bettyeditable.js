@@ -31,8 +31,7 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.upload = function(e){
-          var files = this.files;
-          BettyCropper.upload(files).then(
+          BettyCropper.upload().then(
             function(success){
               console.log(success);
               uploadSuccess(success);
@@ -47,17 +46,10 @@ angular.module('bulbsCmsApp')
         };
       },
       link: function (scope, element, attrs) {
-        var input = element.find('input');
-        input.on('change', scope.upload);
+
 
         var ratioWidth = parseInt(scope.ratio.split('x')[0], 10);
         var ratioHeight = parseInt(scope.ratio.split('x')[1], 10);
-
-        element
-          .find('#betty-editable-add-image')
-          .bind('click', function () {
-            input[0].click();
-          })
 
         scope.showImage = function () {
           if (scope.imageData === null) {
