@@ -21,17 +21,17 @@ angular.module('bulbsCmsApp')
       }
       $scope.last_saved_article = angular.copy(data);
 
-      $scope.$watch('article.detail_image.id', function (newVal, oldVal) {
+      $scope.$watch('article.image.id', function (newVal, oldVal) {
         if (!$scope.article) { return; }
         if (newVal && oldVal && newVal === oldVal) { return; }
 
-        if (newVal === null) { return; } //no image
+        if (newVal === null || newVal === undefined) { return; } //no image
 
-        if (!$scope.article.image || !$scope.article.image.id || //no thumbnail
-          (newVal && oldVal && $scope.article.image && $scope.article.image.id && oldVal === $scope.article.image.id) || //thumbnail is same
+        if (!$scope.article.thumbnail || !$scope.article.thumbnail.id || //no thumbnail
+          (newVal && oldVal && $scope.article.thumbnail && $scope.article.thumbnail.id && oldVal === $scope.article.thumbnail.id) || //thumbnail is same
           (!oldVal && newVal) //detail was trashed
         ) {
-          $scope.article.image = {id: newVal, alt: null, caption: null};
+          $scope.article.thumbnail = {id: newVal, alt: null, caption: null};
         }
 
 
@@ -242,6 +242,8 @@ angular.module('bulbsCmsApp')
       if(angular.equals($scope.article, $scope.last_saved_article)){
         $scope.articleIsDirty = false;
       }else{
+        console.log($scope.article)
+        console.log($scope.last_saved_article)
         $scope.articleIsDirty = true;
       }
     }, true);
