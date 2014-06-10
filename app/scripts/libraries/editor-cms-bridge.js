@@ -38,37 +38,25 @@ This bridges the embed module that the editor exposes & our custom image impleme
 
 (function(global) {
     'use strict';
-    var OnionImage = OnionImage || function(editor, options) {
+    var OnionImage = OnionImage || function(editor, instanceOptions) {
 
         editor.on("inline:edit:image", editImage);
         editor.on("inline:insert:image", uploadImage);
 
         function uploadImage(options) {
-
-            //CHANGE THIS METHOD DO SOMETHING SET VIA OPTIONS
-            global.uploadImage({onProgress: onProgress,
-                                onSuccess: onSuccess,
-                                onError: onError,
-                                onCancel: onCancel})
-
-            // insert image status overlay.
-            function onProgress() {
-                //update an indicator
-            }
-
-            function onSuccess(data) {
-                //insert image.
-                options.onSuccess(options.block, {image_id: data.id});
-                window.picturefill();
-            }
-
-            function onError() {
-                //show msg, allow user to trigger upload again
-            }
-
-            function onCancel() {
-                //remove placeholder. Call it a day.
-            }
+            instanceOptions.uploadImage().then(
+                function(success){
+                    //insert image.
+                    options.onSuccess(options.block, {image_id: data.id});
+                    window.picturefill();
+                },
+                function(error){
+                    console.log(error);
+                },
+                function(progress){
+                    console.log(progress);
+                }
+            );
         }
 
         var activeElement,
@@ -143,25 +131,23 @@ This bridges the embed module that the editor exposes & our custom image impleme
                     onProgress(progress);
                 }
             );
+        }
 
-            // insert image status overlay.
+        function onProgress() {
+            //update an indicator
+        }
 
-            function onProgress() {
-                //update an indicator
-            }
+        function setVideoID(id) {
+            $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
+            $(activeElement).attr('data-videoid', id)
+        }
 
-            function setVideoID(id) {
-                $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
-                $(activeElement).attr('data-videoid', id)
-            }
+        function onError() {
+            //show msg, allow user to trigger upload again
+        }
 
-            function onError() {
-                //show msg, allow user to trigger upload again
-            }
-
-            function onCancel() {
-                //remove placeholder. Call it a day.
-            }
+        function onCancel() {
+            //remove placeholder. Call it a day.
         }
 
         function editVideo(el) {
