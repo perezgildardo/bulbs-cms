@@ -47,7 +47,9 @@ This bridges the embed module that the editor exposes & our custom image impleme
             instanceOptions.uploadImage().then(
                 function(success){
                     //insert image.
-                    options.onSuccess(options.block, {image_id: data.id});
+                    console.log('editor cms bridge upload image success')
+                    console.log(success)
+                    options.onSuccess(options.block, {image_id: success.id});
                     window.picturefill();
                 },
                 function(error){
@@ -131,23 +133,24 @@ This bridges the embed module that the editor exposes & our custom image impleme
                     onProgress(progress);
                 }
             );
-        }
 
-        function onProgress() {
-            //update an indicator
-        }
+            function onProgress() {
+                //update an indicator
+            }
 
-        function setVideoID(id) {
-            $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
-            $(activeElement).attr('data-videoid', id)
-        }
+            function setVideoID(id) {
+                $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
+                $(activeElement).attr('data-videoid', id)
+            }
 
-        function onError() {
-            //show msg, allow user to trigger upload again
-        }
+            function onError() {
+                //show msg, allow user to trigger upload again
+            }
 
-        function onCancel() {
-            //remove placeholder. Call it a day.
+            function onCancel() {
+                //remove placeholder. Call it a day.
+            }
+
         }
 
         function editVideo(el) {

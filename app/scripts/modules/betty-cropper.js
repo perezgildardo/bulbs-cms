@@ -1,24 +1,37 @@
 angular.module('BettyCropper', [])
   .service('BettyCropper', function BettyCropper($http, $interpolate, $q, IMAGE_SERVER_URL, BC_API_KEY) {
-    this.upload = function (files) {
+    var fileInputId = '#bulbs-cms-hidden-image-file-input'
+    var inputTemplate = '<input id="bulbs-cms-hidden-image-file-input" type="file" accept="image/*" style="position: absolute; left:-99999px;" name="image" />'
+
+    this.upload = function () {
       var uploadImageDeferred = $q.defer();
 
-      if (files.length != 1) {
-        uploadImageDeferred.reject('We need exactly one image!');
-      }
-      var file = files[0];
-      if (file.type.indexOf('image/') != 0) {
-        uploadImageDeferred.reject('Not an image!');
-      }
+      angular.element(fileInputId).remove();
+      var fileInput = angular.element(inputTemplate);
+      var file;
+      angular.element('body').append(fileInput);
+      fileInput.click();
+      fileInput.unbind('change');
 
-      if (file.size > 6800000) {
-        uploadImageDeferred.reject('The file is too large!')
-      }
+      fileInput.bind('change', function(elem){
+        if (this.files.length != 1) {
+          uploadImageDeferred.reject('We need exactly one image!');
+        }
+        var file = this.files[0];
+        if (file.type.indexOf('image/') != 0) {
+          uploadImageDeferred.reject('Not an image!');
+        }
 
-      newImage(file).success(function(success){
-        uploadImageDeferred.resolve(success);
-      }).error(function(error){
-        uploadImageDeferred.reject(error);
+        if (file.size > 6800000) {
+          uploadImageDeferred.reject('The file is too large!')
+        }
+
+        newImage(file).success(function(success){
+          uploadImageDeferred.resolve(success);
+        }).error(function(error){
+          uploadImageDeferred.reject(error);
+        });
+
       });
 
       return uploadImageDeferred.promise;
