@@ -40,8 +40,8 @@ This bridges the embed module that the editor exposes & our custom image impleme
     'use strict';
     var OnionImage = OnionImage || function(editor, instanceOptions) {
 
-        editor.on("inline:edit:onion-image", editImage);
-        editor.on("inline:insert:onion-image", uploadImage);
+        editor.on("inline:edit:image", editImage);
+        editor.on("inline:insert:image", uploadImage);
 
         function uploadImage(options) {
             instanceOptions.uploadImage().then(
