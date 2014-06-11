@@ -47,8 +47,6 @@ This bridges the embed module that the editor exposes & our custom image impleme
             instanceOptions.uploadImage().then(
                 function(success){
                     //insert image.
-                    console.log('editor cms bridge upload image success')
-                    console.log(success)
                     options.onSuccess(options.block, {image_id: success.id});
                     window.picturefill();
                 },
@@ -108,8 +106,7 @@ This bridges the embed module that the editor exposes & our custom image impleme
         }
 
         function uploadVideo(options) {
-            console.log("uploadvideo here", editor, instanceOptions, options)
-            //return an identifier, for cancelling?
+
             var activeElement = options.onSuccess(options.block, {videoid:"NONE"});
             return instanceOptions.uploadVideo().then(
                 function(videoObject){

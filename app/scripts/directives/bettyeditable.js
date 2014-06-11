@@ -33,7 +33,6 @@ angular.module('bulbsCmsApp')
         $scope.upload = function(e){
           BettyCropper.upload().then(
             function(success){
-              console.log(success);
               uploadSuccess(success);
             },
             function(error){
