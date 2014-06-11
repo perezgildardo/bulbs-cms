@@ -63,7 +63,7 @@ angular.module('bulbsCmsApp')
     };
 
   })
-  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, EditorOptions, VIDEO_EMBED_URL) {
+  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, openImageCropModal, EditorOptions, VIDEO_EMBED_URL) {
 
     /* Gab configuration out of .  */
 
@@ -101,6 +101,7 @@ angular.module('bulbsCmsApp')
             /* This probably deserves its own file */
             inline: EditorOptions.getOptions(),
             uploadImage: BettyCropper.upload,
+            editImage: openImageCropModal,
             uploadVideo: Zencoder.onVideoFileUpload,
             videoEmbedUrl: VIDEO_EMBED_URL
           }

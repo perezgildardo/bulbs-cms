@@ -242,8 +242,6 @@ angular.module('bulbsCmsApp')
       if(angular.equals($scope.article, $scope.last_saved_article)){
         $scope.articleIsDirty = false;
       }else{
-        console.log($scope.article)
-        console.log($scope.last_saved_article)
         $scope.articleIsDirty = true;
       }
     }, true);
