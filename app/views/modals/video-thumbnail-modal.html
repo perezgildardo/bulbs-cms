@@ -4,19 +4,17 @@
 
 <div class="modal-body">
   <div class="text-center">
-    <h1 class="h4">Poster</h1>
+    <h1 class="h4">Choose a still from the video</h1>
     <img class="poster-preview" width="320" height="180" ng-src="{{posterUrl}}" >
     <div class="poster-buttons" style="margin-top:10px">
-      <button ng-show="currentThumbnail !== false && currentThumbnail > 0" type="button" class="prev-thumb btn btn-primary btn-xs" ng-click="prevThumb();"><i class="fa fa-caret-left"></i></button>
-      <button ng-show="currentThumbnail !== false && currentThumbnail < MAX_THUMBNAIL" type="button" class="next-thumb btn btn-primary btn-xs" ng-click="nextThumb();"><i class="fa fa-caret-right"></i></button>
+      <button ng-show="currentThumbnail !== false" type="button" class="prev-thumb btn btn-primary btn-xs" ng-click="prevThumb();"><i class="fa fa-caret-left"></i></button>
+      <button ng-show="currentThumbnail !== false" type="button" class="next-thumb btn btn-primary btn-xs" ng-click="nextThumb();"><i class="fa fa-caret-right"></i></button>
       <button ng-show="currentThumbnail === false" type="button" class="btn btn-primary btn-xs" ng-click="defaultThumb();">Default</button>
     </div>
   </div>
-  <div style="margin-top:10px">
+  <div style="margin-top:10px; margin-bottom: 10px;">
     <label>Poster Image URL</label>
     <input type="text" name="poster_url" class="text-input smooth-border smooth-bg" style=" width: 80%" ng-model="posterUrl">
-  </div>
-  <div style="margin-top:25px;">
   </div>
 </div>
 

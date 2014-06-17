@@ -3,7 +3,7 @@
 angular.module('bulbsCmsApp')
   .controller('VideothumbnailmodalCtrl', function ($scope, $http, $modalInstance, Zencoder, videoId, posterUrl, VIDEO_THUMBNAIL_URL) {
     var DEFAULT_THUMBNAIL = 4;
-    $scope.MAX_THUMBNAIL = 19;
+    var MAX_THUMBNAIL = 19;
     $scope.posterUrl = posterUrl || compilePosterUrl(DEFAULT_THUMBNAIL);
 
     $scope.$watch('posterUrl', function(){
@@ -18,11 +18,11 @@ angular.module('bulbsCmsApp')
     });
 
     $scope.nextThumb = function () {
-      $scope.posterUrl = compilePosterUrl($scope.currentThumbnail+1);
+      $scope.posterUrl = compilePosterUrl($scope.currentThumbnail < MAX_THUMBNAIL ? $scope.currentThumbnail+1 : 0);
     };
 
     $scope.prevThumb = function () {
-      $scope.posterUrl = compilePosterUrl($scope.currentThumbnail-1);
+      $scope.posterUrl = compilePosterUrl($scope.currentThumbnail > 0 ? $scope.currentThumbnail-1 : MAX_THUMBNAIL);
     };
 
     $scope.defaultThumb = function () {
