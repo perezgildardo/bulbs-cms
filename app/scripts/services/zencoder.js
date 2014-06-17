@@ -1,12 +1,12 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .service('Zencoder', function Zencoder($http, $q, $, $window) {
+  .service('Zencoder', function Zencoder($http, $q, $modal, $, routes) {
     var newVideoUrl = '/video/new';
     var fileInputId = '#bulbs-cms-hidden-video-file-input'
     var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />'
 
-    this.onVideoFileUpload = function(){
+    this.onVideoFileUpload = function() {
       var clickDeferred = $q.defer();
 
       angular.element(fileInputId).remove();
@@ -46,7 +46,6 @@ angular.module('bulbsCmsApp')
       });
 
       return clickDeferred.promise;
-
     }
 
     function getNewVideoUploadCredentials(file) {
@@ -127,6 +126,20 @@ angular.module('bulbsCmsApp')
       });
 
       return encodeDeferred.promise;
+    }
+    this.encode = function(videoId) {
+      encode({attrs: {id: videoId}});
+    }
+
+    this.openVideoThumbnailModal = function(videoId, posterUrl) {
+      return $modal.open({
+        templateUrl: routes.PARTIALS_URL + 'modals/video-thumbnail-modal.html',
+        controller: 'VideothumbnailmodalCtrl',
+        resolve: {
+          videoId: function(){ return videoId; },
+          posterUrl: function(){ return posterUrl || null; }
+        }
+      });
     }
 
   });
