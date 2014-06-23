@@ -158,7 +158,7 @@ angular.module('bulbsCmsApp')
       return $http({
         method: 'POST',
         url: url,
-        data: video,
+        data: data,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
       });
     };
