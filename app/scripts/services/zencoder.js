@@ -119,7 +119,9 @@ angular.module('bulbsCmsApp')
         method: 'POST',
         url: '/video/' + videoObject.attrs.id + '/encode'
       }).success(function(data){
-        videoObject['encode'] = data;
+        videoObject.attrs['encode_status_endpoints'] = data;
+        _encodingVideos[videoObject.attrs.id] = videoObject.attrs;
+
         encodeDeferred.resolve(videoObject);
       }).error(function(data){
         encodeDeferred.reject(data);
@@ -141,5 +143,27 @@ angular.module('bulbsCmsApp')
         }
       });
     }
+
+    this.getVideo = function(videoId) {
+      var url = '/video/' + videoId;
+      return $http({
+        method: 'GET',
+        url: url
+      });
+    };
+
+    this.setVideo = function(video) {
+      var url = '/video/' + video.id;
+      var data = $.param(video);
+      return $http({
+        method: 'POST',
+        url: url,
+        data: video,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      });
+    };
+
+    var _encodingVideos = {};
+    this.encodingVideos = _encodingVideos;
 
   });
