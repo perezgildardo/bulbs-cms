@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('PromotionCtrl', function ($scope, $window, $location, $, _, ContentApi, PromotionApi, promo_options, routes) {
+  .controller('PromotionCtrl', function ($scope, $http, $window, $location, $, _, ContentApi, PromotionApi, promo_options, routes) {
     $window.document.title = routes.CMS_NAMESPACE + ' | Promotion Tool'; // set title
 
     $scope.$watch('pzone', function (pzone) {
@@ -132,8 +132,11 @@ angular.module('bulbsCmsApp')
       } else {
         payload.content = $scope.promotedArticles;
       }
-      var pzone = ContentApi.restangularizeElement(null, payload, 'contentlist');
-      return pzone.put().then(function(data){
+      return $http({
+        method: 'PUT',
+        url: '/cms/api/v1/contentlist/' + payload.id + '/',
+        data: payload
+      }).then(function(data){
         $scope.lastSavedPromotedArticles = _.clone(data.content);
         $scope.promotedArticles = data.content;
       });
