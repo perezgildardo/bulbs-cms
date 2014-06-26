@@ -370,6 +370,7 @@ module.exports = function (grunt) {
     uglify: {
       options: {
         mangle: false, //https://github.com/theonion/bulbs-cms/issues/4
+        compress: false
       },
       templates: {
         files: {
@@ -491,7 +492,7 @@ module.exports = function (grunt) {
     'less',
     'autoprefixer',
     'concat',
-    'ngmin',
+    //'ngmin',
     'copy:dist',
     'copy:jcropGif',
     'copy:fontawesome',
