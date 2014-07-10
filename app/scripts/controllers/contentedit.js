@@ -14,12 +14,7 @@ angular.module('bulbsCmsApp')
 
     var getArticleCallback = function (data) {
       $window.article = $scope.article = data; //exposing article on window for debugging
-      if ($location.search().rating_type && (!data.ratings || data.ratings.length === 0)) {
-        $scope.article.ratings = [{
-          type: $location.search().rating_type,
-          media_item: {}
-        }];
-      }
+
       $scope.last_saved_article = angular.copy(data);
 
       $scope.$watch('article.image.id', function (newVal, oldVal) {
@@ -130,82 +125,15 @@ angular.module('bulbsCmsApp')
         $scope.article.slug = $window.URLify($scope.article.title, 50);
       }
 
-      //because media_items get saved to a different API,
-      //have to save all unsaved media_items first
-      //then once thats done save the article.
-      //should probably use PROMISES here but for now
-      //using a good ol fashioned COUNTER
-      $scope.mediaItemCallbackCounter = (data.ratings && data.ratings.length) || saveToContentApi();
-      for (var i in data.ratings) {
-        var show;
+      saveToContentApi();
 
-        if (data.ratings[i].type === 'tvseason') {
-          var identifier = data.ratings[i].media_item.identifier;
-          show = data.ratings[i].media_item.show;
-          IfExistsElse.ifExistsElse(
-            ReviewApi.all('tvseason').getList({
-              season: identifier,
-              show: show
-            }),
-            {identifier: identifier, show: show},
-            mediaItemExistsCbkFactory(i),
-            mediaItemDoesNotExistCbkFactory(i),
-            saveArticleErrorCbk
-          );
-        } else if (data.ratings[i].type === 'tvepisode') {
-          show = data.ratings[i].media_item.show;
-          var season = data.ratings[i].media_item.season;
-          var episode = data.ratings[i].media_item.episode;
-          IfExistsElse.ifExistsElse(
-            ReviewApi.all('tvepisode').getList({
-              show: show,
-              season: season,
-              episode: episode
-            }),
-            {show: show, season: season, episode: episode},
-            mediaItemExistsCbkFactory(i),
-            mediaItemDoesNotExistCbkFactory(i),
-            saveArticleErrorCbk
-          );
-        } else {
-          saveMediaItem(i);
-        }
-      }
       return $scope.saveArticleDeferred.promise;
 
-    }
-
-    function mediaItemExistsCbkFactory(index) {
-      return function (media_item) {
-        $scope.article.ratings[index].media_item = media_item;
-        $scope.mediaItemCallbackCounter -= 1;
-      };
-    }
-
-    function mediaItemDoesNotExistCbkFactory(index) {
-      return function () {
-        saveMediaItem(index);
-      };
     }
 
     var saveHTML =  "<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save";
     var navbarSave = ".navbar-save";
 
-    function saveMediaItem(index) {
-      var type = $scope.article.ratings[index].type;
-      var mediaItem = $scope.article.ratings[index].media_item;
-      mediaItem = ReviewApi.restangularizeElement(null, mediaItem, type);
-      var q;
-      if (mediaItem.id) {
-        q = mediaItem.put();
-      } else {
-        q = mediaItem.post();
-      }
-      q.then(function (resp) {
-        $scope.article.ratings[index].media_item = resp;
-        $scope.mediaItemCallbackCounter -= 1;
-      }).catch(saveArticleErrorCbk);
-    }
 
     function saveToContentApi() {
       $(navbarSave).html('<i class=\'glyphicon glyphicon-refresh fa-spin\'></i> Saving');
