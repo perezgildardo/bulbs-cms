@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .service('Login', function Login($rootScope, $http, $cookies, $window, $modal, $, routes) {
+  .service('Login', function Login($rootScope, $http, $cookies, $window, $, routes) {
 
     $rootScope.$watch(function () {
       return $cookies.csrftoken;
@@ -11,20 +11,14 @@ angular.module('bulbsCmsApp')
     });
 
     return {
-      showLoginModal: function () {
-        return $modal.open({
-          templateUrl: routes.PARTIALS_URL + 'modals/login-modal.html',
-          controller: 'LoginmodalCtrl'
-        });
-      },
       login: function (username, password) {
         var data = $.param({username: username, password: password});
         return $http({
-            method: 'POST',
-            url: '/login/',
-            data: data,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-          })
+          method: 'POST',
+          url: '/login/',
+          data: data,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        });
       }
     }
   });

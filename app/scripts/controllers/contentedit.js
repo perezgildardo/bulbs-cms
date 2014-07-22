@@ -6,6 +6,8 @@ angular.module('bulbsCmsApp')
     $location, $timeout, $interval, $compile, $q, $modal,
     $, _, keypress,
     IfExistsElse, Localstoragebackup, ContentApi, Login, routes)
+    $, _, keypress, Raven,
+    IfExistsElse, Localstoragebackup, ContentApi, Login, routes)
   {
     $scope.PARTIALS_URL = routes.PARTIALS_URL;
     $scope.CONTENT_PARTIALS_URL = routes.CONTENT_PARTIALS_URL;
@@ -47,36 +49,6 @@ angular.module('bulbsCmsApp')
 
     $scope.tagDisplayFn = function (o) {
       return o.name;
-    };
-
-    $scope.tagCallback = function (o, input, freeForm) {
-      var tagVal = freeForm ? o : o.name;
-      IfExistsElse.ifExistsElse(
-        ContentApi.all('tag').getList({
-          ordering: 'name',
-          search: tagVal
-        }),
-        {name: tagVal},
-        function (tag) { $scope.article.tags.push(tag); },
-        function (value) { $scope.article.tags.push({name: value.name, type: 'content_tag', new: true}); },
-        function (data, status) { if (status === 403) { Login.showLoginModal(); } }
-      );
-      $(input).val('');
-    };
-
-    $scope.sectionCallback = function (o, input, freeForm) {
-      var tagVal = freeForm ? o : o.name;
-      IfExistsElse.ifExistsElse(
-        ContentApi.all('tag').getList({
-          ordering: 'name',
-          search: tagVal
-        }),
-        {name: tagVal},
-        function (tag) { $scope.article.tags.push(tag); },
-        function () { console.log('Can\'t create sections.'); },
-        function (data, status) { if (status === 403) { Login.showLoginModal(); } }
-      );
-      $(input).val('');
     };
 
     $scope.saveArticleDeferred = $q.defer();
@@ -142,12 +114,7 @@ angular.module('bulbsCmsApp')
     }
 
     function saveArticleErrorCbk(data) {
-      if (data.status === 403) {
-        //gotta get them to log in
-        Login.showLoginModal();
-        $(navbarSave).html(saveHTML);
-        return;
-      }
+      console.log(data)
       $(navbarSave).html('<i class=\'glyphicon glyphicon-remove\'></i> Error');
       if (status === 400) {
         $scope.errors = data;

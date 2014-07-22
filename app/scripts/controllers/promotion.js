@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('PromotionCtrl', function ($scope, $window, $location, $, _, ContentApi, PromotionApi, promo_options, routes) {
+  .controller('PromotionCtrl', function ($scope, $window, $location, $, _, ContentApi, PromotionApi, Login, promo_options, routes, Raven) {
     $window.document.title = routes.CMS_NAMESPACE + ' | Promotion Tool'; // set title
 
     $scope.$watch('pzone', function (pzone) {
@@ -138,6 +138,9 @@ angular.module('bulbsCmsApp')
         $scope.lastSavedPromotedArticles = _.clone(data.content);
         $scope.promotedArticles = data.content;
         $('.save-button').html(oldSaveHtml);
+      }, function(data){
+        Raven.captureMessage('Error Saving Pzone', {extra: data});
+        $('.save-button').html('<i class="fa fa-times-circle"></i> Error');
       });
     };
 
