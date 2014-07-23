@@ -150,21 +150,6 @@ angular.module('bulbsCmsApp')
       }
     });
 
-    $scope.addRating = function (type) {
-      $scope.article.ratings.push({
-        grade: '',
-        type: type,
-        media_item: {
-          'type': type
-        }
-      });
-      $('#add-review-modal').modal('hide');
-    };
-
-    $scope.deleteRating = function (index) {
-      $scope.article.ratings.splice(index, 1);
-    };
-
     $scope.publishSuccessCbk = function () {
       return getContent();
     };
