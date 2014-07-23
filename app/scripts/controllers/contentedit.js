@@ -4,8 +4,6 @@ angular.module('bulbsCmsApp')
   .controller('ContenteditCtrl', function (
     $scope, $routeParams, $http, $window,
     $location, $timeout, $interval, $compile, $q, $modal,
-    $, _, keypress,
-    IfExistsElse, Localstoragebackup, ContentApi, Login, routes)
     $, _, keypress, Raven,
     IfExistsElse, Localstoragebackup, ContentApi, Login, routes)
   {
