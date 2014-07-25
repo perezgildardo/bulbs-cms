@@ -78,7 +78,8 @@ angular.module('bulbsCmsApp', [
   });
 
   $httpProvider.interceptors.push('BugReportInterceptor');
-  $httpProvider.interceptors.push('PermissionsInterceptor');;
+  $httpProvider.interceptors.push('PermissionsInterceptor');
+  $httpProvider.interceptors.push('BadRequestInterceptor');
 
 })
 .run(function ($rootScope, $http, $cookies) {
