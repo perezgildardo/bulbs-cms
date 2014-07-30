@@ -9,7 +9,7 @@ angular.module('bulbsCmsApp')
       busy: 'Publishing',
       finished: 'Published!',
       error: 'Error!'
-    }
+    };
 
     $scope.$watch('pickerValue', function(newVal){
       var pubTimeMoment = moment(newVal).zone(TIMEZONE_OFFSET);
@@ -26,25 +26,25 @@ angular.module('bulbsCmsApp')
     var modelDateFormat = 'YYYY-MM-DDTHH:mmZ';
 
     $scope.setTimeShortcut = function (shortcut) {
-      if(shortcut == 'now'){
+      if (shortcut === 'now') {
         var now = moment().zone(TIMEZONE_OFFSET);
         $scope.pickerValue = now;
       }
-      if(shortcut == 'midnight'){
+      if (shortcut === 'midnight') {
         var midnight = moment().zone(TIMEZONE_OFFSET).hour(24).minute(0);
         $scope.pickerValue = midnight;
       }
-    }
+    };
 
     $scope.setDateShortcut = function (shortcut) {
       var today = moment().zone(TIMEZONE_OFFSET);
-      if(shortcut == 'today'){
+      if (shortcut === 'today') {
         $scope.datePickerValue = moment().year(today.year()).month(today.month()).date(today.date());
       }
-      if(shortcut == 'tomorrow'){
+      if (shortcut === 'tomorrow') {
         $scope.datePickerValue = moment().year(today.year()).month(today.month()).date(today.date() + 1);
       }
-    }
+    };
 
     $scope.setPubTime = function () {
       //we're planning on making feature_type a db required field
@@ -65,7 +65,7 @@ angular.module('bulbsCmsApp')
         .date(newDate.date())
         .hour(newTime.hour())
         .minute(newTime.minute())
-        .format(modelDateFormat)
+        .format(modelDateFormat);
       var data = {published: newDateTime};
 
       return $http({
@@ -113,12 +113,12 @@ angular.module('bulbsCmsApp')
         .catch(function (reason) {
           $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
           $modalInstance.dismiss();
-        })
+        });
     };
 
-    if($scope.article.published){
+    if ($scope.article.published) {
       $scope.pickerValue = moment($scope.article.published);
-    }else{
+    } else {
       $scope.setTimeShortcut('now');
     }
 

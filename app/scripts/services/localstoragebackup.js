@@ -29,24 +29,24 @@ angular.module('bulbsCmsApp')
       var mostRecentTimestamp = 0;
       for(var keyIndex in localStorageKeys){
         var key = $window.localStorage.key(keyIndex);
-        if(key && key.split('.')[2] == $routeParams.id && Number(key.split('.')[1]) > mostRecentTimestamp){
+        if (key && key.split('.')[2] === $routeParams.id && Number(key.split('.')[1]) > mostRecentTimestamp) {
           mostRecentTimestamp = Number(key.split('.')[1]);
         }
       }
       var mostRecentValue = $window.localStorage.getItem(keyPrefix + '.' + mostRecentTimestamp + keySuffix);
-      if(!(mostRecentValue != $("#content-body .editor").html())){
+      if (!(mostRecentValue != $('#content-body .editor').html())) {
         return;
       }
       try{
         $window.localStorage &&
-          $window.localStorage.setItem(keyPrefix + '.' + moment().unix() + keySuffix, $("#content-body .editor").html()); //TODO: this is gonna break
+          $window.localStorage.setItem(keyPrefix + '.' + moment().unix() + keySuffix, $('#content-body .editor').html()); //TODO: this is gonna break
       }catch (error){
-        console.log("Caught localStorage Error " + error)
-        console.log("Trying to prune old entries");
+        console.log('Caught localStorage Error ' + error);
+        console.log('Trying to prune old entries');
 
-        for(var keyIndex in localStorageKeys){
+        for (var keyIndex in localStorageKeys) {
           var key = $window.localStorage.key(keyIndex);
-          if(!key || key && key.split('.')[0] != keyPrefix){
+          if (!key || key && key.split('.')[0] !== keyPrefix) {
             continue;
           }
           var yesterday = moment().date(moment().date()-1).unix();
