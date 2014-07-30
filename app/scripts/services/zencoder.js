@@ -3,8 +3,8 @@
 angular.module('bulbsCmsApp')
   .service('Zencoder', function Zencoder($http, $q, $modal, $, routes) {
     var newVideoUrl = '/video/new';
-    var fileInputId = '#bulbs-cms-hidden-video-file-input'
-    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />'
+    var fileInputId = '#bulbs-cms-hidden-video-file-input';
+    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />';
 
     this.onVideoFileUpload = function() {
       var clickDeferred = $q.defer();
@@ -21,19 +21,19 @@ angular.module('bulbsCmsApp')
 
           // We have a file upload limit of 1024MB
           if (file.size > (1024 * 1024 * 1024)) {
-            clickDeferred.reject("Upload file cannot be larger than 1024MB.");
+            clickDeferred.reject('Upload file cannot be larger than 1024MB.');
           }
 
           if (file.type.indexOf('video/') !== 0) {
-            clickDeferred.reject("You must upload a video file.");
+            clickDeferred.reject('You must upload a video file.');
           }
         } else {
-          clickDeferred.reject("Please select a file.")
+          clickDeferred.reject('Please select a file.');
         }
 
         getNewVideoUploadCredentials(file)
           .then(uploadToS3)
-          .then(encode, angular.noop, function(uploadPercentComplete){ clickDeferred.notify(uploadPercentComplete) })
+          .then(encode, angular.noop, function(uploadPercentComplete){ clickDeferred.notify(uploadPercentComplete); })
           .then(
             function(videoObject){
               clickDeferred.resolve(videoObject);
@@ -46,10 +46,10 @@ angular.module('bulbsCmsApp')
       });
 
       return clickDeferred.promise;
-    }
+    };
 
     function getNewVideoUploadCredentials(file) {
-      var data = {name: file.name}
+      var data = {name: file.name};
       data = $.param(data);
 
       var newVideoDeferred = $q.defer();
@@ -63,13 +63,13 @@ angular.module('bulbsCmsApp')
         newVideoDeferred.resolve({
           file: file,
           attrs: data
-        })
+        });
       }).error(function(data){
         newVideoDeferred.reject(data);
       });
 
       return newVideoDeferred.promise;
-    };
+    }
 
     function uploadToS3(videoObject) {
       var s3deferred = $q.defer();
@@ -89,7 +89,7 @@ angular.module('bulbsCmsApp')
         processData: false,
         contentType: false,
         data: formData,
-        type: "POST",
+        type: 'POST',
         xhr: function() {
           var req = $.ajaxSettings.xhr();
           if (req) {
@@ -131,7 +131,7 @@ angular.module('bulbsCmsApp')
     }
     this.encode = function(videoId) {
       encode({attrs: {id: videoId}});
-    }
+    };
 
     this.openVideoThumbnailModal = function(videoId, posterUrl) {
       return $modal.open({
@@ -142,7 +142,7 @@ angular.module('bulbsCmsApp')
           posterUrl: function(){ return posterUrl || null; }
         }
       });
-    }
+    };
 
     this.getVideo = function(videoId) {
       var url = '/video/' + videoId;

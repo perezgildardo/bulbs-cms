@@ -73,11 +73,11 @@ angular.module('bulbsCmsApp', [
     return function(exception, cause) {
       $delegate(exception, cause);
       window.Raven.captureException(exception);
-    }
+    };
   });
 
   $httpProvider.interceptors.push('BugReportInterceptor');
-  $httpProvider.interceptors.push('PermissionsInterceptor');;
+  $httpProvider.interceptors.push('PermissionsInterceptor');
 
 })
 .run(function ($rootScope, $http, $cookies) {
