@@ -7,8 +7,6 @@ cache:
   directories:
   - node_modules
   - app/bower_components
-addons:
-  sauce_connect: true
 env:
   global:
   - secure: SMuB6bfiSZjhl/IWbborF+Zy2RVK1gHY6/Ps8bDGmETcK3La++KMneDK5aeJLCY4Hx3VuhAb5Da44M1tYT0oa8kcXaPguDULBIJEY/lTZWZZfq/kTAws/qBATcBe5LdYjpSSRUwsuPNzwgPbG+Ci6PilPd60oFtHir8uJ5FFLjg=
