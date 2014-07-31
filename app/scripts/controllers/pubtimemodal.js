@@ -11,7 +11,7 @@ angular.module('bulbsCmsApp')
       error: 'Error!'
     };
 
-    $scope.$watch('pickerValue', function(newVal){
+    $scope.$watch('pickerValue', function (newVal) {
       var pubTimeMoment = moment(newVal).zone(TIMEZONE_OFFSET);
       $scope.datePickerValue = moment()
         .year(pubTimeMoment.year())
@@ -79,11 +79,13 @@ angular.module('bulbsCmsApp')
       publish_promise
         .then(function (result) {
           $scope.article.published = result.data.published;
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          }
           $modalInstance.close();
         })
         .catch(function (reason) {
-          Raven.captureMessage('Error Setting Pubtime', {extra: data});
+          Raven.captureMessage('Error Setting Pubtime', {extra: reason.data});
           $modalInstance.dismiss();
         });
     };
@@ -107,11 +109,15 @@ angular.module('bulbsCmsApp')
     $scope.unpublishCbk = function (unpub_promise) {
       unpub_promise
         .then(function (result) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          }
           $modalInstance.close();
         })
         .catch(function (reason) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
+          }
           $modalInstance.dismiss();
         });
     };

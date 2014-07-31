@@ -10,7 +10,7 @@ angular.module('bulbsCmsApp')
 
     var canceller;
     $scope.search = function (url) {
-      if(!url) { return; }
+      if (!url) { return; }
 
       if (typeof(canceller) === 'undefined') {
         canceller = $q.defer();
@@ -36,7 +36,7 @@ angular.module('bulbsCmsApp')
       }).error(function (data, status, headers, config) {
         if (status === 404) {
           $scope.targetingArray = [];
-          $scope.targetingArray.push(["", ""]);
+          $scope.targetingArray.push(['', '']);
           NProgress.done();
         }
       });
