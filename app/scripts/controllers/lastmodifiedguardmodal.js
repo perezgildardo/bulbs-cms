@@ -5,7 +5,7 @@ angular.module('bulbsCmsApp')
     $scope.articleOnServer = articleOnServer;
 
     ContentApi.all('log').getList({content: article.id}).then(function (log) {
-      var latest = _.max(log, function (entry) { return moment(entry.action_time); })
+      var latest = _.max(log, function (entry) { return moment(entry.action_time); });
       var lastSavedById = latest.user;
       ContentApi.one('author', lastSavedById).get().then(function (data) {
         $scope.lastSavedBy = data;

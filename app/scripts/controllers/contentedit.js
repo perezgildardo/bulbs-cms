@@ -202,7 +202,7 @@ angular.module('bulbsCmsApp')
       $scope.saveArticleDeferred.resolve(resp);
     }
 
-    $scope.$watch('article', function(){
+    $scope.$watch('article', function () {
       if (angular.equals($scope.article, $scope.last_saved_article)) {
         $scope.articleIsDirty = false;
       } else {
@@ -215,7 +215,7 @@ angular.module('bulbsCmsApp')
         $window.onbeforeunload = function () {
           return 'You have unsaved changes. Do you want to continue?';
         };
-      }else{
+      } else {
         $window.onbeforeunload = function () {};
       }
     });
