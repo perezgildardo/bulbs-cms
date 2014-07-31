@@ -1,3 +1,191 @@
+(function( w ){
+    /* We can request an image at every possible width, but let's limit it to a reasonable number
+       We can set these so they correspond to our more common sizes.
+    */
+    function tmpl(text, dict) {
+        for (var k in dict) {
+            text = text.replace("{{" + k + "}}", dict[k]);
+        }
+        return text;
+    }
+    w.picturefill = function(element) {
+        var ps;
+        if (element && element.getAttribute('data-type') === 'image') {
+          ps = [element];
+        }
+        else { 
+          if (typeof element === "undefined") {
+            element = w.document;
+          }
+          ps = element.getElementsByTagName( "div" );
+        }
+
+        var imageData = [];
+        for( var i = 0, il = ps.length; i < il; i++ ){
+            var el = ps[i];
+            if(el.getAttribute( "data-type" ) !== "image" ){
+                continue;
+            }
+            var div = el.getElementsByTagName( "div" )[0];
+            if( el.getAttribute( "data-image-id" ) !== null ){
+                var id = el.getAttribute( "data-image-id" ),
+                    crop = el.getAttribute( "data-crop" );
+                var _w = div.offsetWidth,
+                    _h = div.offsetHeight;
+
+                if (!crop || crop === "" || crop === "auto") {
+                    crop = computeAspectRatio(_w, _h);
+                }
+                if (el.getAttribute("data-format")) {
+                    format = el.getAttribute("data-format");
+                }
+                else {
+                    format = "jpg";
+                }
+
+                var element = div;
+                if (id) {
+                    $(".image-css-" + id).remove();
+                    $.ajax({
+                        url: w.BC_ADMIN_URL + '/api/' + id,
+                        headers: {
+                            'X-Betty-Api-Key': w.BC_API_KEY,
+                            'Content-Type': undefined
+                        },
+                        success: $.proxy(function (res) {
+                            var imageData = res;
+                            if (this.crop === "original") {
+                                createStyle('.image[data-image-id="' + this.id + '"]>div', {
+                                        'padding-bottom':  ((res.height / res.width) * 100) + '%'
+                                }, "image-css-" + this.id);
+
+                                var cropDetails = {x0:0, x1:res.width, y0:0, y1:res.height};
+                            }
+                            else {
+                                var cropDetails = imageData.selections[this.crop]
+                            }
+                            
+                            computeStyle(this.element, imageData, cropDetails)
+                        }, {element: element, id: id, crop:crop}),
+                        error: $.proxy(function() {
+                            if (this.crop === "original") {
+                                //default to 16x9
+                                createStyle('.image[data-image-id="' + this.id + '"]>div', {
+                                    'padding-bottom':  '56.25%', // default to 16x9 for errors
+                                    'background-color':'rgba(200, 0,0, .5)'
+                                }, "image-css-" + this.id);
+                            }
+                        }, {id: id, crop:crop})
+                    });
+                }
+            }
+        }
+    };
+
+    function computeStyle(element, image, selection) {
+        var selector = '.image[data-image-id="' + image.id + '"]>div';
+        var elementWidth = $(selector).width();
+
+        var scale, styles,
+        elementHeight = (image.height / image.width) * elementWidth,
+        s_width = selection.x1 - selection.x0,
+        s_height = selection.y1 - selection.y0,
+        tmp_selection = selection;
+        
+
+        if (!s_width || !s_height) {
+          /*
+              If we have bogus selections, make
+              the crop equal to the whole image
+          */
+          s_width = elementWidth;
+          s_height = elementHeight;
+          tmp_selection = {
+            'x0': 0,
+            'y0': 0,
+            'x1': s_width,
+            'y1': s_height
+          };
+        }
+
+        var imageUrl = w.BC_ADMIN_URL + '/' + image.id + '/original/1200.jpg';
+        scale = elementWidth / s_width;
+
+        var rules = {
+            'background-image': 'url(' + imageUrl +')',
+            'background-size': scaleNumber(image.width, scale) + 'px',
+            'background-position':
+              '-' + scaleNumber(tmp_selection.x0, scale) + 'px ' +
+              '-' + scaleNumber(tmp_selection.y0, scale) + 'px',
+            'background-repeat': 'no-repeat'
+          }
+        createStyle(selector, rules,  "image-css-" + image.id);
+    }
+
+    function createStyle(selector, rules, classname) {
+        var styleNode = document.createElement("style");
+        styleNode.type = "text/css";
+        styleNode.className = classname;
+        var css = "";
+        
+        var temp = "" + selector + '{';
+        for (var rule in rules) {
+            temp += rule + ':' + rules[rule] + ';';
+        }
+        temp += '}';
+        css += temp;
+    
+        if (styleNode.styleSheet) {
+            styleNode.styleSheet.cssText = css;
+        } else {
+            styleNode.appendChild(document.createTextNode(css));
+        }
+        $(document).find("head").append(styleNode);
+    }
+
+
+    function scaleNumber(num, by_scale) {
+      return Math.floor(num * by_scale);
+    };
+
+
+    function computeAspectRatio(_w, _h) {
+        if (_w !== 0 && _h !== 0) {
+            var aspectRatio = Math.ceil(_w/_h * 10);
+            //smooth out rounding issues.
+            switch (aspectRatio) {
+                case 30:
+                case 31:
+                    crop = "3x1";
+                    break;
+                case 20:
+                    crop = "2x1";
+                    break;
+                case 14:
+                    crop = "4x3";
+                    break;
+                case 18:
+                    crop = "16x9";
+                    break;
+                case 8:
+                    crop = "3x4";
+                    break;
+                case 10:
+                    crop = "1x1";
+                    break;
+                default:
+                    crop = "original";
+            }
+            return crop;
+        }
+        else {
+            return "16x9"
+        }
+    }
+
+
+}( this ));;
+'use strict';
 /*
 
 Image
@@ -6,275 +194,28 @@ This bridges the embed module that the editor exposes & our custom image impleme
 
 */
 
-(function(global) {
-   'use strict';
-    var OnionCmsUI = OnionCmsUI  || function(editor, options) {
-        var toolbarPosition;
-        function init() {
-            toolbarPosition = $("#content-body .document-tools").offset().top + 12;
-            $(window).scroll(function() {
-
-                if (window.scrollY > toolbarPosition) {
-                    $("#content-body .document-tools").css("position", "fixed")
-                }
-                else {
-                    $("#content-body .document-tools").css("position", "absolute")
-                }
-            });
-
-            key('⌘+s, ctrl+s', function(e) { e.preventDefault(); }); //SAVE })
-        }
-        function destroy() {
-            key.unbind('⌘+s, ctrl+s');
-        }
-        editor.on("init", init)
-    }
-    global.EditorModules.push(OnionCmsUI);
-})(this);
-
-
-
-
-
-(function(global) {
-    'use strict';
-    var OnionImage = OnionImage || function(editor, instanceOptions) {
-
-        editor.on("inline:edit:image", editImage);
-        editor.on("inline:insert:image", uploadImage);
-
-        function uploadImage(options) {
-            instanceOptions.uploadImage().then(
-                function(success){
-                    var format;
-                    if (success.name.toUpperCase().indexOf("GIF") !== -1) {
-                        format = "gif";
-                    }
-                    else {
-                        format = "jpg";
-                    }
-                    options.onSuccess(options.block, {image_id: success.id, format: format});
-                    window.picturefill();
-                },
-                function(error){
-                    console.log(error);
-                },
-                function(progress){
-                    console.log(progress);
-                }
-            );
-        }
-
-        var activeElement,
-            current_id;
-
-        function editImage(options) {
-
-            current_id = options.element.getAttribute('data-image-id');
-
-            instanceOptions.editImage({id: current_id, caption: '', alt: ''}).then(
-                function (image) {
-
-                    if (image.id === null) {
-                        $(options.element).remove();
-                    } else {
-                        $(options.element).attr('data-image-id', image.id);
-                        $(options.element).attr('data-alt', image.alt);
-                        $(".caption", options.element).html(image.caption);
-                    }
-                    window.picturefill();
-                }
-            );
-
-        }
-    }
-    global.EditorModules.push(OnionImage);
-})(this);
-
-(function(global) {
-    'use strict';
-    var OnionVideo = OnionVideo || function(editor, instanceOptions) {
-
-        editor.on("inline:edit:onion-video", editVideo);
-        editor.on("inline:insert:onion-video", uploadVideo);
-
-        editor.on("init", cleanup);
-
-        function cleanup() {
-            // hack alert: let's transform old embeds here. Not ideal, but whatever.
-            var old_embeds = $("[data-type=embed] iframe[src^='/videos/embed']").parents("div.embed");
-            for (var i = 0; i < old_embeds.length; i++) {
-                var id = $("iframe", old_embeds[i]).attr("src").split("=")[1]
-                $(old_embeds[i]).attr("data-videoid", id);
-            }
-            old_embeds
-                .attr("data-type", "onion-video")
-                .addClass("onion-video")
-                .attr("data-size", "big")
-                .attr("data-crop", "16x9")
-                .removeClass("size-")
-                .removeClass("crop-")
-                .addClass("crop-16x9")
-                .addClass("size-big");
-        }
-
-        function uploadVideo(options) {
-
-            var activeElement = options.onSuccess(options.block, {videoid:"NONE"});
-            return instanceOptions.uploadVideo().then(
-                function(videoObject){
-                    setVideoID(videoObject.attrs.id);
-                }, function(error){
-                    onError(error);
-                }, function(progress){
-                    onProgress(progress);
-                }
-            );
-
-            function onProgress() {
-                //update an indicator
-            }
-
-            function setVideoID(id) {
-                $("iframe", activeElement).attr("src", instanceOptions.videoEmbedUrl + id);
-                $(activeElement).attr('data-videoid', id)
-            }
-
-            function onError() {
-                //show msg, allow user to trigger upload again
-            }
-
-            function onCancel() {
-                //remove placeholder. Call it a day.
-            }
-
-        }
-
-        function editVideo(el) {
-            var id = $(el.element).data('videoid');
-            window.editVideo(id);
-        }
-    }
-    global.EditorModules.push(OnionVideo);
-})(this);
-
-(function(global) {
-    'use strict';
-    var ArticleList = ArticleList || function(editor, options) {
-        //editor.on("inline:edit:articlelist", editImage);
-        editor.on("inline:insert:articlelist", insert);
-        function insert(options) {
-            options.onSuccess(options.block, {})
-        }
-    }
-    global.EditorModules.push(ArticleList);
-})(this);
-
-
-
-(function(global) {
-    'use strict';
-    var Embed = Embed || function(editor, options) {
-        var self = this;
-        editor.on("inline:edit:embed", edit);
-        editor.on("inline:insert:embed", insert);
-
-        $("#embed-modal").on("hide.bs.modal", function() {
-            $("#set-embed-button").unbind("click");
-            $(".embed-error").hide();
-        });
-
-
-        function edit(opts) {
-            //populate modal contents
-
-            $("#embed-modal .embed-body").val(unescape($(opts.element).attr("data-body")));
-            $("#embed-modal .embed-source").val($(opts.element).attr("data-source"));
-            $("#embed-modal .embed-caption").val($(".caption", opts.element).text());
-
-
-            $("#embed-modal").modal("show");
-            $("#set-embed-button").click(function () {
-                var embed_body = $("#embed-modal .embed-body").val();
-                if (embed_body.trim() === "") {
-                     $(".embed-error").show();
-                }
-                else {
-                    $(".embed-error").hide();
-                    opts.onChange(opts.element,
-                        {body: embed_body,
-                        caption: $("#embed-modal .embed-caption").val(),
-                        source: $("#embed-modal .embed-source").val(),
-                        escapedbody: escape(embed_body)
-                    })
-                    $("#embed-modal").modal("hide");
-
-                }
-            });
-            $("#embed-modal").modal("show");
-        }
-
-        function insert(opts) {
-            $("#embed-modal input, #embed-modal textarea").val("")
-            $("#embed-modal").modal("show");
-
-            $("#set-embed-button").click(function () {
-                var embed_body = $("#embed-modal .embed-body").val();
-
-                if (embed_body.trim() === "") {
-                     $(".embed-error").show();
-                }
-                else {
-                    $(".embed-error").hide();
-                    opts.onSuccess(opts.block,
-                        {body: embed_body,
-                        caption: $("#embed-modal .embed-caption").val(),
-                        source: $("#embed-modal .embed-source").val(),
-                        escapedbody: escape(embed_body)
-                    })
-                    $("#embed-modal").modal("hide");
-                }
-            });
-        }
-    }
-    global.EditorModules.push(Embed);
-})(this);
-
-
-(function(global) {
-    'use strict';
-    var HR = HR || function(editor, options) {
-        //editor.on("inline:edit:articlelist", editImage);
-        editor.on("inline:insert:hr", insert);
-        function insert(options) {
-            $(options.block).before('<hr>');
-        }
-    }
-    global.EditorModules.push(HR);
-})(this);
 
 /* prevents backspace from accidentally triggering a back event */
 
 $(document).unbind('keydown').bind('keydown', function (event) {
-    var doPrevent = false;
-    if (event.keyCode === 8) {
-        var d = event.srcElement || event.target;
-        if (['TEXTAREA', 'INPUT'].indexOf(d.tagName.toUpperCase() !==  -1)) {
-            doPrevent = d.readOnly || d.disabled;
-        }
-        //we're in a content editable field
-        else if (d.isContentEditable) {
-            doPrevent = false;
-        }
-        else {
-            doPrevent = true;
-        }
+  var doPrevent = false;
+  if (event.keyCode === 8) {
+    var d = event.srcElement || event.target;
+    if (['TEXTAREA', 'INPUT'].indexOf(d.tagName.toUpperCase() !==  -1)) {
+      doPrevent = d.readOnly || d.disabled;
     }
-    if (doPrevent) {
-        event.preventDefault();
+    //we're in a content editable field
+    else if (d.isContentEditable) {
+      doPrevent = false;
+    } else {
+      doPrevent = true;
     }
+  }
+  if (doPrevent) {
+    event.preventDefault();
+  }
 });
-;
+
 'use strict';
 
 // ****** External Libraries ****** \\
@@ -339,19 +280,19 @@ angular.module('bulbsCmsApp', [
       redirectTo: '/cms/app/list/'
     });
 
-    //TODO: whitelist staticonion.
-    $sceProvider.enabled(false);
-    /*.resourceUrlWhitelist([
-    'self',
-    STATIC_URL + "**"]);*/
+  //TODO: whitelist staticonion.
+  $sceProvider.enabled(false);
+  /*.resourceUrlWhitelist([
+  'self',
+  STATIC_URL + "**"]);*/
 
 })
 .config(function ($provide, $httpProvider) {
-  $provide.decorator('$exceptionHandler', function($delegate) {
-    return function(exception, cause) {
+  $provide.decorator('$exceptionHandler', function ($delegate) {
+    return function (exception, cause) {
       $delegate(exception, cause);
       window.Raven.captureException(exception);
-    }
+    };
   });
 
   $httpProvider.interceptors.push('BugReportInterceptor');
@@ -367,7 +308,7 @@ angular.module('bulbsCmsApp', [
   $http.defaults.headers.delete = deleteHeaders;
 });
 
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -391,7 +332,7 @@ angular.module('bulbsCmsApp')
 
     $scope.getContent = function (params, merge) {
         params = params || {};
-        if(merge){
+        if (merge) {
           var curParams = $location.search();
           params = $.extend(true, curParams, params);
         }
@@ -490,7 +431,7 @@ angular.module('bulbsCmsApp')
       };
     }
   ]);
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -532,7 +473,7 @@ angular.module('bulbsCmsApp')
     }
     getContent();
 
-    $scope.$watch('article.title', function(){
+    $scope.$watch('article.title', function () {
       $window.document.title = routes.CMS_NAMESPACE + ' | Editing ' + ($scope.article && $('<span>' + $scope.article.title + '</span>').text());
     });
 
@@ -554,9 +495,9 @@ angular.module('bulbsCmsApp')
       Localstoragebackup.backupToLocalStorage();
 
       ContentApi.one('content', $routeParams.id).get().then(function (data) {
-        if(data.last_modified &&
+        if (data.last_modified &&
           $scope.article.last_modified &&
-          moment(data.last_modified) > moment($scope.article.last_modified)){
+          moment(data.last_modified) > moment($scope.article.last_modified)) {
           $scope.saveArticleDeferred.reject();
           $modal.open({
             templateUrl: routes.PARTIALS_URL + 'modals/last-modified-guard-modal.html',
@@ -567,7 +508,7 @@ angular.module('bulbsCmsApp')
               articleOnServer: function () { return data; },
             }
           });
-        }else{
+        } else {
           $scope.postValidationSaveArticle();
         }
       });
@@ -577,8 +518,8 @@ angular.module('bulbsCmsApp')
     };
 
     var listener = new keypress.Listener();
-    listener.simple_combo('cmd s', function(e) { $scope.saveArticle(); });
-    listener.simple_combo('ctrl s', function(e) { $scope.saveArticle(); });
+    listener.simple_combo('cmd s', function (e) { $scope.saveArticle(); });
+    listener.simple_combo('ctrl s', function (e) { $scope.saveArticle(); });
 
     $scope.postValidationSaveArticle = function () {
 
@@ -594,8 +535,8 @@ angular.module('bulbsCmsApp')
 
     }
 
-    var saveHTML =  "<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save";
-    var navbarSave = ".navbar-save";
+    var saveHTML =  '<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save';
+    var navbarSave = '.navbar-save';
 
 
     function saveToContentApi() {
@@ -605,7 +546,6 @@ angular.module('bulbsCmsApp')
     }
 
     function saveArticleErrorCbk(data) {
-      console.log(data)
       $(navbarSave).html('<i class=\'glyphicon glyphicon-remove\'></i> Error');
       if (status === 400) {
         $scope.errors = data;
@@ -625,20 +565,20 @@ angular.module('bulbsCmsApp')
       $scope.saveArticleDeferred.resolve(resp);
     }
 
-    $scope.$watch('article', function(){
-      if(angular.equals($scope.article, $scope.last_saved_article)){
+    $scope.$watch('article', function () {
+      if (angular.equals($scope.article, $scope.last_saved_article)) {
         $scope.articleIsDirty = false;
-      }else{
+      } else {
         $scope.articleIsDirty = true;
       }
     }, true);
 
-    $scope.$watch('articleIsDirty', function(){
-      if($scope.articleIsDirty){
+    $scope.$watch('articleIsDirty', function () {
+      if ($scope.articleIsDirty) {
         $window.onbeforeunload = function () {
           return 'You have unsaved changes. Do you want to continue?';
         };
-      }else{
+      } else {
         $window.onbeforeunload = function () {};
       }
     });
@@ -654,15 +594,13 @@ angular.module('bulbsCmsApp')
       }, 1500);
     };
 
-
-    var backupInterval = (function(){
+    var backupInterval = (function () {
       var interval = 60000; //1 minute
-      return $interval(Localstoragebackup.backupToLocalStorage, interval)
+      return $interval(Localstoragebackup.backupToLocalStorage, interval);
     })();
 
-
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -682,10 +620,10 @@ angular.module('bulbsCmsApp')
       }
     });
 
-    $scope.$watch('promotedArticles', function(){
-      if(_.isEqual($scope.promotedArticles, $scope.lastSavedPromotedArticles)){
+    $scope.$watch('promotedArticles', function () {
+      if (_.isEqual($scope.promotedArticles, $scope.lastSavedPromotedArticles)) {
         $scope.promotedArticlesDirty = false;
-      }else{
+      } else {
         $scope.promotedArticlesDirty = true;
       }
     }, true);
@@ -799,11 +737,11 @@ angular.module('bulbsCmsApp')
         payload.content = $scope.promotedArticles;
       }
       var pzone = ContentApi.restangularizeElement(null, payload, 'contentlist');
-      return pzone.put().then(function(data){
+      return pzone.put().then(function (data) {
         $scope.lastSavedPromotedArticles = _.clone(data.content);
         $scope.promotedArticles = data.content;
         $('.save-button').html(oldSaveHtml);
-      }, function(data){
+      }, function (data) {
         Raven.captureMessage('Error Saving Pzone', {extra: data});
         $('.save-button').html('<i class="fa fa-times-circle"></i> Error');
       });
@@ -829,7 +767,7 @@ angular.module('bulbsCmsApp')
 
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -842,7 +780,7 @@ angular.module('bulbsCmsApp')
 
     var canceller;
     $scope.search = function (url) {
-      if(!url) { return; }
+      if (!url) { return; }
 
       if (typeof(canceller) === 'undefined') {
         canceller = $q.defer();
@@ -866,13 +804,13 @@ angular.module('bulbsCmsApp')
         }
         NProgress.done();
       }).error(function (data, status, headers, config) {
-        if (status == 404) {
+        if (status === 404) {
           $scope.targetingArray = [];
-          $scope.targetingArray.push(["", ""]);
+          $scope.targetingArray.push(['', '']);
           NProgress.done();
         }
       });
-    }
+    };
 
     $scope.save = function () {
       var data = {};
@@ -897,9 +835,9 @@ angular.module('bulbsCmsApp')
       if (event.keyCode === 13) { // enter
         this.search(url);
       } else if (event.keyCode === 27) { // escape
-        event.currentTarget.value = "";
+        event.currentTarget.value = '';
       }
-    }
+    };
 
     //grab url query key
     var search = $location.search();
@@ -908,7 +846,7 @@ angular.module('bulbsCmsApp')
     }
   }
 );
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -921,7 +859,7 @@ angular.module('bulbsCmsApp')
         controller: 'TrashcontentmodalCtrl',
         scope: $scope,
         resolve: {
-          articleId: function(){ return articleId; }
+          articleId: function () { return articleId; }
         }
       });
     };
@@ -932,7 +870,7 @@ angular.module('bulbsCmsApp')
         controller: 'PubtimemodalCtrl',
         scope: $scope,
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
@@ -943,7 +881,7 @@ angular.module('bulbsCmsApp')
         controller: 'SendtoeditormodalCtrl',
         scope: $scope,
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
@@ -954,7 +892,7 @@ angular.module('bulbsCmsApp')
         controller: 'ChangelogmodalCtrl',
         scope: $scope,
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
@@ -964,7 +902,7 @@ angular.module('bulbsCmsApp')
         templateUrl: routes.PARTIALS_URL + 'modals/thumbnail-modal.html',
         scope: $scope,
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
@@ -975,7 +913,7 @@ angular.module('bulbsCmsApp')
         templateUrl: routes.PARTIALS_URL + 'modals/sponsored-content-modal.html',
         scope: $scope,
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
@@ -986,10 +924,10 @@ angular.module('bulbsCmsApp')
         scope: $scope,
         controller: 'SponsormodalCtrl',
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
-    }
+    };
 
     $scope.versionBrowserModal = function (article) {
       return $modal.open({
@@ -998,29 +936,29 @@ angular.module('bulbsCmsApp')
         scope: $scope,
         size: 'lg',
         resolve: {
-          article: function(){ return article; }
+          article: function () { return article; }
         }
       });
     };
 
     $scope.getStatus = function (article) {
-      if(!article || !article.published){
+      if (!article || !article.published) {
         return 'unpublished';
-      }else if(moment(article.published) > moment()){
+      } else if (moment(article.published) > moment()) {
         return 'scheduled';
-      }else{
+      } else {
         return 'published';
       }
     };
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .controller('TrashcontentmodalCtrl', function ($scope, $http, $modalInstance, $, Login, articleId, Raven) {
-    console.log('trash content modal ctrl here')
-    console.log(articleId)
+    console.log('trash content modal ctrl here');
+    console.log(articleId);
 
     $scope.deleteButton = {
       idle: 'Delete',
@@ -1030,7 +968,7 @@ angular.module('bulbsCmsApp')
     };
 
     $scope.trashContent = function () {
-      console.log("trash content here");
+      console.log('trash content here');
       return $http({
         'method': 'POST',
         'url': '/cms/api/v1/content/' + articleId + '/trash/'
@@ -1040,7 +978,7 @@ angular.module('bulbsCmsApp')
     $scope.trashCbk = function (trash_promise) {
       trash_promise
         .then(function (result) {
-          console.log("trash success")
+          console.log('trash success');
           $scope.trashSuccessCbk();
           $modalInstance.close();
         })
@@ -1053,9 +991,9 @@ angular.module('bulbsCmsApp')
           Raven.captureMessage('Error Deleting Article', {extra: reason});
           $modalInstance.dismiss();
         });
-    }
+    };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1067,9 +1005,9 @@ angular.module('bulbsCmsApp')
       busy: 'Publishing',
       finished: 'Published!',
       error: 'Error!'
-    }
+    };
 
-    $scope.$watch('pickerValue', function(newVal){
+    $scope.$watch('pickerValue', function (newVal) {
       var pubTimeMoment = moment(newVal).zone(TIMEZONE_OFFSET);
       $scope.datePickerValue = moment()
         .year(pubTimeMoment.year())
@@ -1084,25 +1022,25 @@ angular.module('bulbsCmsApp')
     var modelDateFormat = 'YYYY-MM-DDTHH:mmZ';
 
     $scope.setTimeShortcut = function (shortcut) {
-      if(shortcut == 'now'){
+      if (shortcut === 'now') {
         var now = moment().zone(TIMEZONE_OFFSET);
         $scope.pickerValue = now;
       }
-      if(shortcut == 'midnight'){
+      if (shortcut === 'midnight') {
         var midnight = moment().zone(TIMEZONE_OFFSET).hour(24).minute(0);
         $scope.pickerValue = midnight;
       }
-    }
+    };
 
     $scope.setDateShortcut = function (shortcut) {
       var today = moment().zone(TIMEZONE_OFFSET);
-      if(shortcut == 'today'){
+      if (shortcut === 'today') {
         $scope.datePickerValue = moment().year(today.year()).month(today.month()).date(today.date());
       }
-      if(shortcut == 'tomorrow'){
+      if (shortcut === 'tomorrow') {
         $scope.datePickerValue = moment().year(today.year()).month(today.month()).date(today.date() + 1);
       }
-    }
+    };
 
     $scope.setPubTime = function () {
       //we're planning on making feature_type a db required field
@@ -1123,7 +1061,7 @@ angular.module('bulbsCmsApp')
         .date(newDate.date())
         .hour(newTime.hour())
         .minute(newTime.minute())
-        .format(modelDateFormat)
+        .format(modelDateFormat);
       var data = {published: newDateTime};
 
       return $http({
@@ -1137,11 +1075,13 @@ angular.module('bulbsCmsApp')
       publish_promise
         .then(function (result) {
           $scope.article.published = result.data.published;
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          }
           $modalInstance.close();
         })
         .catch(function (reason) {
-          Raven.captureMessage('Error Setting Pubtime', {extra: data});
+          Raven.captureMessage('Error Setting Pubtime', {extra: reason.data});
           $modalInstance.dismiss();
         });
     };
@@ -1165,23 +1105,27 @@ angular.module('bulbsCmsApp')
     $scope.unpublishCbk = function (unpub_promise) {
       unpub_promise
         .then(function (result) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          }
           $modalInstance.close();
         })
         .catch(function (reason) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
+          }
           $modalInstance.dismiss();
-        })
+        });
     };
 
-    if($scope.article.published){
+    if ($scope.article.published) {
       $scope.pickerValue = moment($scope.article.published);
-    }else{
+    } else {
       $scope.setTimeShortcut('now');
     }
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1239,10 +1183,10 @@ angular.module('bulbsCmsApp')
     };
 
     function roundSelection(number, max) {
-      if(number < 0) return 0;
-      if(number > max) return max;
+      if (number < 0) { return 0; }
+      if (number > max) { return max; }
       return number;
-    };
+    }
 
     $scope.setSelectedCrop = function (ratio, selection) {
       $scope.cropMode = true;
@@ -1267,7 +1211,7 @@ angular.module('bulbsCmsApp')
           $scope.image.selections[$scope.ratioOrder[0]]
         );
       }
-    }
+    };
 
     $scope.$watch('selectedCrop', function (newVal) {
       if (angular.isUndefined(newVal)) {  return;  }
@@ -1384,7 +1328,7 @@ angular.module('bulbsCmsApp')
     $scope.$watchCollection('image.selections', function (newCollection, oldCollection) {
       var uncomputedCrops = [];
       for (var ratio in newCollection) {
-        if (newCollection[ratio].source != 'user') {
+        if (newCollection[ratio].source !== 'user') {
           uncomputedCrops.push(ratio);
         }
       }
@@ -1406,7 +1350,7 @@ angular.module('bulbsCmsApp')
         classes['bg-info'] = true;
       }
 
-      if ($scope.image.selections[ratio].source == 'user') {
+      if ($scope.image.selections[ratio].source === 'user') {
         classes['fa-check bootstrap-green'] = true;
       } else {
         classes['fa-circle-thin'] = true;
@@ -1418,18 +1362,18 @@ angular.module('bulbsCmsApp')
     $scope.isCropDone = function (ratio) {
       var classes = {};
 
-      if ($scope.image.selections[ratio].source == 'user') {
+      if ($scope.image.selections[ratio].source === 'user') {
         classes['fa-check bootstrap-green'] = true;
       }
 
       return classes;
-    }
+    };
 
     $scope.onInit = function () {
       BettyCropper.detail($scope.img_ref.id)
         .success(function (data) {
           $scope.image = data;
-          if(cropsToEdit){
+          if (cropsToEdit) {
             $scope.image.selections = {'16x9': $scope.image.selections['16x9']};
           }
           $scope.setThumbStyles($scope.image, $scope.image.selections);
@@ -1457,27 +1401,26 @@ angular.module('bulbsCmsApp')
           });
 
         });
-    }
+    };
 
     $scope.onInit();
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .controller('LoginmodalCtrl', function ($scope, Login, $modalInstance, $) {
-    $scope.login = function(){
-      var username = $("input[name='username']").val();
-      var password = $("input[name='password']").val();
+    $scope.login = function () {
+      var username = $('input[name=\'username\']').val();
+      var password = $('input[name=\'password\']').val();
       Login.login(username, password).then(
-        function(){ $modalInstance.close(); },
-        function(){ $modalInstance.dismiss(); }
-      )
-    }
-
+        function () { $modalInstance.close(); },
+        function () { $modalInstance.dismiss(); }
+      );
+    };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1502,15 +1445,19 @@ angular.module('bulbsCmsApp')
     $scope.unpublishCbk = function (unpub_promise) {
       unpub_promise
         .then(function (result) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: result.data});
+          }
         })
         .catch(function (reason) {
-          $scope.publishSuccessCbk && $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
-        })
+          if ($scope.publishSuccessCbk) {
+            $scope.publishSuccessCbk({article: $scope.article, response: reason.data});
+          }
+        });
     };
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1523,13 +1470,13 @@ angular.module('bulbsCmsApp')
       link: function postLink(scope, element, attrs) {
         scope.href = attrs.href;
         scope.label = attrs.label;
-        if($location.path().indexOf(scope.href) === 0){
+        if ($location.path().indexOf(scope.href) === 0) {
           element.addClass('active');
         }
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1546,7 +1493,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1556,7 +1503,7 @@ angular.module('bulbsCmsApp')
           <div class="entry" ng-repeat="option in autocomplete_list" ng-click="onClick(option)">\
               {{display(option);}}\
           </div>\
-      </div>'
+      </div>';
 
     return {
       restrict: 'AC',
@@ -1627,7 +1574,6 @@ angular.module('bulbsCmsApp')
           });
         }
 
-        scope.blurTimeout;
         $elem.on('blur', function (e) {
           $(dropdown).fadeOut('fast');
         });
@@ -1682,7 +1628,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1710,7 +1656,7 @@ angular.module('bulbsCmsApp')
         $scope.dismissModal = function () {
           $scope.modalVisible = false;
           $scope.showThankYou = false;
-        }
+        };
 
         $scope.sendToWebtech = function () {
           var report =
@@ -1730,10 +1676,10 @@ angular.module('bulbsCmsApp')
           promise
             .then(function () {
               $scope.showThankYou = true;
-              $timeout(function() {
+              $timeout(function () {
                 $scope.dismissModal();
                 for (var entry in $scope.report) {
-                  $scope.report[entry] = "";
+                  $scope.report[entry] = '';
                 }
               }, 5000);
             });
@@ -1744,7 +1690,7 @@ angular.module('bulbsCmsApp')
           Will revisit when we review how to
           report bugs on the CMS.
         */
-        $window.showBugReportModal = function() {
+        $window.showBugReportModal = function () {
           $scope.$apply($scope.showModal());
         };
 
@@ -1752,9 +1698,9 @@ angular.module('bulbsCmsApp')
       link: function (scope, element) {
 
       }
-    }
+    };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1773,7 +1719,7 @@ angular.module('bulbsCmsApp')
 
         $scope.imageData = null;
 
-        function uploadSuccess(response){
+        function uploadSuccess(response) {
           if (!$scope.image) {
             $scope.image = {
               id: null,
@@ -1787,16 +1733,16 @@ angular.module('bulbsCmsApp')
           $scope.editImage();
         }
 
-        $scope.upload = function(e){
+        $scope.upload = function (e) {
           BettyCropper.upload().then(
-            function(success){
+            function (success) {
               uploadSuccess(success);
             },
-            function(error){
+            function (error) {
               console.log(error);
             },
-            function(progress){
-              console.log(error);
+            function (progress) {
+              console.log(progress);
             }
           );
         };
@@ -1866,7 +1812,7 @@ angular.module('bulbsCmsApp')
           ).success(function (response) {
             scope.imageData = response;
             scope.showImage();
-          }).error(function(data, status, headers, config){
+          }).error(function (data, status, headers, config) {
             if (status === 404) {
               var el_Height = (ratioHeight / ratioWidth) * $(element).parent().width();
               scope.imageStyling = {
@@ -1886,10 +1832,11 @@ angular.module('bulbsCmsApp')
         };
 
         scope.editImage = function () {
-          if(attrs.editRatios){
-            var editRatios = eval(attrs.editRatios);
-          }else{
-            var editRatios = false;
+          var editRatios;
+          if (attrs.editRatios) {
+            editRatios = eval(attrs.editRatios);
+          } else {
+            editRatios = false;
           }
           openImageCropModal(scope.image, editRatios)
           .then(function (image) {
@@ -1899,8 +1846,8 @@ angular.module('bulbsCmsApp')
               scope.image = image;
               scope.getImageData();
             }
-          })
-        }
+          });
+        };
 
         if (scope.image && scope.image.id) {
           scope.showImage();
@@ -1909,7 +1856,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1932,7 +1879,7 @@ angular.module('bulbsCmsApp')
         var height = (scope.width * ratioHeight / ratioWidth) + 'px';
 
         element.css('width', scope.width + 'px');
-        element.css('height', (scope.width * ratioHeight / ratioWidth) + 'px');
+        element.css('height', height);
 
         var selection = scope.image.selections[scope.ratio];
         var selectionWidth = (selection.x1 - selection.x0);
@@ -1944,7 +1891,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -1983,12 +1930,12 @@ angular.module('bulbsCmsApp')
             $scope.gotTags = true;
           }
 
-          if(AUTO_ADD_AUTHOR){
-            ContentApi.one('me').get().then(function(data){
+          if (AUTO_ADD_AUTHOR) {
+            ContentApi.one('me').get().then(function (data) {
               $scope.init.authors = [data];
               $scope.gotUser = true;
             });
-          }else{
+          } else {
             $scope.gotUser = true;
           }
 
@@ -2057,8 +2004,8 @@ angular.module('bulbsCmsApp')
           }
         });
 
-        $('#create').on('hidden.bs.modal', function(){
-          scope.newTitle = "";
+        $('#create').on('hidden.bs.modal', function () {
+          scope.newTitle = '';
           scope.panel = 1;
         });
 
@@ -2066,7 +2013,7 @@ angular.module('bulbsCmsApp')
 
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2096,7 +2043,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2107,7 +2054,6 @@ angular.module('bulbsCmsApp')
       link: function (scope, element, attrs) {
         var $element = $(element);
         var $input = $element.find('input');
-        scope.searchTerm;
 
         scope.autocompleteArray = [];
 
@@ -2231,10 +2177,10 @@ angular.module('bulbsCmsApp')
           $input.trigger('blur');
         }
 
-        function getFilterObjects () {
+        function getFilterObjects() {
           var search = $location.search();
           scope.filterObjects = {};
-          if (typeof(search) === 'undefined') { console.log("udnefined"); return; }
+          if (typeof(search) === 'undefined') { console.log('undefined'); return; }
           //TODO: this sucks
           var filterParamsToTypes = {'authors': 'author', 'tags': 'tag', 'feature_types': 'feature_type'};
           for (var filterParam in filterParamsToTypes) {
@@ -2281,7 +2227,7 @@ angular.module('bulbsCmsApp')
 
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp').directive(
@@ -2298,7 +2244,7 @@ angular.module('bulbsCmsApp').directive(
         console.log(scope.video_id);
         scope.$watch('article.video', function () {
           if (scope.article.video) {
-            scope.embedUrl = $sce.trustAsUrl('/videos/embed?id=' + scope.article.video);
+            scope.embedUrl = $sce.trustAsUrl('/video/embed?id=' + scope.article.video);
             $http({
               method: 'GET',
               url: '/videos/api/video/' + scope.article.video + '/'
@@ -2315,7 +2261,6 @@ angular.module('bulbsCmsApp').directive(
 
         });
 
-        var button = element.find('label.btn');
         var progressEl = element.find('div.progress');
         var progressBar = element.find('div.progress-bar');
         var progressText = element.find('div.progress span');
@@ -2354,7 +2299,9 @@ angular.module('bulbsCmsApp').directive(
 
         function abortUpload() {
           setProgress(0);
-          scope.req && scope.req.abort();
+          if (scope.req) {
+            scope.req.abort();
+          }
           scope.video = {};
           setProgress(0);
         }
@@ -2444,7 +2391,7 @@ angular.module('bulbsCmsApp').directive(
 
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2455,11 +2402,11 @@ angular.module('bulbsCmsApp')
       templateUrl: routes.PARTIALS_URL + 'logged-in-user.html',
       scope: {},
       link: function (scope, element, attrs) {
-        scope.current_user = CurrentUser
+        scope.current_user = CurrentUser;
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2482,7 +2429,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2502,7 +2449,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2578,11 +2525,11 @@ angular.module('bulbsCmsApp')
           if (scope.saveCbk) {
             scope.saveCbk({promise: promise});
           }
-        }
+        };
       }
-    }
-  })
-;
+    };
+  });
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2639,7 +2586,7 @@ angular.module('bulbsCmsApp')
 
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2657,160 +2604,99 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .provider('EditorOptions', function () {
-    var _options = {
-      "image": {
-        "size": ["big", "medium", "small", "tiny"],
-        "crop": ["original", "16x9", "1x1", "3x1"],
-        "defaults": {
-          "size": "big",
-          "crop": "original",
-          "image_id": 0,
-          "caption": "",
-          "url": "",
-          "format": "jpg"
-        },
-        "template":
-          "<div data-type=\"image\" class=\"onion-image image inline size-{{size}} crop-{{crop}}\" data-image-id=\"{{image_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\" data-format=\"{{format}}\"><div></div><span class=\"caption\">{{caption}}</span></div>"
-      },
-      "onion-video": {
-        "size": ["big"],
-        "crop": ["16x9"],
-        "defaults": {
-          "size": "big",
-          "crop": "16x9"
-        },
-        "template":
-          "<div data-type=\"onion-video\" class=\"onion-video video inline size-{{size}} crop-{{crop}}\" data-video-id=\"{{video_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><div><iframe src=\"/videos/embed?id={{video_id}}\"></iframe></div></div>"
-      },
-      "embed": {
-        "size": ["original", "big", "small"],
-        "crop": ["16x9", "4x3", "auto"],
-        "defaults": {
-          "size":"original",
-          "crop": "auto",
-          "body": ""
-        },
-        "template":
-          "<div data-type=\"embed\" data-crop=\"{{crop}}\" class=\"inline embed size-{{size}} crop-{{crop}}\" data-source=\"{{source}}\" data-body=\"{{escapedbody}}\"><div>{{body}}</div><span class=\"caption\">{{caption}}</span></div>"
-      },
-      "youtube": {
-        "size": ["big"],
-        "crop": ["16x9", "4x3"],
-        "defaults": {
-          "size": "big",
-          "crop": "16x9",
-          "youtube_id": "foMQX9ZExsE",
-          "caption": ""
-        },
-        "template":
-        "<div data-type=\"youtube\" class=\"youtube inline size-{{size}} crop-{{crop}}\" data-youtube-id=\"{{youtube_id}}\" data-size=\"{{size}}\" data-crop=\"{{crop}}\"><div><img src=\"http://img.youtube.com/vi/{{youtube_id}}/hqdefault.jpg\"></div<span class=\"caption\">{{caption}}</span></div>"
-      },
-      "hr": {
-        "template":  "<hr/>"
-      }
-    };
-
-    this.setOptions = function(options) {
-      _options = options;
-    };
-
-    this.$get = function () {
-      return {
-        getOptions: function () {
-          return _options;
-        }
-      };
-    };
-
-  })
-  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, openImageCropModal, EditorOptions, VIDEO_EMBED_URL) {
-
-    /* Gab configuration out of .  */
-
+  .directive('onionEditor', function (routes, $, Zencoder, BettyCropper, openImageCropModal, VIDEO_EMBED_URL) {
     return {
       require: 'ngModel',
       replace: true,
       restrict: 'E',
       templateUrl: routes.PARTIALS_URL + 'editor.html',
-      scope: {ngModel:'='},
-      link: function(scope, element, attrs, ngModel) {
+      scope: {ngModel: '='},
+      link: function (scope, element, attrs, ngModel) {
 
         if (!ngModel) {
           return;
         }
 
-        if (attrs.role == "multiline") {
-          var defaultValue = "<p><br></p>";
-          var options = {
-            /* global options */
-            element: element[0],
-            onContentChange: read,
-            toolbar: {
-              linkTools: $("#link-tools-template").html()
+        var formatting;
+        if (attrs.formatting) {
+          formatting = attrs.formatting.split(',');
+        }
+
+        var options = {};
+
+        if (attrs.role === 'multiline') {
+          options = {
+            // global options
+            multiline: true,
+            formatting: formatting || ['link', 'bold', 'italic', 'blockquote', 'heading', 'list', 'strike'],
+            placeholder: {
+              text: attrs.placeholder ||  '<p>Write here</p>',
+              container: $('.editorPlaceholder', element[0])[0],
             },
-            undoManager: new UndoManager(),
-            placeholder: attrs.placeholder ||  "Write here",
-            editSource: true,
-            // NOT SURE WHAT TO DO ABOUT THIS....
-            avlink: {
-              thingsUrl: "/cms/api/v1/things/",
-              contentUrl:"/cms/api/v1/content/",
-              host: "avclub.com"
+            link: {
+              domain: attrs.linkDomain || false,
+              // Sean, you can figure out a nicer way to handle the search handler.
+              searchHandler: window[attrs.linkSearchHandler] || false
             },
-            statsContainer: ".wordcount",
-            /* This probably deserves its own file */
-            inline: EditorOptions.getOptions(),
-            uploadImage: BettyCropper.upload,
-            editImage: openImageCropModal,
-            uploadVideo: Zencoder.onVideoFileUpload,
-            videoEmbedUrl: VIDEO_EMBED_URL
-          }
+            statsContainer: '.wordcount',
+            inlineObjects: attrs.inlineObjects,
+            image: {
+              insertDialog: BettyCropper.upload,
+              editDialog: openImageCropModal,
+            },
+            video: {
+              insertDialog: Zencoder.onVideoFileUpload,
+              editDialog: function () {},
+              videoEmbedUrl: VIDEO_EMBED_URL
+            }
+          };
         }
         else {
-          $(".document-tools, .embed-tools", element).hide();
-          var defaultValue = "";
-          var options = {
-            /* global options */
-            element: element[0],
-            onContentChange: read,
-            placeholder: attrs.placeholder ||  "Type your Headline",
-            allowNewline: false,
-            allowNbsp: false,
-            characterLimit: 200,
-            sanitize: {
-              elements: ['i', 'em'],
-              remove_contents: ['script', 'style', ],
-            }
-          }
+          $('.document-tools, .embed-tools', element).hide();
+          var defaultValue = '';
+          options = {
+            // global options
+            multiline: false,
+            placeholder: {
+              text: attrs.placeholder || 'Write here',
+              container: $('.editorPlaceholder', element[0])[0],
+            },
+            formatting: formatting || []
+          };
         }
 
-        var editor = new Editor(options);
+        var editor = new OnionEditor($('.editor', element[0])[0], options);
 
-        ngModel.$render = function() {
+        ngModel.$render = function () {
           editor.setContent(ngModel.$viewValue || defaultValue);
-        }
+          // register on change here, after the initial load so angular doesn't get mad...
+          setTimeout(function () {
+            editor.setChangeHandler(read);
+          });
+        };
+        
+
         // Write data to the model
         function read() {
-          scope.$apply(function(){
+          scope.$apply(function () {
             var html = editor.getContent();
-            if (html.trim() === defaultValue) {
-              html = "";
-            }
             ngModel.$setViewValue(html);
           });
         }
 
-        scope.$watch(ngModel, function() {
+        scope.$watch(ngModel, function () {
           editor.setContent(ngModel.$viewValue || defaultValue);
+          if (window.picturefill) {
+            window.picturefill(element[0]);
+          }
         });
       }
     };
-  });;
+  });
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2840,7 +2726,7 @@ angular.module('bulbsCmsApp')
       return input;
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -2857,45 +2743,46 @@ angular.module('bulbsCmsApp')
       return input;
     };
   });
-;
+
+'use strict';
+
 angular.module('BettyCropper', [])
   .service('BettyCropper', function BettyCropper($http, $interpolate, $q, IMAGE_SERVER_URL, BC_API_KEY) {
-    var fileInputId = '#bulbs-cms-hidden-image-file-input'
-    var inputTemplate = '<input id="bulbs-cms-hidden-image-file-input" type="file" accept="image/*" style="position: absolute; left:-99999px;" name="image" />'
+    var fileInputId = '#bulbs-cms-hidden-image-file-input';
+    var inputTemplate = '<input id="bulbs-cms-hidden-image-file-input" type="file" accept="image/*" style="position: absolute; left:-99999px;" name="image" />';
 
     this.upload = function () {
       var uploadImageDeferred = $q.defer();
 
       angular.element(fileInputId).remove();
       var fileInput = angular.element(inputTemplate);
-      var file;
       angular.element('body').append(fileInput);
       fileInput.click();
       fileInput.unbind('change');
 
-      fileInput.bind('change', function(elem){
-        if (this.files.length != 1) {
+      fileInput.bind('change', function (elem) {
+        if (this.files.length !== 1) {
           uploadImageDeferred.reject('We need exactly one image!');
         }
         var file = this.files[0];
-        if (file.type.indexOf('image/') != 0) {
+        if (file.type.indexOf('image/') !== 0) {
           uploadImageDeferred.reject('Not an image!');
         }
 
-        if (file.size > 10*1024*1024) { //MAGIC!
-          uploadImageDeferred.reject('The file is too large!')
+        if (file.size > 10 * 1024 * 1024) { // MAGIC!
+          uploadImageDeferred.reject('The file is too large!');
         }
 
-        newImage(file).success(function(success){
+        newImage(file).success(function (success) {
           uploadImageDeferred.resolve(success);
-        }).error(function(error){
+        }).error(function (error) {
           uploadImageDeferred.reject(error);
         });
 
       });
 
       return uploadImageDeferred.promise;
-    }
+    };
 
     this.detail = function (id) {
       return $http({
@@ -2928,7 +2815,7 @@ angular.module('BettyCropper', [])
       });
     };
 
-    function newImage (image, name, credit) {
+    function newImage(image, name, credit) {
       var imageData = new FormData();
       imageData.append('image', image);
       if (name) { imageData.append('name', name); }
@@ -2945,12 +2832,12 @@ angular.module('BettyCropper', [])
         data: imageData,
         transformRequest: angular.identity
       });
-    };
+    }
 
     this.updateSelection = function (id, ratio, selections) {
       return $http({
         method: 'POST',
-        url: IMAGE_SERVER_URL + '/api/' + id + "/" + ratio,
+        url: IMAGE_SERVER_URL + '/api/' + id + '/' + ratio,
         headers: {
           'X-Betty-Api-Key': BC_API_KEY,
           'Content-Type': undefined,
@@ -2962,7 +2849,7 @@ angular.module('BettyCropper', [])
 
     this.url = function (id, crop, width, format) {
       var exp = $interpolate(
-        "{{ url }}/{{ id }}/{{ crop }}/{{ width }}.{{ format }}"
+        '{{ url }}/{{ id }}/{{ crop }}/{{ width }}.{{ format }}'
       );
       return exp({
         url: IMAGE_SERVER_URL,
@@ -2982,7 +2869,7 @@ angular.module('BettyCropper', [])
     };
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3016,7 +2903,7 @@ angular.module('bulbsCmsApp')
       }).catch(errorCbk);
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3024,7 +2911,7 @@ angular.module('bulbsCmsApp')
     var openImageCropModal = function (image, cropsToEdit) {
 
       return $modal.open({
-        templateUrl: routes.PARTIALS_URL + "image-crop-modal.html",
+        templateUrl: routes.PARTIALS_URL + 'image-crop-modal.html',
         controller: 'ImageCropModalCtrl',
         resolve: {
           img_ref: function () { return image; },
@@ -3036,7 +2923,7 @@ angular.module('bulbsCmsApp')
 
     return openImageCropModal;
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3062,7 +2949,7 @@ angular.module('bulbsCmsApp')
   })
   .constant('bulbsApiConfig', {
     requestSuffix: '/'
-  });;
+  });
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3071,14 +2958,14 @@ angular.module('bulbsCmsApp')
     var self = this;
 
     this.getItems = function () {
-      ContentApi.one('me').get().then(function(data){
+      ContentApi.one('me').get().then(function (data) {
         self.data = data;
       });
     };
 
     this.getItems();
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3090,7 +2977,7 @@ angular.module('bulbsCmsApp')
   .constant('contentApiConfig', {
     baseUrl: '/cms/api/v1'
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3102,7 +2989,7 @@ angular.module('bulbsCmsApp')
   .constant('promotionApiConfig', {
     baseUrl: '/promotions/api'
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3114,7 +3001,7 @@ angular.module('bulbsCmsApp')
   .constant('adApiConfig', {
     baseUrl: '/ads'
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3124,7 +3011,9 @@ angular.module('bulbsCmsApp')
       return $cookies.csrftoken;
     }, function (newCsrf, oldCsrf) {
       $http.defaults.headers.common['X-CSRFToken'] = newCsrf;
-      $window.jqueryCsrfSetup && $window.jqueryCsrfSetup();
+      if ($window.jqueryCsrfSetup) {
+        $window.jqueryCsrfSetup();
+      }
     });
 
     return {
@@ -3137,25 +3026,25 @@ angular.module('bulbsCmsApp')
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         });
       }
-    }
-  });;
+    };
+  });
 'use strict';
 
 angular.module('bulbsCmsApp')
   .filter('tzDate', function (dateFilter, moment, TIMEZONE_OFFSET, TIMEZONE_LABEL) {
     return function (input, format) {
-      if(!input){
-        return "";
+      if (!input) {
+        return '';
       }
       var newdate = moment(input).zone(TIMEZONE_OFFSET).format('YYYY-MM-DDTHH:mm');
       var formattedDate = dateFilter(newdate, format);
-      if(format.toLowerCase().indexOf('h') > -1){
+      if (format.toLowerCase().indexOf('h') > -1) {
         formattedDate += ' ' + TIMEZONE_LABEL;
       }
       return formattedDate;
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3167,7 +3056,7 @@ angular.module('bulbsCmsApp')
       $scope.changelog = data;
 
       var userIds = _.unique(_.pluck(data, 'user'));
-      for(var i in userIds){
+      for (var i in userIds) {
         ContentApi.one('author', userIds[i]).get().then(function (data) {
           $scope.users[data.id] = data;
         });
@@ -3175,7 +3064,7 @@ angular.module('bulbsCmsApp')
     });
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3183,9 +3072,9 @@ angular.module('bulbsCmsApp')
     Localstoragebackup.backupToLocalStorage();
 
     var keys = _.keys($window.localStorage);
-    var timestamps = []
-    for(var i in keys){
-      if(keys[i] && (keys[i].split('.')[0] != Localstoragebackup.keyPrefix || keys[i].split('.')[2] != article.id)){
+    var timestamps = [];
+    for (var i in keys) {
+      if (keys[i] && (keys[i].split('.')[0] !== Localstoragebackup.keyPrefix || keys[i].split('.')[2] !== article.id)) {
         continue;
       }
       var timestamp = Number(keys[i].split('.')[1]) * 1000;
@@ -3198,7 +3087,7 @@ angular.module('bulbsCmsApp')
       $('.version-timestamp-list .active').removeClass('active');
       $($event.target).parent().addClass('active');
 
-      var key = Localstoragebackup.keyPrefix + '.' + timestamp/1000 + '.' + article.id + '.body';
+      var key = Localstoragebackup.keyPrefix + '.' + timestamp / 1000 + '.' + article.id + '.body';
       var html = $window.localStorage.getItem(key);
       $scope.versionPreview = html;
     };
@@ -3208,7 +3097,7 @@ angular.module('bulbsCmsApp')
       $modalInstance.close();
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3238,39 +3127,40 @@ angular.module('bulbsCmsApp')
     this.backupToLocalStorage = function () {
       var localStorageKeys = Object.keys($window.localStorage);
       var mostRecentTimestamp = 0;
-      for(var keyIndex in localStorageKeys){
+      for (var keyIndex in localStorageKeys) {
         var key = $window.localStorage.key(keyIndex);
-        if(key && key.split('.')[2] == $routeParams.id && Number(key.split('.')[1]) > mostRecentTimestamp){
+        if (key && key.split('.')[2] === $routeParams.id && Number(key.split('.')[1]) > mostRecentTimestamp) {
           mostRecentTimestamp = Number(key.split('.')[1]);
         }
       }
       var mostRecentValue = $window.localStorage.getItem(keyPrefix + '.' + mostRecentTimestamp + keySuffix);
-      if(!(mostRecentValue != $("#content-body .editor").html())){
+      if (mostRecentValue === $('#content-body .editor').html()) {
         return;
       }
-      try{
-        $window.localStorage &&
-          $window.localStorage.setItem(keyPrefix + '.' + moment().unix() + keySuffix, $("#content-body .editor").html()); //TODO: this is gonna break
-      }catch (error){
-        console.log("Caught localStorage Error " + error)
-        console.log("Trying to prune old entries");
+      if ($window.localStorage) {
+        try {
+          $window.localStorage.setItem(keyPrefix + '.' + moment().unix() + keySuffix, $('#content-body .editor').html()); //TODO: this is gonna break
+        } catch (error) {
+          console.log('Caught localStorage Error ' + error);
+          console.log('Trying to prune old entries');
 
-        for(var keyIndex in localStorageKeys){
-          var key = $window.localStorage.key(keyIndex);
-          if(!key || key && key.split('.')[0] != keyPrefix){
-            continue;
-          }
-          var yesterday = moment().date(moment().date()-1).unix();
-          var keyStamp = Number(key.split('.')[1]);
-          if(keyStamp < yesterday){
-            $window.localStorage.removeItem(key);
+          for (var keyIndex in localStorageKeys) {
+            var key = $window.localStorage.key(keyIndex);
+            if (!key || key && key.split('.')[0] !== keyPrefix) {
+              continue;
+            }
+            var yesterday = moment().date(moment().date() - 1).unix();
+            var keyStamp = Number(key.split('.')[1]);
+            if (keyStamp < yesterday) {
+              $window.localStorage.removeItem(key);
+            }
           }
         }
       }
     };
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3278,7 +3168,7 @@ angular.module('bulbsCmsApp')
     $scope.articleOnServer = articleOnServer;
 
     ContentApi.all('log').getList({content: article.id}).then(function (log) {
-      var latest = _.max(log, function(entry){ return moment(entry.action_time) })
+      var latest = _.max(log, function (entry) { return moment(entry.action_time); });
       var lastSavedById = latest.user;
       ContentApi.one('author', lastSavedById).get().then(function (data) {
         $scope.lastSavedBy = data;
@@ -3288,45 +3178,45 @@ angular.module('bulbsCmsApp')
     $scope.loadFromServer = function () {
       $route.reload();
       $modalInstance.close();
-    }
+    };
 
     $scope.saveAnyway = function () {
       $modalInstance.close();
       $scope.$parent.postValidationSaveArticle();
-    }
+    };
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .filter('user', function () {
     return function (user) {
-      if (!user) { return ""; }
+      if (!user) { return ''; }
       if (user.full_name) {
         return user.full_name;
-      } else if(user.first_name && user.last_name){
+      } else if (user.first_name && user.last_name) {
         return user.first_name + ' ' + user.last_name;
       } else {
         return user.username;
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .provider('StatusFilterOptions', function () {
     var _statuses = [
       {label: 'Draft', key: 'status', value: 'draft'},
-      {label: 'Published', key: 'before', value: function(){ return moment().format('YYYY-MM-DDTHH:mmZ')}},
-      {label: 'Scheduled', key: 'after', value: function(){ return moment().format('YYYY-MM-DDTHH:mmZ')}},
+      {label: 'Published', key: 'before', value: function () { return moment().format('YYYY-MM-DDTHH:mmZ'); }},
+      {label: 'Scheduled', key: 'after', value: function () { return moment().format('YYYY-MM-DDTHH:mmZ'); }},
       {label: 'All', key: null, value: null}
     ];
 
     this.setStatuses = function (statuses) {
       _statuses = statuses;
-    }
+    };
 
     this.$get = function () {
       return {
@@ -3346,16 +3236,16 @@ angular.module('bulbsCmsApp')
       link: function postLink(scope, element, attrs) {
         scope.options = StatusFilterOptions.getStatuses();
 
-        scope.isActive = function (option){
-          if(option.key && option.key in $location.search() && $location.search()[option.key] == getValue(option)){
+        scope.isActive = function (option) {
+          if (option.key && option.key in $location.search() && $location.search()[option.key] === getValue(option)) {
             return true;
           }
-          if(!option.key){ //all
+          if (!option.key) { //all
             var possibleKeys = _.pluck(scope.options, 'key');
             var searchKeys = _.keys($location.search());
-            if(_.intersection(possibleKeys, searchKeys).length > 0){
+            if (_.intersection(possibleKeys, searchKeys).length > 0) {
               return false;
-            }else{
+            } else {
               return true;
             }
           }
@@ -3363,37 +3253,37 @@ angular.module('bulbsCmsApp')
         };
 
         scope.filterByStatus = function (option) {
-          var search = {}
+          var search = {};
           var value;
-          if(option.key){
+          if (option.key) {
             value = getValue(option);
             search[option.key] = value;
           }
           scope.getContent(search);
         };
 
-        function getValue(option){
+        function getValue(option) {
           var value;
-          if(typeof option.value == "function"){
+          if (typeof option.value === 'function') {
             value = option.value();
-          }else{
-            value = option.value
+          } else {
+            value = option.value;
           }
           return value;
         }
 
       }
     };
-  });;
+  });
 'use strict';
 
 angular.module('bulbsCmsApp')
   .service('Zencoder', function Zencoder($http, $q, $modal, $, routes) {
     var newVideoUrl = '/video/new';
-    var fileInputId = '#bulbs-cms-hidden-video-file-input'
-    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />'
+    var fileInputId = '#bulbs-cms-hidden-video-file-input';
+    var inputTemplate = '<input id="bulbs-cms-hidden-video-file-input" type="file" accept="video/*" style="position: absolute; left:-99999px;" name="video" />';
 
-    this.onVideoFileUpload = function() {
+    this.onVideoFileUpload = function () {
       var clickDeferred = $q.defer();
 
       angular.element(fileInputId).remove();
@@ -3402,30 +3292,30 @@ angular.module('bulbsCmsApp')
       angular.element('body').append(fileInput);
       fileInput.click();
       fileInput.unbind('change');
-      fileInput.bind('change', function(elem){
-        if(this.files.length !== 0) {
+      fileInput.bind('change', function (elem) {
+        if (this.files.length !== 0) {
           file = this.files[0];
 
           // We have a file upload limit of 1024MB
           if (file.size > (1024 * 1024 * 1024)) {
-            clickDeferred.reject("Upload file cannot be larger than 1024MB.");
+            clickDeferred.reject('Upload file cannot be larger than 1024MB.');
           }
 
           if (file.type.indexOf('video/') !== 0) {
-            clickDeferred.reject("You must upload a video file.");
+            clickDeferred.reject('You must upload a video file.');
           }
         } else {
-          clickDeferred.reject("Please select a file.")
+          clickDeferred.reject('Please select a file.');
         }
 
         getNewVideoUploadCredentials(file)
           .then(uploadToS3)
-          .then(encode, angular.noop, function(uploadPercentComplete){ clickDeferred.notify(uploadPercentComplete) })
+          .then(encode, angular.noop, function (uploadPercentComplete) { clickDeferred.notify(uploadPercentComplete); })
           .then(
-            function(videoObject){
+            function (videoObject) {
               clickDeferred.resolve(videoObject);
             },
-            function(error){
+            function (error) {
               clickDeferred.reject(error);
             }
           );
@@ -3433,10 +3323,10 @@ angular.module('bulbsCmsApp')
       });
 
       return clickDeferred.promise;
-    }
+    };
 
     function getNewVideoUploadCredentials(file) {
-      var data = {name: file.name}
+      var data = {name: file.name};
       data = $.param(data);
 
       var newVideoDeferred = $q.defer();
@@ -3446,17 +3336,17 @@ angular.module('bulbsCmsApp')
         url: newVideoUrl,
         data: data,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-      }).success(function(data){
+      }).success(function (data) {
         newVideoDeferred.resolve({
           file: file,
           attrs: data
-        })
-      }).error(function(data){
+        });
+      }).error(function (data) {
         newVideoDeferred.reject(data);
       });
 
       return newVideoDeferred.promise;
-    };
+    }
 
     function uploadToS3(videoObject) {
       var s3deferred = $q.defer();
@@ -3476,21 +3366,21 @@ angular.module('bulbsCmsApp')
         processData: false,
         contentType: false,
         data: formData,
-        type: "POST",
-        xhr: function() {
+        type: 'POST',
+        xhr: function () {
           var req = $.ajaxSettings.xhr();
           if (req) {
-            req.upload.addEventListener('progress', function(e) {
-              var percent = (e.loaded / e.total ) * 100;
+            req.upload.addEventListener('progress', function (e) {
+              var percent = (e.loaded / e.total) * 100;
               s3deferred.notify(percent);
             }, false);
           }
           return req;
         },
-        success: function(data) {
+        success: function (data) {
           s3deferred.resolve(videoObject);
         },
-        error: function(data){
+        error: function (data) {
           s3deferred.reject(data);
         }
       });
@@ -3505,33 +3395,33 @@ angular.module('bulbsCmsApp')
       $http({
         method: 'POST',
         url: '/video/' + videoObject.attrs.id + '/encode'
-      }).success(function(data){
+      }).success(function (data) {
         videoObject.attrs['encode_status_endpoints'] = data;
         _encodingVideos[videoObject.attrs.id] = videoObject.attrs;
 
         encodeDeferred.resolve(videoObject);
-      }).error(function(data){
+      }).error(function (data) {
         encodeDeferred.reject(data);
       });
 
       return encodeDeferred.promise;
     }
-    this.encode = function(videoId) {
+    this.encode = function (videoId) {
       encode({attrs: {id: videoId}});
-    }
+    };
 
-    this.openVideoThumbnailModal = function(videoId, posterUrl) {
+    this.openVideoThumbnailModal = function (videoId, posterUrl) {
       return $modal.open({
         templateUrl: routes.PARTIALS_URL + 'modals/video-thumbnail-modal.html',
         controller: 'VideothumbnailmodalCtrl',
         resolve: {
-          videoId: function(){ return videoId; },
-          posterUrl: function(){ return posterUrl || null; }
+          videoId: function () { return videoId; },
+          posterUrl: function () { return posterUrl || null; }
         }
       });
-    }
+    };
 
-    this.getVideo = function(videoId) {
+    this.getVideo = function (videoId) {
       var url = '/video/' + videoId;
       return $http({
         method: 'GET',
@@ -3539,7 +3429,7 @@ angular.module('bulbsCmsApp')
       });
     };
 
-    this.setVideo = function(video) {
+    this.setVideo = function (video) {
       var url = '/video/' + video.id;
       var data = $.param(video);
       return $http({
@@ -3554,7 +3444,7 @@ angular.module('bulbsCmsApp')
     this.encodingVideos = _encodingVideos;
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3573,7 +3463,7 @@ angular.module('bulbsCmsApp')
         scope.resourceUrl = '/cms/api/v1/author/?ordering=name&search=';
         scope.display = userFilter;
 
-        scope.$watch('article.authors', function(){
+        scope.$watch('article.authors', function () {
           scope.objects = scope.article.authors;
         }, true);
 
@@ -3600,7 +3490,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3621,7 +3511,7 @@ angular.module('bulbsCmsApp')
           return o.name;
         };
 
-        scope.$watch('article.tags', function(){
+        scope.$watch('article.tags', function () {
           scope.objects = _.where(article.tags, {type: 'content_tag'});
         }, true);
 
@@ -3655,7 +3545,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3673,7 +3563,7 @@ angular.module('bulbsCmsApp')
         scope.placeholder = 'Feature Type';
         scope.resourceUrl = '/cms/api/v1/things/?type=feature_type&q=';
 
-        scope.$watch('article.feature_type', function(){
+        scope.$watch('article.feature_type', function () {
           scope.model = scope.article.feature_type;
         });
 
@@ -3702,7 +3592,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3720,7 +3610,7 @@ angular.module('bulbsCmsApp')
           return o.name;
         };
 
-        scope.$watch('article.tags', function(){
+        scope.$watch('article.tags', function () {
           scope.objects = _.where(article.tags, {type: 'core_section'});
         }, true);
 
@@ -3754,7 +3644,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3767,7 +3657,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3785,41 +3675,41 @@ angular.module('bulbsCmsApp')
 
         scope.uploadVideo = function () {
           Zencoder.onVideoFileUpload().then(
-            function(success){
+            function (success) {
               console.log(success);
               scope.article.video = success.attrs.id;
             },
             angular.noop,
-            function(progress){
+            function (progress) {
               console.log(progress);
               scope.uploadProgress = progress;
             }
           );
-        }
+        };
 
         scope.thumbnailModal = function () {
           Zencoder.openVideoThumbnailModal(article.video).result.then(
-            function(resolve){
-              console.log("thumbnail modal resolve")
+            function (resolve) {
+              console.log('thumbnail modal resolve');
               console.log(resolve);
               //article.poster_url = resolve;
             },
-            function(reject){
-              console.log("thumbnail modal rejected")
+            function (reject) {
+              console.log('thumbnail modal rejected');
             }
-          )
-        }
+          );
+        };
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .controller('SponsormodalCtrl', function ($scope, ContentApi, article) {
     $scope.article = article;
 
-    ContentApi.all('sponsor').getList().then(function(data){
+    ContentApi.all('sponsor').getList().then(function (data) {
       $scope.sponsors = data;
     });
 
@@ -3833,7 +3723,7 @@ angular.module('bulbsCmsApp')
 
 
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3844,41 +3734,41 @@ angular.module('bulbsCmsApp')
     $scope.mode = 'still';
 
     Zencoder.getVideo(videoId).then(
-      function(response){
-        $scope.video = response.data
-        if(response.data.status == "In Progress"){
+      function (response) {
+        $scope.video = response.data;
+        if (response.data.status === 'In Progress') {
           $scope.inProgress = true;
           $scope.video.poster = $scope.video.poster || null;
-        }else{
+        } else {
           $scope.video.poster = $scope.video.poster || compilePosterUrl(DEFAULT_THUMBNAIL);
         }
       }
-    )
+    );
 
-    $scope.$watch('video.poster', function(){
-      if(!$scope.video || !$scope.video.poster) return;
+    $scope.$watch('video.poster', function () {
+      if (!$scope.video || !$scope.video.poster) { return; }
       var defaultUrl = VIDEO_THUMBNAIL_URL.replace('{{video}}', videoId);
       var thumbnailIndex = defaultUrl.indexOf('{{thumbnail}}');
-      if($scope.video.poster.indexOf(defaultUrl.substr(0, thumbnailIndex)) === 0){
+      if ($scope.video.poster.indexOf(defaultUrl.substr(0, thumbnailIndex)) === 0) {
         $scope.currentThumbnail = Number($scope.video.poster.substr(thumbnailIndex, 4));
         $scope.uploadedImage.id = null;
-      }else{
+      } else {
         $scope.currentThumbnail = false;
       }
     });
 
-    $scope.$watch('uploadedImage.id', function(){
-      if($scope.uploadedImage.id){
+    $scope.$watch('uploadedImage.id', function () {
+      if ($scope.uploadedImage.id) {
         $scope.video.poster = STATIC_IMAGE_URL.replace('{{image}}', $scope.uploadedImage.id);
       }
     });
 
     $scope.nextThumb = function () {
-      $scope.video.poster = compilePosterUrl($scope.currentThumbnail < MAX_THUMBNAIL ? $scope.currentThumbnail+1 : 0);
+      $scope.video.poster = compilePosterUrl($scope.currentThumbnail < MAX_THUMBNAIL ? $scope.currentThumbnail + 1 : 0);
     };
 
     $scope.prevThumb = function () {
-      $scope.video.poster = compilePosterUrl($scope.currentThumbnail > 0 ? $scope.currentThumbnail-1 : MAX_THUMBNAIL);
+      $scope.video.poster = compilePosterUrl($scope.currentThumbnail > 0 ? $scope.currentThumbnail - 1 : MAX_THUMBNAIL);
     };
 
     $scope.defaultThumb = function () {
@@ -3892,18 +3782,18 @@ angular.module('bulbsCmsApp')
 
     $scope.reencode = function () {
       Zencoder.encode(videoId);
-    }
+    };
 
     function compilePosterUrl(thumbnail) {
       return VIDEO_THUMBNAIL_URL.replace('{{video}}', videoId).replace('{{thumbnail}}', pad4(thumbnail));
     }
 
     function pad4(num) {
-      var s = "0000" + num;
-      return s.substr(s.length-4);
+      var s = '0000' + num;
+      return s.substr(s.length - 4);
     }
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3914,40 +3804,42 @@ angular.module('bulbsCmsApp')
       link: function postLink(scope, element, attrs) {
         scope.encodingVideos = {};
 
-        scope.$watch(function(){
+        scope.$watch(function () {
           return Zencoder.encodingVideos;
-        }, function(){
+        }, function () {
           updateEncodeStatuses();
         }, true);
 
-        $interval(function(){
-          $("iframe").filter(function(){ return this.src.match(/\/video\/embed\/?/) }).each(function(){
+        $interval(function () {
+          $('iframe').filter(function () { return this.src.match(/\/video\/embed\/?/); }).each(function () {
             var idRegex = /\/video\/embed\/?\?id=(\d+)/;
             var id = idRegex.exec(this.src)[1];
-            if(!(id in Zencoder.encodingVideos)){
-              Zencoder.getVideo(id).then(function(data){
+            if (!(id in Zencoder.encodingVideos)) {
+              Zencoder.getVideo(id).then(function (data) {
                 Zencoder.encodingVideos[id] = data.data;
               });
             }
           });
           updateEncodeStatuses();
-        }, 5000)
+        }, 5000);
 
-        function updateEncodeStatuses(){
-          for(var i in Zencoder.encodingVideos){
-            if(scope.encodingVideos[i] && scope.encodingVideos[i].finished) continue;
+        function updateEncodeStatuses() {
+          for (var i in Zencoder.encodingVideos) {
+            if (scope.encodingVideos[i] && scope.encodingVideos[i].finished) {
+              continue;
+            }
             scope.encodingVideos[i] = Zencoder.encodingVideos[i];
-            (function(videoid){
-              if(Zencoder.encodingVideos[videoid].encode_status_endpoints && Zencoder.encodingVideos[videoid].encode_status_endpoints.json){
+            (function (videoid) {
+              if (Zencoder.encodingVideos[videoid].encode_status_endpoints && Zencoder.encodingVideos[videoid].encode_status_endpoints.json) {
                 $http({
                   method: 'GET',
                   url: Zencoder.encodingVideos[videoid].encode_status_endpoints.json,
                   headers: {
                     'X-CSRFToken': undefined
                   },
-                }).success(function(data){
+                }).success(function (data) {
                   scope.encodingVideos[videoid].job_status = data;
-                  if(data.state == "finished"){
+                  if (data.state === 'finished') {
                     scope.encodingVideos[videoid].finished = true;
                   }
 
@@ -3960,7 +3852,7 @@ angular.module('bulbsCmsApp')
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
@@ -3972,29 +3864,29 @@ angular.module('bulbsCmsApp')
         'image': '='
       },
       link: function postLink(scope, element, attrs) {
-        scope.$watch('image', function(){
-          if(scope.image && scope.image.id){
+        scope.$watch('image', function () {
+          if (scope.image && scope.image.id) {
             scope.imageUrl = STATIC_IMAGE_URL.replace('{{image}}', scope.image.id);
-          }else{
+          } else {
             scope.imageUrl = false;
           }
         });
       }
     };
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .controller('ForbiddenmodalCtrl', function ($scope, detail) {
     $scope.detail = detail;
   });
-;
+
 'use strict';
 
 angular.module('bulbsCmsApp')
   .directive('hideIfForbidden', function ($http) {
-    function hideElement(element){
+    function hideElement(element) {
       element.addClass('hidden');
     }
 
@@ -4005,20 +3897,22 @@ angular.module('bulbsCmsApp')
           method: 'OPTIONS',
           url: attrs.optionsUrl,
           noPermissionIntercept: true
-        }).success(function(data, status){
+        }).success(function (data, status) {
           //I guess 403s aren't errors? I dont know.
-          if(status === 403){
+          if (status === 403) {
             hideElement(element);
           }
-        }).error(function(data, status){
-          if(status === 403){
+        }).error(function (data, status) {
+          if (status === 403) {
             hideElement(element);
           }
         });
       }
     };
   });
-;
+
+'use strict';
+
 angular.module('bulbsCmsApp').factory('BugReportInterceptor', function ($q, $window, PNotify) {
     return {
       responseError: function (rejection) {
@@ -4031,8 +3925,7 @@ angular.module('bulbsCmsApp').factory('BugReportInterceptor', function ($q, $win
           new PNotify({
             title: 'You found a bug!',
             text:
-              'Looks like something just went wrong, and we need your help to fix it! \
-              Report it, and we\'ll make sure it never happens again.',
+              'Looks like something just went wrong, and we need your help to fix it! Report it, and we\'ll make sure it never happens again.',
             type: 'error',
             confirm: {
               confirm: true,
@@ -4050,47 +3943,48 @@ angular.module('bulbsCmsApp').factory('BugReportInterceptor', function ($q, $win
               sticker: false
             },
             icon: 'fa fa-bug pnotify-error-icon',
-            addclass: "stack-bottomright",
+            addclass: 'stack-bottomright',
             stack: stack
           });
         }
         return $q.reject(rejection);
       }
     };
-  });;
+  });
+'use strict';
   /* helpful SO question on injecting $modal into interceptor and doing intercept pass-through
     http://stackoverflow.com/questions/14681654/i-need-two-instances-of-angularjs-http-service-or-what
   */
 angular.module('bulbsCmsApp').factory('PermissionsInterceptor', function ($q, $injector, routes) {
-    return {
-      responseError: function (rejection) {
-        if(rejection.config.noPermissionIntercept) {
-          return $q.when(rejection);
-        }else{
-          $injector.invoke(function($modal){
-            if (rejection.status == 403) {
-              if(rejection.data && rejection.data.detail && rejection.data.detail.indexOf("credentials") > 0){
-                $modal.open({
-                  templateUrl: routes.PARTIALS_URL + 'modals/login-modal.html',
-                  controller: 'LoginmodalCtrl'
-                });
-              }else{
-                var detail = rejection.data && rejection.data.detail || 'Forbidden';
-                $modal.open({
-                  templateUrl: routes.PARTIALS_URL + 'modals/403-modal.html',
-                  controller: 'ForbiddenmodalCtrl',
-                  resolve: {
-                    detail: function(){ return detail; }
-                  }
-                });
-              }
+  return {
+    responseError: function (rejection) {
+      if (rejection.config.noPermissionIntercept) {
+        return $q.when(rejection);
+      } else {
+        $injector.invoke(function ($modal) {
+          if (rejection.status === 403) {
+            if (rejection.data && rejection.data.detail && rejection.data.detail.indexOf('credentials') > 0) {
+              $modal.open({
+                templateUrl: routes.PARTIALS_URL + 'modals/login-modal.html',
+                controller: 'LoginmodalCtrl'
+              });
+            } else {
+              var detail = rejection.data && rejection.data.detail || 'Forbidden';
+              $modal.open({
+                templateUrl: routes.PARTIALS_URL + 'modals/403-modal.html',
+                controller: 'ForbiddenmodalCtrl',
+                resolve: {
+                  detail: function () { return detail; }
+                }
+              });
             }
-          });
-          return $q.reject(rejection);
-        }
+          }
+        });
+        return $q.reject(rejection);
       }
     }
-  });;
+  };
+});
 angular.module('bulbsCmsApp').factory('BadRequestInterceptor', function ($q, $injector, routes) {
     return {
       responseError: function (rejection) {
@@ -4109,7 +4003,7 @@ angular.module('bulbsCmsApp').factory('BadRequestInterceptor', function ($q, $in
         return $q.reject(rejection);
       }
     }
-  });;
+  });
 'use strict';
 
 angular.module('bulbsCmsApp')
