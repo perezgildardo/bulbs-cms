@@ -11,7 +11,7 @@ angular.module('bulbsCmsApp')
       link: function postLink(scope, element, attrs) {
         scope.$watch('image', function () {
           if (scope.image && scope.image.id) {
-            scope.imageUrl = STATIC_IMAGE_URL.replace('{{image}}', scope.image.id);
+            scope.imageUrl = STATIC_IMAGE_URL.replace('{{ratio}}', '16x9').replace('{{image}}', scope.image.id);
           } else {
             scope.imageUrl = false;
           }
