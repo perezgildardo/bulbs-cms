@@ -122,7 +122,7 @@ module.exports = function (grunt) {
         reporter: require('jshint-stylish')
       },
       all: [
-        'Gruntfile.js',
+        // 'Gruntfile.js',
         '<%= yeoman.app %>/scripts/{,*/}*.js'
       ],
       test: {
@@ -394,7 +394,7 @@ module.exports = function (grunt) {
     },
     concat: {
       options: {
-        separator: ';' + grunt.util.linefeed,
+        separator: grunt.util.linefeed,
       }
     },
 

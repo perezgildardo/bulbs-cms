@@ -39,7 +39,7 @@ angular.module('bulbsCmsApp')
     }
     getContent();
 
-    $scope.$watch('article.title', function(){
+    $scope.$watch('article.title', function () {
       $window.document.title = routes.CMS_NAMESPACE + ' | Editing ' + ($scope.article && $('<span>' + $scope.article.title + '</span>').text());
     });
 
@@ -56,14 +56,27 @@ angular.module('bulbsCmsApp')
         saveToContentApi();
       }
     });
+    
+    $scope.saveArticleIfDirty = function () {
+      /*this is only for operations that trigger a saveArticle (e.g. send to editor)
+      if the article isn't dirty, we don't want to fire saveArticle
+      and possibly trigger the last-modified-guard or whatever else*/
+      if ($scope.articleIsDirty) {
+        return $scope.saveArticle();
+      } else {
+        //resolves immediately with article as the resolved value
+        //(saveArticle resolves to article as well)
+        return $q.when($scope.article);
+      }
+    };
 
     $scope.saveArticle = function () {
       Localstoragebackup.backupToLocalStorage();
 
       ContentApi.one('content', $routeParams.id).get().then(function (data) {
-        if(data.last_modified &&
+        if (data.last_modified &&
           $scope.article.last_modified &&
-          moment(data.last_modified) > moment($scope.article.last_modified)){
+          moment(data.last_modified) > moment($scope.article.last_modified)) {
           $scope.saveArticleDeferred.reject();
           $modal.open({
             templateUrl: routes.PARTIALS_URL + 'modals/last-modified-guard-modal.html',
@@ -74,7 +87,7 @@ angular.module('bulbsCmsApp')
               articleOnServer: function () { return data; },
             }
           });
-        }else{
+        } else {
           $scope.postValidationSaveArticle();
         }
       });
@@ -84,25 +97,20 @@ angular.module('bulbsCmsApp')
     };
 
     var listener = new keypress.Listener();
-    listener.simple_combo('cmd s', function(e) { $scope.saveArticle(); });
-    listener.simple_combo('ctrl s', function(e) { $scope.saveArticle(); });
+    listener.simple_combo('cmd s', function (e) { $scope.saveArticle(); });
+    listener.simple_combo('ctrl s', function (e) { $scope.saveArticle(); });
 
     $scope.postValidationSaveArticle = function () {
-
       var data = $scope.article;
-
       if ($scope.article.status !== 'Published') {
         $scope.article.slug = $window.URLify($scope.article.title, 50);
       }
-
       saveToContentApi();
-
       return $scope.saveArticleDeferred.promise;
-
     }
 
-    var saveHTML =  "<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save";
-    var navbarSave = ".navbar-save";
+    var saveHTML =  '<i class=\'glyphicon glyphicon-floppy-disk\'></i> Save';
+    var navbarSave = '.navbar-save';
 
 
     function saveToContentApi() {
@@ -112,7 +120,6 @@ angular.module('bulbsCmsApp')
     }
 
     function saveArticleErrorCbk(data) {
-      console.log(data)
       $(navbarSave).html('<i class=\'glyphicon glyphicon-remove\'></i> Error');
       if (status === 400) {
         $scope.errors = data;
@@ -132,20 +139,20 @@ angular.module('bulbsCmsApp')
       $scope.saveArticleDeferred.resolve(resp);
     }
 
-    $scope.$watch('article', function(){
-      if(angular.equals($scope.article, $scope.last_saved_article)){
+    $scope.$watch('article', function () {
+      if (angular.equals($scope.article, $scope.last_saved_article)) {
         $scope.articleIsDirty = false;
-      }else{
+      } else {
         $scope.articleIsDirty = true;
       }
     }, true);
 
-    $scope.$watch('articleIsDirty', function(){
-      if($scope.articleIsDirty){
+    $scope.$watch('articleIsDirty', function () {
+      if ($scope.articleIsDirty) {
         $window.onbeforeunload = function () {
           return 'You have unsaved changes. Do you want to continue?';
         };
-      }else{
+      } else {
         $window.onbeforeunload = function () {};
       }
     });
@@ -161,11 +168,9 @@ angular.module('bulbsCmsApp')
       }, 1500);
     };
 
-
-    var backupInterval = (function(){
+    var backupInterval = (function () {
       var interval = 60000; //1 minute
-      return $interval(Localstoragebackup.backupToLocalStorage, interval)
+      return $interval(Localstoragebackup.backupToLocalStorage, interval);
     })();
-
 
   });
