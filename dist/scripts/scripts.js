@@ -1857,9 +1857,11 @@ angular.module('bulbsCmsApp')
           });
         };
 
-        if (scope.image && scope.image.id) {
-          scope.showImage();
-        }
+        scope.$watch('image', function(){ 
+          if (scope.image && scope.image.id) {
+            scope.showImage();
+          }
+        }, true);
 
       }
     };
