@@ -9,6 +9,7 @@ angular.module('bulbsCmsApp')
     return {
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
+        console.log('OPTIONS HEAAAA')
         $http({
           method: 'OPTIONS',
           url: attrs.optionsUrl,
