@@ -1,21 +1,12 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .directive('lazyInclude', function (routes, $, $rootScope, $compile, $q, $http, $templateCache) {
-
-    function getTemplate (templateUrl) {
-      var template = $templateCache.get(templateUrl);
-      if (template) {
-        return $q.when(template);
-      }else {
-        var deferred = $q.defer();
-        $http.get(templateUrl, {cache: true}).success(function (html) {
-          deferred.resolve(html);
-        });
-        
-        return deferred.promise;
-      }
-    }
+  .directive('lazyInclude', function (routes, $, $compile, $q, $http, $templateCache, Gettemplate) {
+    /*
+      this is like ng-include but it doesn't compile/render the included template
+      until the child element is visible
+      intended to help with responsiveness by cutting down requests and rendering time
+    */
 
     return {
       restrict: 'A',
@@ -30,7 +21,7 @@ angular.module('bulbsCmsApp')
           }, function(visible){
             if(visible && !scope.loaded){
               scope.loaded = true;
-              getTemplate(templateUrl).then(function(html){
+              Gettemplate.get(templateUrl).then(function(html){
                 var template = angular.element(html);
                 var compiledEl = $compile(template)(scope);
                 element.html(compiledEl);

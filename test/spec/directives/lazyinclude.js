@@ -6,15 +6,24 @@ describe('Directive: lazyInclude', function () {
   beforeEach(module('bulbsCmsApp'));
 
   var element,
-    scope;
+    scope,
+    _Gettemplate,
+    _compile;
 
-  beforeEach(inject(function ($rootScope) {
+  var html = '<div style="display: none;" lazy-include template="test.html"></div>';
+
+  beforeEach(inject(function ($rootScope, $compile, Gettemplate) {
     scope = $rootScope.$new();
+    _Gettemplate = Gettemplate;
+    _compile = $compile;
   }));
 
-  it('should make hidden element visible', inject(function ($compile) {
-    element = angular.element('<lazily-render></lazily-render>');
-    element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the lazyInclude directive');
-  }));
+  it('should not call getTemplate if the element is not visible', function(){
+    spyOn(_Gettemplate, 'get');
+    element = angular.element(_compile('<div style="display: none;" lazy-include template="test.html"></div>')(scope));
+    expect(_Gettemplate.get).not.toHaveBeenCalled();
+  });
+
+
+
 });
