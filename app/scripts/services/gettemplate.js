@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .service('Gettemplate', function Gettemplate() {
-    this.get = function () {
+  .service('Gettemplate', function Gettemplate($templateCache, $q, $http) {
+    this.get = function (templateUrl) {
       var template = $templateCache.get(templateUrl);
       if (template) {
         return $q.when(template);
