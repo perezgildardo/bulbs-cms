@@ -1,12 +1,11 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .directive('lazilyRender', function (routes, $, $rootScope, $compile, $q, $http, $templateCache) {
+  .directive('lazyInclude', function (routes, $, $rootScope, $compile, $q, $http, $templateCache) {
 
     function getTemplate (templateUrl) {
       var template = $templateCache.get(templateUrl);
       if (template) {
-        console.log('returning from cache')
         return $q.when(template);
       }else {
         var deferred = $q.defer();
@@ -34,7 +33,7 @@ angular.module('bulbsCmsApp')
               getTemplate(templateUrl).then(function(html){
                 var template = angular.element(html);
                 var compiledEl = $compile(template)(scope);
-                element.append(compiledEl);
+                element.html(compiledEl);
                 element.css('height', 'auto');
               });
             }

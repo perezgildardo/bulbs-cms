@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: lazilyRender', function () {
+describe('Directive: lazyInclude', function () {
 
   // load the directive's module
   beforeEach(module('bulbsCmsApp'));
@@ -15,6 +15,6 @@ describe('Directive: lazilyRender', function () {
   it('should make hidden element visible', inject(function ($compile) {
     element = angular.element('<lazily-render></lazily-render>');
     element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the lazilyRender directive');
+    expect(element.text()).toBe('this is the lazyInclude directive');
   }));
 });

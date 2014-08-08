@@ -66,6 +66,9 @@ angular.module('bulbsCmsApp')
           }, 1500);
       };
       
+    $('body').on('shown.bs.collapse', '.panel-collapse', function(e){
+      $scope.$digest();
+    });
 
   })
   .directive('ngConfirmClick', [ // Used on the unpublish button
