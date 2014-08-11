@@ -57161,7 +57161,7 @@ define('scribe-plugin-onion-video',[],function () {
       }
 
       function edit(block, callback) {
-          var id = $(block).attr('data-video-id');
+          var id = $(block).attr('data-video-id') || $(block).attr('data-videoid');
           config.editDialog(id);
       }
     };
@@ -57245,7 +57245,7 @@ define('link-formatter',[
         if (
             url.substr(0, 7) !== "http://" &&
             url.substr(0, 8) !== "https://" &&
-            url.substr(0, 6) !== "mailto:" &&
+            url.substr(0, 7) !== "mailto:" &&
             url.substr(0, 1) !== "/" 
             ) {
             // check for email, but default to http
