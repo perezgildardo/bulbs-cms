@@ -1694,8 +1694,6 @@ angular.module('bulbsCmsApp')
         $scope.imageData = null;
 
         function uploadSuccess(response) {
-          console.log('uploadSuccess')
-          console.log($scope.image)
           if (!$scope.image) {
             $scope.image = {
               id: null,
@@ -1730,8 +1728,6 @@ angular.module('bulbsCmsApp')
         var ratioHeight = parseInt(scope.ratio.split('x')[1], 10);
 
         scope.showImage = function () {
-          console.log('showImage')
-          console.log(scope.image)
           if (scope.imageData === null) {
             scope.getImageData();
             return;
@@ -1744,8 +1740,6 @@ angular.module('bulbsCmsApp')
         };
 
         scope.computeImageStyle = function (image, selection) {
-          console.log('computeImageStyle')
-          console.log(image)
           var scale, styles,
           el_height = (image.height / image.width) * $(element).parent().width(),
           s_width = selection.x1 - selection.x0,
@@ -1787,8 +1781,6 @@ angular.module('bulbsCmsApp')
         };
 
         scope.getImageData = function () {
-          console.log('getImageData')
-          console.log(scope.image)
           BettyCropper.detail(
             scope.image.id
           ).success(function (response) {
