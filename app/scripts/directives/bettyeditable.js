@@ -17,6 +17,8 @@ angular.module('bulbsCmsApp')
         $scope.imageData = null;
 
         function uploadSuccess(response) {
+          console.log('uploadSuccess')
+          console.log($scope.image)
           if (!$scope.image) {
             $scope.image = {
               id: null,
@@ -51,6 +53,8 @@ angular.module('bulbsCmsApp')
         var ratioHeight = parseInt(scope.ratio.split('x')[1], 10);
 
         scope.showImage = function () {
+          console.log('showImage')
+          console.log(scope.image)
           if (scope.imageData === null) {
             scope.getImageData();
             return;
@@ -63,6 +67,8 @@ angular.module('bulbsCmsApp')
         };
 
         scope.computeImageStyle = function (image, selection) {
+          console.log('computeImageStyle')
+          console.log(image)
           var scale, styles,
           el_height = (image.height / image.width) * $(element).parent().width(),
           s_width = selection.x1 - selection.x0,
@@ -86,7 +92,7 @@ angular.module('bulbsCmsApp')
 
           styles = {};
           scale = $(element).parent().width() / s_width;
-          styles['background'] = 'url(' + BettyCropper.origJpg(scope.image.id, DEFAULT_IMAGE_WIDTH) + ')';
+          styles['background'] = 'url(' + BettyCropper.origJpg(image.id, DEFAULT_IMAGE_WIDTH) + ')';
           styles['background-size'] = scope.scaleNumber(image.width, scale) + 'px';
           styles['background-position'] = '' +
             '-' + scope.scaleNumber(tmp_selection.x0, scale) + 'px ' +
@@ -104,6 +110,8 @@ angular.module('bulbsCmsApp')
         };
 
         scope.getImageData = function () {
+          console.log('getImageData')
+          console.log(scope.image)
           BettyCropper.detail(
             scope.image.id
           ).success(function (response) {
