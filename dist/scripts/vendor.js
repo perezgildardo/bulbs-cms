@@ -57084,10 +57084,8 @@ define('scribe-plugin-embed',[],function () {
       var $bodyInput = $(".embed-body", $modal),
           $captionInput = $(".embed-caption", $modal),
           $embedBtn = $(".set-embed-button", $modal),
-          $error = $(".embed-error", $modal);
-
-
-
+          $error = $(".embed-error", $modal),
+          $sizeInput = $("[name=size]", $modal);
 
       $modal.on("hide.bs.modal", function() {
         $embedBtn.unbind("click");
@@ -57105,19 +57103,19 @@ define('scribe-plugin-embed',[],function () {
         $("[value=" + sizeCropPair + "]", $modal).attr("checked", true);
         $modal.modal("show");
         $embedBtn.click(function () {
-          var embed_body = $bodyInput.val();
-          if (embed_body.trim() === "") {
+          var embedBody = $bodyInput.val();
+          if (embedBody.trim() === "") {
              $error.show();
           }
           else {
             $error.hide();
-            callback(block,
-              {code: embed_body,
+            callback(block, {
+              code: embedBody,
               caption: $captionInput.val(),
-              escaped_code: escape(embed_body),
+              escaped_code: escape(embedBody),
               size: getSize(),
               crop: getCrop()
-            })
+            });
             $modal.modal("hide");
 
           }
@@ -57131,30 +57129,39 @@ define('scribe-plugin-embed',[],function () {
         $modal.modal("show");
 
         $embedBtn.click(function () {
-          var embed_body = $bodyInput.val();
+          var embedBody = $bodyInput.val();
 
-          if (embed_body.trim() === "") {
+          if (embedBody.trim() === "") {
              $error.show();
           }
           else {
             $error.hide();
-            callback(
-              {code: embed_body,
+            callback({
+              code: embedBody,
               caption: $captionInput.val(),
-              escaped_code: escape(embed_body),
+              escaped_code: escape(embedBody),
               size: getSize(),
               crop: getCrop()
-            })
+            });
             $modal.modal("hide");
           }
         });
       }
+
       function getSize() {
-        return $("[name=size]:checked", $modal).val().split("-")[0];
+        var value = 'original';
+        if ($sizeInput.length > 0) {
+          $sizeInput.val().split("-")[0]; 
+        }
+        return value;
       }
 
       function getCrop() {
-        return $("[name=size]:checked", $modal).val().split("-")[1];
+        var value = 'original';
+        if ($sizeInput.length > 0) {
+          $sizeInput.val().split("-")[1]; 
+        }
+        return value;
       }
 
     };
@@ -57286,7 +57293,7 @@ define('link-formatter',[
         if (
             url.substr(0, 7) !== "http://" &&
             url.substr(0, 8) !== "https://" &&
-            url.substr(0, 6) !== "mailto:" &&
+            url.substr(0, 7) !== "mailto:" &&
             url.substr(0, 1) !== "/" 
             ) {
             // check for email, but default to http
@@ -57385,7 +57392,7 @@ define('onion-editor',[
       domain: 'avclub.com'
     },
     video: {
-      videoEmbedUrl: "http://example.com?videoid=",
+      videoEmbedUrl: 'http://example.com?videoid=',
       insertDialog: function() {  },
       editDialog: function() {  }
     },
@@ -57393,7 +57400,7 @@ define('onion-editor',[
       insertDialog: function() {  },
       editDialog: function() {  }
     }
-  }
+  };
 
   function OnionEditor(element, options) {
 
@@ -57412,7 +57419,7 @@ define('onion-editor',[
     var tags = {}, 
         /* if a node running throught the sanitizer passes this test, it won't get santized true */
         skipSanitization = function(node) {
-          return ($(node).is("div.inline"));
+          return ($(node).is('div.inline'));
         };
     
     // Multiline
@@ -57424,20 +57431,20 @@ define('onion-editor',[
 
     // Bold
     if (options.formatting.indexOf('bold') !== -1) {
-      keyCommands.bold = function (event) { return event.metaKey && event.keyCode === 66; }; // b
+      // keyCommands.bold = function (event) { return event.metaKey && event.keyCode === 66; }; // b
       tags.b = {};
     }
 
     // Italics
     if (options.formatting.indexOf('italic') !== -1) {
-      keyCommands.italic = function (event) { return event.metaKey && event.keyCode === 73; }; // i
+      // keyCommands.italic = function (event) { return event.metaKey && event.keyCode === 73; }; // i
       tags.i = {};
       tags.em = {};
     }
 
     // Strike
     if (options.formatting.indexOf('strike') !== -1) {
-      keyCommands.strikeThrough = function (event) { return event.altKey && event.shiftKey && event.keyCode === 83; }; // s
+      // keyCommands.strikeThrough = function (event) { return event.altKey && event.shiftKey && event.keyCode === 83; }; // s
       tags.s = {};
     }
 
@@ -57451,7 +57458,7 @@ define('onion-editor',[
       scribe.use(scribePluginIntelligentUnlinkCommand());
       scribe.use(scribePluginLinkUI(options.link));
       scribe.use(linkFormatter(options.link));
-      tags.a = { href:true, target:true }
+      tags.a = { href:true, target:true };
     }
 
     // Lists
@@ -57525,7 +57532,7 @@ define('onion-editor',[
       // Default is to skipFormatters. Only place this needs to be set to false is when updating links. 
       // We want formatters to run on links. Embeds & other shit seem to get sanitized 
       // despite there being safegaurds for that.
-      if (typeof skipFormatters == "undefined") {
+      if (typeof skipFormatters === 'undefined') {
         skipFormatters = true;
       }
       scribe._skipFormatters = skipFormatters;
@@ -57533,14 +57540,14 @@ define('onion-editor',[
       setTimeout(function() {        
         scribe.el.focus();
         setTimeout(function() {
-          scribe.transactionManager.run(fn)
+          scribe.transactionManager.run(fn);
           window.scrollTo(0, scrollY);
 
           // This should notify any changes that happen outside of typing 
           scribe.trigger('content-changed');
         }, 20);
       }, 20);
-    }
+    };
     
     scribe.use(scribePluginCurlyQuotes());
     scribe.use(scribePluginKeyboardShortcuts(Object.freeze(keyCommands)));
@@ -57554,31 +57561,31 @@ define('onion-editor',[
     }
 
     // a little hacky to prevent deletion of images and other inline elements via the backspace key. 
-    scribe.el.addEventListener("keydown", function(event) {
+    scribe.el.addEventListener('keydown', function(event) {
       if (event.keyCode === 8) {
         // is the previous immediate child of editor an inline item?
         var sel = new scribe.api.Selection();
-        var prev = $(sel.selection.anchorNode).closest(".editor>*").prev();
-        if (prev.hasClass("inline") 
+        var prev = $(sel.selection.anchorNode).closest('.editor>*').prev();
+        if (prev.hasClass('inline') 
           && sel.selection.anchorOffset === 0 
           && sel.selection.isCollapsed) {
           event.preventDefault();
         }
       }
-    })
+    });
 
     scribe.use(scribePluginFormatterPlainTextConvertNewLinesToHtml());
 
     this.setChangeHandler = function(func) {
       scribe.on('content-changed', func); 
-    }
+    };
 
     this.setContent = function(content) {
       if (!content) {
-          content = "<p><br></p>";
+          content = '<p><br></p>';
       }
       scribe.setContent(content);
-    }
+    };
 
     this.getContent = function() {
       //todo: if multiline is false, only return contents of the paragraph
@@ -57587,7 +57594,7 @@ define('onion-editor',[
 
       // Allow any plugins to clean up markup. Main use case is for embed plugin, atm.
       return contents;
-    }
+    };
 
     this.scribe = scribe;
     return this;
