@@ -46,6 +46,10 @@ angular.module('bulbsCmsApp', [
       controller: 'ContenteditCtrl',
       reloadOnSearch: false
     })
+    .when('/cms/:id/contributions/', {
+      templateUrl: routes.PARTIALS_URL + 'contributions.html',
+      controller: 'ContributionsCtrl'
+    })
     .when('/cms/app/promotion/', {
       templateUrl:  routes.PARTIALS_URL + 'promotion.html',
       controller: 'PromotionCtrl',
