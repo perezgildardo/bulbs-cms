@@ -116,6 +116,7 @@
 
     <script src="scripts/api/module.js"></script>
     <script src="scripts/api/authors.js"></script>
+    <script src="scripts/api/contributions.js"></script>
 
     <script src="scripts/controllers/contentlist.js"></script>
     <script src="scripts/controllers/contentedit.js"></script>
@@ -131,7 +132,10 @@
     <script src="scripts/controllers/loginmodal.js"></script>
     <script src="scripts/controllers/unpublish.js"></script>
 
-    <script src="scripts/directives/autocomplete.js"></script>
+    <script src="scripts/directives/autocomplete/menu.js"></script>
+    <script src="scripts/directives/autocomplete/select.js"></script>
+
+
     <script src="scripts/directives/activenav.js"></script>
     <script src="scripts/directives/articlecontainer.js"></script>
     <script src="scripts/directives/bulbs-autocomplete.js"></script>
@@ -195,6 +199,9 @@
     <script src="bower_components/angular-mocks/angular-mocks.js"></script>
     <script src="mocks/app.js"></script>
     <script src="mocks/api.js"></script>
+
+    <script src="mocks/newapp.js"></script>
+    <script src="scripts/api/mock.js"></script>
 
 
     <script type="text/javascript">
@@ -260,7 +267,7 @@
     <script src="keys.js"></script>
 
     <script>
-        angular.module('bulbsCmsAppDev', ['bulbsCmsApp.mockApi', 'bulbsCmsApp'])
+        angular.module('bulbsCmsAppDev', ['bulbsCmsApp.mockApi', 'bulbsCmsApp', 'bulbs.api.mock'])
           .config(function (StatusFilterOptionsProvider) {
             StatusFilterOptionsProvider.setStatuses([
               {label: 'Filter 1', key: 'filter1key', value: 'charizard'},

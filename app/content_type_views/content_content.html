@@ -19,14 +19,6 @@
   <div class="well clearfix">
   <authors-field article="article"></authors-field></div></section>
 
-<section>
-  <div class="well clearfix">
-  <autocomplete name="test-authors"
-                ng-model="article.authors[0]" 
-                service="AuthorService"
-                label-attr="first_name"
-                placeholder="Authors"></autocomplete></div></section>
-
 <onion-editor id="content-body" 
   ng-model="article.body" 
   role="multiline" 

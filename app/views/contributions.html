@@ -14,10 +14,18 @@
     </div>
 
     <div class="edit-page row">
-        <div id="content-wrapper" class="container">
+        <div class="container">
             <h4>Contributions for "{{ article.title }}"</h4>
-            <div class="form-group">
-                
+            <div class="contribution form-inline" ng-repeat="contribution in contributions">
+                <div class="form-group" >
+                    <autocomplete type="text"
+                                  class="form-control"
+                                  ng-model="contribution.contributor" 
+                                  service="AuthorService"
+                                  label-attr="get_full_name"
+                                  placeholder="Search for author"></autocomplete>
+
+                </div>
             </div>
         </div>
     </div>

@@ -1,6 +1,8 @@
 'use strict';
 angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
   $httpBackend.when('OPTIONS', /^\/cms\/api\/v1\/.*/).respond('');
+
+  // Authors Service
   $httpBackend.when('GET', /^\/cms\/api\/v1\/author\/?\?.*/).respond([
     {
       id: 1,
@@ -39,4 +41,50 @@ angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
     last_name: 'Sinchok',
     username: 'csinchok'
   });
+
+
+  // Contribution Service
+  $httpBackend.when('GET', new RegExp('^/cms/api/v1/contributions/contribution.*')).respond([
+    {
+      id: 1,
+      content: 12345,
+      contributor: {
+        id: 2,
+        first_name: 'Chris',
+        last_name: 'Sinchok',
+        username: 'csinchok'
+      },
+      role: {
+        id: 1,
+        name: 'Author'
+      }
+    },
+    {
+      id: 1,
+      content: 12345,
+      contributor: {
+        id: 2,
+        first_name: 'Adam',
+        last_name: 'Wentz',
+        username: 'awentz'
+      },
+      role: {
+        id: 2,
+        name: 'Editor'
+      }
+    },
+  ]);
+
+  // ContributorRole Service
+  $httpBackend.when('GET', new RegExp('^/cms/api/v1/contributions/role.*')).respond([
+    {
+      id: 1,
+      name: 'Author'
+    },
+    {
+      id: 2,
+      name: 'Editor'
+    },
+  ]);
+
 });

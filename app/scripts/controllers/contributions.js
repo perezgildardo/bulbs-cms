@@ -4,18 +4,15 @@ angular.module('bulbsCmsApp')
   .controller('ContributionsCtrl', function (
     $scope, $routeParams, $http, $window,
     $location, $timeout, $compile, $q, $modal,
-    $, _, keypress, Login, routes, ContentApi)
+    $, routes, ContentApi, ContributionService)
   {
 
-    function getContent() {
-      return ContentApi.one('content', $routeParams.id).get().then(function(data){
-        $scope.article = data;
+
+    function getContributions() {
+      return ContributionService.getList({'content': $routeParams.id}).then(function(data) {
+        $scope.contributions = data;
       });
     }
-    getContent();
-
-    $scope.$watch('article.title', function () {
-      $window.document.title = routes.CMS_NAMESPACE + ' | Contributions for ' + ($scope.article && $('<span>' + $scope.article.title + '</span>').text());
-    });
+    getContributions();
 
   });

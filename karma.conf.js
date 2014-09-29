@@ -57,6 +57,10 @@ module.exports = function(config) {
       'app/mocks/betty.js',
 
       'app/scripts/*.js',
+
+      'app/scripts/api/module.js',
+      'app/scripts/api/*.js',
+
       'app/scripts/**/*.js',
       'test/spec/**/*.js',
 
