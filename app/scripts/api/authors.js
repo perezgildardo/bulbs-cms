@@ -5,7 +5,7 @@ angular.module('bulbs.api').
     Restangular.extendModel('author', function (obj) {
       return angular.extend(obj, {
         get_full_name: function() {
-          return this.first_name + ' ' + this.last_name;
+          return obj.first_name + ' ' + obj.last_name;
         }
       });
     });

@@ -21,10 +21,10 @@
 
 <section>
   <div class="well clearfix">
-  <autocomplete value="article.authors" 
-                multiple="true"
+  <autocomplete name="test-authors"
+                ng-model="article.authors[0]" 
                 service="AuthorService"
-                displayKey="get_full_name"
+                label-attr="first_name"
                 placeholder="Authors"></autocomplete></div></section>
 
 <onion-editor id="content-body" 
