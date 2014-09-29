@@ -30,7 +30,8 @@ angular.module('bulbsCmsApp', [
   'PNotify',
   'keypress',
   'Raven',
-  'firebase'
+  'firebase',
+  'bulbs.api'
 ])
 .config(function ($locationProvider, $routeProvider, $sceProvider, routes) {
   $locationProvider.html5Mode(true);
@@ -85,7 +86,6 @@ angular.module('bulbsCmsApp', [
   $httpProvider.interceptors.push('BugReportInterceptor');
   $httpProvider.interceptors.push('PermissionsInterceptor');
   $httpProvider.interceptors.push('BadRequestInterceptor');
-
 })
 .run(function ($rootScope, $http, $cookies) {
   // set the CSRF token here
