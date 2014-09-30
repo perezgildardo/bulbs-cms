@@ -11,14 +11,26 @@ angular.module('bulbsCmsApp')
         $scope.service = $injector.get($attrs.service);
       },
       link: function ($scope, element, attrs, ngModel, transclude) {
+
+        ngModel.$render = function() {
+          if (ngModel.$modelValue) {
+            var viewValue = ngModel.$modelValue[attrs.labelAttr];
+            if (typeof(viewValue) === "function") {
+              viewValue = viewValue();
+            }
+            element.val(viewValue);
+          }
+        }
+
         if(attrs.labelAttr) {
           ngModel.$formatters.push(function () {
-            var viewValue = ngModel.$modelValue[attrs.labelAttr];
-            console.log(ngModel.$modelValue);
-            if (typeof(viewValue) == "function") {
-              return viewValue();
-            } else {
-              return viewValue;
+            if (ngModel.$modelValue !== undefined) {
+              var viewValue = ngModel.$modelValue[attrs.labelAttr];
+              if (typeof(viewValue) === "function") {
+                return viewValue();
+              } else {
+                return viewValue;
+              }
             }
           });
         }
@@ -37,13 +49,15 @@ angular.module('bulbsCmsApp')
             }
             timeoutId = $timeout(function(){ queryData(value)}, 250);
           }
+          return undefined;
         });
 
         var menuScope = $scope.$new();
         menuScope.items = [];
         menuScope.index = 0;
         menuScope.select = function(index) {
-          console.log(index);
+          ngModel.$setViewValue(menuScope.items[index]);
+          ngModel.$render();
           hideMenu();
         }
 
@@ -80,7 +94,11 @@ angular.module('bulbsCmsApp')
                 }
               });
               break;
-            case 13:
+            case 13: // RETURN
+              if (menuScope.index) {
+                ngModel.$modelValue = menuScope.items[menuScope.index];
+                ngModel.$render();
+              }
               hideMenu();
               break;
             default:
