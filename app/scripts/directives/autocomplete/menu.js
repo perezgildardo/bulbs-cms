@@ -37,6 +37,6 @@ angular.module('bulbsCmsApp')
         }
 
       },
-      template: '<ul class="autocomplete-menu"><li ng-repeat="item in items" ng-click="select($index)" ng-class="{\'active\': $index == index}" ng-mouseenter = "setIndex($index)"><span>{{ label($index) }}</span></li></ul>'
+      template: '<ul class="autocomplete-menu" ng-show="items.length !== 0"><li ng-repeat="item in items" ng-click="select($index)" ng-class="{\'active\': $index == index}" ng-mouseenter = "setIndex($index)"><span>{{ label($index) }}</span></li></ul>'
     };
   });

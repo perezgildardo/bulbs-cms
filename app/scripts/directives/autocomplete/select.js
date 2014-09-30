@@ -27,11 +27,11 @@ angular.module('bulbsCmsApp')
           }
         }
 
-        element.find('button').on('click', function(event) {
+        $scope.openMenu = function(e) {
           appendMenu();
           inputEl.removeAttr('disabled');
           inputEl[0].focus();
-        });
+        }
 
         inputEl.on('blur keyup change', function() {
           if (isMenuAppended === false) {
@@ -42,7 +42,7 @@ angular.module('bulbsCmsApp')
             if (timeoutId) {
               $timeout.cancel(timeoutId);
             }
-            timeoutId = $timeout(function(){ queryData(value)}, 250);
+            timeoutId = $timeout(function(){ queryData(value)}, 150);
           }
         });
 
@@ -50,7 +50,6 @@ angular.module('bulbsCmsApp')
         menuScope.items = [];
         menuScope.index = 0;
         menuScope.select = function(index) {
-          console.log(menuScope.items[index]);
           ngModel.$modelValue = menuScope.items[index];
           reset();
         }
@@ -64,13 +63,17 @@ angular.module('bulbsCmsApp')
         transclude(menuScope, function(clone){ menuEl.append(clone) });
         $compile(menuEl)(menuScope);
 
-        // element.parent().append(menuEl);
-        // menuEl.hide();
 
-        element.find('input').on('keydown', function(e) {
+        element.find('input').on('keyup', function(e) {
           switch(e.which) {
             case 27: // ESC
-              reset();
+              console.log(inputEl.val());
+              if (inputEl.val() === '') {
+                console.log("reset");
+                reset();
+              } else {
+                inputEl.val('');
+              }
               break;
             case 40: // DOWN
               $scope.$apply(function() {
@@ -113,7 +116,7 @@ angular.module('bulbsCmsApp')
             isMenuAppended = true;
             $animate.enter(menuEl, element.parent(), element);
           }
-          showMenu();
+          styleMenu();
         }
 
         function reset() {
@@ -125,7 +128,7 @@ angular.module('bulbsCmsApp')
           });
         }
 
-        function showMenu() {
+        function styleMenu() {
           var parentStyles = window.getComputedStyle(element[0]);
           var offset = element.offset();
 
@@ -142,9 +145,6 @@ angular.module('bulbsCmsApp')
             menuEl[0].style[key] = value;
             menuEl.css('z-index', 1000);
           });
-        }
-
-        function hideMenu() {
         }
       },
       templateUrl: routes.PARTIALS_URL + 'autocomplete.html'
