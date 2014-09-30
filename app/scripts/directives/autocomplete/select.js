@@ -12,6 +12,10 @@ angular.module('bulbsCmsApp')
       },
       link: function ($scope, element, attrs, ngModel, transclude) {
 
+        var isMenuAppended = false;
+        var inputEl = element.find('input');
+        var timeoutId = null;
+
         ngModel.$render = function() {
           if (ngModel.$modelValue) {
             var viewValue = ngModel.$modelValue[attrs.labelAttr];
@@ -19,46 +23,36 @@ angular.module('bulbsCmsApp')
               viewValue = viewValue();
             }
             element.find('input').val(viewValue);
+            inputEl.attr('disabled', 'disabled');
           }
         }
 
-        if(attrs.labelAttr) {
-          ngModel.$formatters.push(function () {
-            if (ngModel.$modelValue !== undefined) {
-              var viewValue = ngModel.$modelValue[attrs.labelAttr];
-              if (typeof(viewValue) === "function") {
-                return viewValue();
-              } else {
-                return viewValue;
-              }
-            }
-          });
-        }
+        element.find('button').on('click', function(event) {
+          appendMenu();
+          inputEl.removeAttr('disabled');
+          inputEl[0].focus();
+        });
 
-        // if (ngModel.$modelValue !== null) {
-        //   element.attr('disabled', 'disabled')
-        // }
-
-        var menuHidden = true;
-        var timeoutId = null;
-
-        ngModel.$parsers.push(function (value){
+        inputEl.on('blur keyup change', function() {
+          if (isMenuAppended === false) {
+            return;
+          }
+          var value = inputEl.val();
           if (value) {
             if (timeoutId) {
               $timeout.cancel(timeoutId);
             }
             timeoutId = $timeout(function(){ queryData(value)}, 250);
           }
-          return undefined;
         });
 
         var menuScope = $scope.$new();
         menuScope.items = [];
         menuScope.index = 0;
         menuScope.select = function(index) {
-          ngModel.$setViewValue(menuScope.items[index]);
-          ngModel.$render();
-          hideMenu();
+          console.log(menuScope.items[index]);
+          ngModel.$modelValue = menuScope.items[index];
+          reset();
         }
 
         var menuEl = angular.element(document.createElement('autocomplete-menu'));
@@ -67,18 +61,16 @@ angular.module('bulbsCmsApp')
           'select': 'select(index)',
           'index': 'index'
         });
-        transclude(menuScope, function(clone){
-          menuEl.append(clone);
-        });
-        var retVal = $compile(menuEl)(menuScope);
+        transclude(menuScope, function(clone){ menuEl.append(clone) });
+        $compile(menuEl)(menuScope);
 
-        angular.element('body').append(menuEl);
-        menuEl.hide();
+        // element.parent().append(menuEl);
+        // menuEl.hide();
 
         element.find('input').on('keydown', function(e) {
           switch(e.which) {
             case 27: // ESC
-              hideMenu();
+              reset();
               break;
             case 40: // DOWN
               $scope.$apply(function() {
@@ -97,9 +89,8 @@ angular.module('bulbsCmsApp')
             case 13: // RETURN
               if (menuScope.index) {
                 ngModel.$modelValue = menuScope.items[menuScope.index];
-                ngModel.$render();
+                reset();
               }
-              hideMenu();
               break;
             default:
               return;
@@ -113,19 +104,35 @@ angular.module('bulbsCmsApp')
           $scope['service'].getList(searchParams).then(function (results) {
 
             menuScope.items = results;
-
-            if (menuHidden) {
-              showMenu();
-            }
             timeoutId = null;
           });
         }
 
+        function appendMenu() {
+          if (!isMenuAppended) {
+            isMenuAppended = true;
+            $animate.enter(menuEl, element.parent(), element);
+          }
+          showMenu();
+        }
+
+        function reset() {
+          ngModel.$render();
+          menuScope.items = [];
+          menuScope.index = 0;
+          $animate.leave(menuEl, function() {
+            isMenuAppended = false;
+          });
+        }
+
         function showMenu() {
+          var parentStyles = window.getComputedStyle(element[0]);
           var offset = element.offset();
-          offset.top += element.outerHeight();
+
+          offset.left = 'auto';
+          offset.right = 'auto';
+          offset.top = element.outerHeight();
           offset.minWidth = element.outerWidth();
-          menuHidden = false;
           menuScope.index = 0;
 
           angular.forEach(offset, function (value, key) {
@@ -134,13 +141,10 @@ angular.module('bulbsCmsApp')
             }
             menuEl[0].style[key] = value;
             menuEl.css('z-index', 1000);
-            menuEl.show();
           });
         }
 
         function hideMenu() {
-          menuEl.hide();
-          menuHidden = true;
         }
       },
       templateUrl: routes.PARTIALS_URL + 'autocomplete.html'
