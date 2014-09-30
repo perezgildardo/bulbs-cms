@@ -14,6 +14,7 @@ angular.module('bulbsCmsApp')
         if(attrs.labelAttr) {
           ngModel.$formatters.push(function () {
             var viewValue = ngModel.$modelValue[attrs.labelAttr];
+            console.log(ngModel.$modelValue);
             if (typeof(viewValue) == "function") {
               return viewValue();
             } else {
@@ -22,17 +23,9 @@ angular.module('bulbsCmsApp')
           });
         }
 
-        if (ngModel.$modelValue !== null) {
-          element.attr('disabled', 'disabled')
-        }
-
-        // ngModel.$render = function () {
-        //   if(attrs.labelAttr) {
-        //     var viewValue = ngModel.$modelValue[attrs.labelAttr];
-        //     ngModel.$viewValue = ngModel.$modelValue[attrs.labelAttr];
-        //     element.change();
-        //   }
-        // };
+        // if (ngModel.$modelValue !== null) {
+        //   element.attr('disabled', 'disabled')
+        // }
 
         var menuHidden = true;
         var timeoutId = null;

@@ -23,8 +23,15 @@
 
             <div class="contribution form-inline">
                 <div class="form-group" >
-                    <input type="text" class="form-control autocomplete-select" placeholder="Search for author" />
-                </div>
+                    <autocomplete type="text"
+                                  ng-model="contributions.0.contributor"
+                                  class="form-control"
+                                  service="AuthorService"
+                                  label-attr="get_full_name"
+                                  placeholder="Search for author"></autocomplete>
+
+<!--                     <input type="text" class="form-control autocomplete-select" placeholder="Search for author" />
+ -->                </div>
                 <div class="form-group" >
                     <select name="role" class="form-control">
                         <option value="1">Writer</option>
