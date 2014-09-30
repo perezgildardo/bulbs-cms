@@ -2,60 +2,83 @@
 
 <div class="container">
     <div class="edit-page row">
-        <div class="container">
+        <div class="container col-xs-12 col-md-offset-2 col-md-8">
             <h4>Contributions for "{{ article.title }}"</h4>
             <!-- <div class="contribution form-inline" ng-repeat="contribution in contributions"> -->
-            <div class="contribution form-inline">
-                <div class="form-group" >
-                    <input type="text" class="form-control autocomplete-select" placeholder="Search for author" disabled="disabled" />
+
+            <div class="contribution panel panel-default">
+                <div class="panel-heading">
+                    <a class="pull-right">
+                        <i class="glyphicon glyphicon-remove text-danger"></i>
+                    </a>
                 </div>
-                <div class="form-group" >
+                <div class="panel-body row">
+                <div class="form-group col-xs-6 col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control autocomplete-select" placeholder="Search for author" disabled="disabled" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col-xs-6 col-md-3">
                     <select name="role" class="form-control">
                         <option value="1">Writer</option>
                         <option value="2">Editor</option>
                         <option value="2">Contributor</option>
                     </select>
                 </div>
-                <div class="form-group" >
-                    <textarea class="form-control" placeholder="Notes"></textarea>
+                <div class="form-group col-md-5">
+                    <textarea class="form-control" rows="3" placeholder="Notes"></textarea>
+                </div>
                 </div>
             </div>
 
-            <div class="contribution form-inline">
-                <div class="form-group" >
-                    <autocomplete type="text"
-                                  ng-model="contributions.0.contributor"
-                                  class="form-control"
-                                  service="AuthorService"
-                                  label-attr="get_full_name"
-                                  placeholder="Search for author"></autocomplete>
+            <div class="contribution panel panel-default">
+                <div class="panel-heading">
+                    <a class="pull-right">
+                        <i class="glyphicon glyphicon-remove text-danger"></i>
+                    </a>
+                </div>
+                <div class="panel-body row">
+                <div class="form-group col-xs-6 col-md-4">
+                    <div class="input-group">
+                        <autocomplete type="text"
+                            ng-model="contributions.0.contributor"
+                            class="form-control"
+                            service="AuthorService"
+                            label-attr="get_full_name"
+                            placeholder="Search for author"></autocomplete>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </button>
+                        </span>
+                    </div>
 
-<!--                     <input type="text" class="form-control autocomplete-select" placeholder="Search for author" />
- -->                </div>
-                <div class="form-group" >
+                    <!--<input type="text" class="form-control autocomplete-select" placeholder="Search for author" />-->
+                </div>
+                <div class="form-group col-xs-6 col-md-3">
                     <select name="role" class="form-control">
                         <option value="1">Writer</option>
                         <option value="2">Editor</option>
                         <option value="2">Contributor</option>
                     </select>
                 </div>
-                <div class="form-group" >
-                    <textarea class="form-control" placeholder="Notes"></textarea>
+
+                <div class="form-group col-md-5">
+                    <textarea class="form-control" rows="3" placeholder="Notes"></textarea>
+                </div>
                 </div>
             </div>
 
-
-<!--            <div class="contribution form-inline">
+            <!-- <div class="contribution form-inline">
                 <div class="form-group" >
-                    <autocomplete type="text"
-                                  class="form-control"
-                                  service="AuthorService"
-                                  label-attr="get_full_name"
-                                  placeholder="Search for author"></autocomplete>
+                    <autocomplete type="text" class="form-control" service="AuthorService" label-attr="get_full_name" placeholder="Search for author"></autocomplete>
                 </div>
             </div> -->
-
-
 
         </div>
     </div>
