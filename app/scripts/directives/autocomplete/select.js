@@ -22,6 +22,10 @@ angular.module('bulbsCmsApp')
           });
         }
 
+        if (ngModel.$modelValue !== null) {
+          element.attr('disabled', 'disabled')
+        }
+
         // ngModel.$render = function () {
         //   if(attrs.labelAttr) {
         //     var viewValue = ngModel.$modelValue[attrs.labelAttr];
@@ -129,6 +133,6 @@ angular.module('bulbsCmsApp')
           menuHidden = true;
         }
       },
-      template: '<input type="text" />'
+      template: '<input class="autocomplete-select" type="text" />'
     };
   });
