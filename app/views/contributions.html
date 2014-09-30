@@ -6,8 +6,7 @@
             <h4>
                 Contributions for "{{ article.title }}"
             </h4>
-            <!-- <div class="contribution form-inline" ng-repeat="contribution in contributions"> -->
-            <div class="contribution panel panel-default">
+            <div class="contribution panel panel-default" ng-repeat="contribution in contributions">
                 <div class="panel-heading">
                     Contributor <a class="pull-right">
                         <i class="glyphicon glyphicon-remove text-danger"></i>
@@ -16,14 +15,11 @@
                 <div class="panel-body row">
                     <div class="col-sm-7">
                         <div class="form-group">
-                            <div class="input-group">
-                                <input type="text" class="form-control autocomplete-select" placeholder="Search for author" disabled="disabled" />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">
-                                        <i class="glyphicon glyphicon-pencil"></i>
-                                    </button>
-                                </span>
-                            </div>
+                            <autocomplete type="text"
+                                ng-model="contribution.contributor"
+                                service="AuthorService"
+                                label-attr="get_full_name"
+                                placeholder="Search for author"></autocomplete>
                         </div>
                         <div class="role">
                             <select name="role" class="form-control form-group">
@@ -44,60 +40,6 @@
                             <h4>
                                 Total:
                                 <span class="pull-right text-disabled">N/A</span>
-                            </h4>
-                            <hr />
-                            <p><strong>Applied Conditions:</strong></p>
-                            <ol class="nav nav-list small">
-                                <li>A headline pays $50</li>
-                                <li>A joke pays $25</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="contribution panel panel-default">
-                <div class="panel-heading">
-                    Contributor <a class="pull-right">
-                        <i class="glyphicon glyphicon-remove text-danger"></i>
-                    </a>
-                </div>
-                <div class="panel-body row">
-                    <div class="col-sm-7">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <autocomplete type="text"
-                                    ng-model="contributions.0.contributor"
-                                    class="form-control"
-                                    service="AuthorService"
-                                    label-attr="get_full_name"
-                                    placeholder="Search for author"></autocomplete>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">
-                                        <i class="glyphicon glyphicon-pencil"></i>
-                                    </button>
-                                </span>
-                            </div>
-                            <!--<input type="text" class="form-control autocomplete-select" placeholder="Search for author" />-->
-                        </div>
-                        <div class="role">
-                            <select name="role" class="form-group form-control">
-                                <option value="1">Writer</option>
-                                <option value="2">Editor</option>
-                                <option value="2">Contributor</option>
-                            </select>
-                            <div class="form-group">
-                                <textarea class="form-control" rows="3" placeholder="Notes"></textarea>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary btn-sm">
-                            <i class="glyphicon glyphicon-plus"></i> <span class="hidden-xs hidden-sm hidden-md">Add Role</span>
-                        </button>
-                    </div>
-                    <div class="col-sm-5 sidebar">
-                        <div class="well well-sm">
-                            <h4>
-                                Total:
-                                <span class="pull-right">$75</span>
                             </h4>
                             <hr />
                             <p><strong>Applied Conditions:</strong></p>

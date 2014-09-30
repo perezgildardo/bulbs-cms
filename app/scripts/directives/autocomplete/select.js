@@ -18,7 +18,7 @@ angular.module('bulbsCmsApp')
             if (typeof(viewValue) === "function") {
               viewValue = viewValue();
             }
-            element.val(viewValue);
+            element.find('input').val(viewValue);
           }
         }
 
@@ -75,7 +75,7 @@ angular.module('bulbsCmsApp')
         angular.element('body').append(menuEl);
         menuEl.hide();
 
-        element.on('keydown', function(e) {
+        element.find('input').on('keydown', function(e) {
           switch(e.which) {
             case 27: // ESC
               hideMenu();
@@ -103,7 +103,6 @@ angular.module('bulbsCmsApp')
               break;
             default:
               return;
-
             return e.preventDefault();
           }
         });
@@ -144,6 +143,6 @@ angular.module('bulbsCmsApp')
           menuHidden = true;
         }
       },
-      template: '<input class="autocomplete-select" type="text" />'
+      templateUrl: routes.PARTIALS_URL + 'autocomplete.html'
     };
   });
