@@ -28,15 +28,16 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.openMenu = function(e) {
-          appendMenu();
+          // appendMenu();
           inputEl.removeAttr('disabled');
           inputEl[0].focus();
         }
 
         inputEl.on('blur keyup change', function() {
-          if (isMenuAppended === false) {
+          if (inputEl.attr('disabled') !== undefined) {
             return;
           }
+          appendMenu();
           var value = inputEl.val();
           if (value) {
             if (timeoutId) {
@@ -68,7 +69,6 @@ angular.module('bulbsCmsApp')
           switch(e.which) {
             case 27: // ESC
               if (inputEl.val() === '') {
-                console.log("reset");
                 reset();
               } else {
                 inputEl.val('');
@@ -76,7 +76,7 @@ angular.module('bulbsCmsApp')
               break;
             case 40: // DOWN
               $scope.$apply(function() {
-                menuScope.index = (menuScope.index + 1) % menuScope.items.length
+                menuScope.index = (menuScope.index + 1) % menuScope.items.length;
               });
               break;
             case 38: // UP
@@ -96,7 +96,6 @@ angular.module('bulbsCmsApp')
               break;
             default:
               return;
-            return e.preventDefault();
           }
         });
 
@@ -113,6 +112,7 @@ angular.module('bulbsCmsApp')
         function appendMenu() {
           if (!isMenuAppended) {
             isMenuAppended = true;
+            menuScope.index = 0;
             $animate.enter(menuEl, element.parent(), element);
           }
           styleMenu();
@@ -133,9 +133,8 @@ angular.module('bulbsCmsApp')
 
           offset.left = 'auto';
           offset.right = 'auto';
-          offset.top = element.outerHeight();
+          offset.top = offset.top;
           offset.minWidth = element.outerWidth();
-          menuScope.index = 0;
 
           angular.forEach(offset, function (value, key) {
             if (!isNaN(value) && angular.isNumber(value)) {
