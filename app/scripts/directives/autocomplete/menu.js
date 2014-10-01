@@ -10,10 +10,10 @@ angular.module('bulbsCmsApp')
       scope: {
         items: '=items',
         pIndex: '=index',
-        select: '&select'
+        select: '&select',
       },
       link: function ($scope, element, attrs) {
-
+        
         $scope.selectItem = function (index) {
           $scope.select(index);
         }
@@ -33,7 +33,11 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.label = function(index) {
-          return $scope.items[index].get_full_name();
+          var viewValue = $scope.items[index][attrs.labelAttr];
+          if (typeof(viewValue) === "function") {
+            viewValue = viewValue();
+          }
+          return viewValue;
         }
 
       },

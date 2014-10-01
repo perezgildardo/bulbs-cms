@@ -15,7 +15,7 @@ describe('Author service', function () {
   it('should get an author detail', function () {
     AuthorService.get(2).then(function(author){
       expect(author.id).toBe(2);
-      expect(author.get_full_name()).toBe('Chris Sinchok');
+      expect(author.getFullName()).toBe('Chris Sinchok');
     });
     $httpBackend.flush();
   });
@@ -23,7 +23,7 @@ describe('Author service', function () {
   it('should be able to search authors', function () {
     AuthorService.getList({'q': 'Chris'}).then(function(authors){
       expect(authors.length).toBe(5);
-      expect(authors[0].get_full_name()).toBe('T. Herman Zweibel');
+      expect(authors[0].getFullName()).toBe('T. Herman Zweibel');
     });
     $httpBackend.flush();
   });

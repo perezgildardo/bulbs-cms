@@ -42,9 +42,8 @@ angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
     username: 'csinchok'
   });
 
-
   // Contribution Service
-  $httpBackend.when('GET', new RegExp('^/cms/api/v1/contributions/contribution.*')).respond([
+  $httpBackend.when('GET', new RegExp('^/cms/api/v1/content/[0-9]+/contributions/?$')).respond([
     {
       id: 1,
       content: 12345,
@@ -74,17 +73,38 @@ angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
       }
     },
   ]);
+  // Contribution Service
+  $httpBackend.when('POST', new RegExp('^/cms/api/v1/content/[0-9]+/contributions/?$')).respond(function (method, url, data, headers) {
+    return [200, data, {}];
+  });
 
-  // ContributorRole Service
-  $httpBackend.when('GET', new RegExp('^/cms/api/v1/contributions/role.*')).respond([
-    {
-      id: 1,
-      name: 'Author'
-    },
-    {
-      id: 2,
-      name: 'Editor'
-    },
-  ]);
+
+  // TODO: Do this better.
+  $httpBackend.when('GET', new RegExp('^/cms/api/v1/content/[0-9]+/?$')).respond({
+    id: 6,
+    title: "No Thumbnail Here Folks",
+    feature_type: "Thumbnails On Holiday",
+    slug: "thumbnails-holiday-6",
+    polymorphic_ctype: "content_content",
+    tags: [],
+    authors: [{
+      username: "hsimpson",
+      first_name: "Homer",
+      last_name: "Simpson",
+      id: 16832
+    }],
+    thumbnail: null,
+    absolute_url: "/article/article-1",
+    sponsor_image: null,
+    status: "Published",
+    published: "2011-04-03T16:20:00Z",
+    last_modified: "2011-05-03T16:00:00Z",
+    description: "",
+    subhead: "",
+    indexed: true,
+    body: "There's no thumbnail here. Go away.",
+    client_pixel: null,
+    sponsor_name: null
+  });
 
 });

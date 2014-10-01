@@ -4,7 +4,7 @@ angular.module('bulbs.api').
     Restangular.setRequestSuffix('/');
     Restangular.extendModel('author', function (obj) {
       return angular.extend(obj, {
-        get_full_name: function() {
+        getFullName: function() {
           return obj.first_name + ' ' + obj.last_name;
         }
       });

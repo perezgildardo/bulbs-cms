@@ -18,6 +18,7 @@ angular.module('bulbsCmsApp')
 
         ngModel.$render = function() {
           if (ngModel.$modelValue) {
+            console.log(ngModel.$modelValue);
             var viewValue = ngModel.$modelValue[attrs.labelAttr];
             if (typeof(viewValue) === "function") {
               viewValue = viewValue();
@@ -58,7 +59,8 @@ angular.module('bulbsCmsApp')
         menuEl.attr({
           'items': 'items',
           'select': 'select(index)',
-          'index': 'index'
+          'index': 'index',
+          'label-attr': attrs.labelAttr,
         });
         transclude(menuScope, function(clone){ menuEl.append(clone) });
         $compile(menuEl)(menuScope);
@@ -66,7 +68,6 @@ angular.module('bulbsCmsApp')
         element.find('input').on('keyup', function(e) {
           switch(e.which) {
             case 27: // ESC
-              console.log(inputEl.val());
               if (inputEl.val() === '') {
                 console.log("reset");
                 reset();

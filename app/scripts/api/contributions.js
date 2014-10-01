@@ -1,6 +1,6 @@
 angular.module('bulbs.api').
   factory('ContributionService', function (Restangular) {
-    Restangular.setBaseUrl('/cms/api/v1/contributions/');
+    Restangular.setBaseUrl('/cms/api/v1/content/');
     Restangular.setRequestSuffix('/');
     Restangular.extendModel('contribution', function (obj) {
       obj.contributor = angular.extend(obj.contributor, {
@@ -11,9 +11,4 @@ angular.module('bulbs.api').
       return obj;
     });
     return Restangular.all('contribution');
-  }).
-  factory('ContributorRoleService', function (Restangular) {
-    Restangular.setBaseUrl('/cms/api/v1/contributions/');
-    Restangular.setRequestSuffix('/');
-    return Restangular.all('role');
   });
