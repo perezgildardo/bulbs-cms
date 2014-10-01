@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="edit-page row">
-        <div class="container col-xs-12 col-sm-pull-2 col-sm-push-2 col-sm-8 col-md-pull-3 col-md-push-3 col-md-6">
+        <div class="container col-xs-12 col-sm-pull-1 col-sm-push-1 col-sm-10 col-md-pull-2 col-md-push-2 col-md-8">
             <h4>
                 Contributions for "{{ article.title }}"
             </h4>
@@ -13,23 +13,25 @@
                     </a>
                 </div>
                 <div class="panel-body">
-                        <div class="form-group">
+                    <div class="row">
+                        <div class="form-group col-sm-6">
                             <autocomplete type="text"
                                 ng-model="contribution.contributor"
                                 service="AuthorService"
                                 label-attr="getFullName"
                                 placeholder="Search for author"></autocomplete>
                         </div>
-                        <div class="role">
+                        <div class="role col-sm-6">
                             <select name="role" class="form-control form-group">
                                 <option value="1">Writer</option>
                                 <option value="2">Editor</option>
                                 <option value="2">Contributor</option>
                             </select>
-                            <div class="form-group">
-                                <textarea class="form-control" rows="3" placeholder="Notes"></textarea>
-                            </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" placeholder="Notes"></textarea>
+                    </div>
                 </div>
             </div>
 
