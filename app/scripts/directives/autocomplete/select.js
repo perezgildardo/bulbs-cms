@@ -18,7 +18,6 @@ angular.module('bulbsCmsApp')
 
         ngModel.$render = function() {
           if (ngModel.$modelValue) {
-            console.log(ngModel.$modelValue);
             var viewValue = ngModel.$modelValue[attrs.labelAttr];
             if (typeof(viewValue) === "function") {
               viewValue = viewValue();

@@ -26,22 +26,5 @@ angular.module('bulbs.api').
       return obj;
     });
 
-    // Restangular.addElementTransformer('contributions', true, function(contributions) {
-    //   if (contributions.length === 0) {
-    //     return contributions;
-    //   }
-    //   for(var i in contributions) {
-    //     if (contributions[i] && contributions[i].contributor) {
-    //       contributions[i].contributor = angular.extend(contributions[i].contributor, {
-    //         getFullName: function() {
-    //           console.log(this);
-    //           return this.first_name + ' ' + this.last_name;
-    //         }
-    //       });
-    //     }
-    //   }
-    //   return contributions;
-    // });
-
     return Restangular.service('content');
   });
