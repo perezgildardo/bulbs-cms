@@ -63,7 +63,6 @@ angular.module('bulbsCmsApp')
         transclude(menuScope, function(clone){ menuEl.append(clone) });
         $compile(menuEl)(menuScope);
 
-
         element.find('input').on('keyup', function(e) {
           switch(e.which) {
             case 27: // ESC
