@@ -17,8 +17,8 @@ angular.module('bulbsCmsApp')
         var timeoutId = null;
 
         ngModel.$render = function() {
-          if (ngModel.$modelValue) {
-            var viewValue = ngModel.$modelValue[attrs.labelAttr];
+          if (ngModel.$viewValue) {
+            var viewValue = ngModel.$viewValue[attrs.labelAttr];
             if (typeof(viewValue) === "function") {
               viewValue = viewValue();
             }
@@ -51,7 +51,7 @@ angular.module('bulbsCmsApp')
         menuScope.items = [];
         menuScope.index = 0;
         menuScope.select = function(index) {
-          ngModel.$modelValue = menuScope.items[index];
+          ngModel.$setViewValue(menuScope.items[index]);
           reset();
         }
 
@@ -90,7 +90,7 @@ angular.module('bulbsCmsApp')
               break;
             case 13: // RETURN
               if (menuScope.index) {
-                ngModel.$modelValue = menuScope.items[menuScope.index];
+                ngModel.$setViewValue(menuScope.items[menuScope.index]);
                 reset();
               }
               break;
@@ -133,7 +133,7 @@ angular.module('bulbsCmsApp')
 
           offset.left = 'auto';
           offset.right = 'auto';
-          offset.top = offset.top;
+          offset.top = element.outerHeight();
           offset.minWidth = element.outerWidth();
 
           angular.forEach(offset, function (value, key) {
