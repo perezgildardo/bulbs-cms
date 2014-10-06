@@ -7,12 +7,12 @@
             <div class="contribution panel panel-default" ng-repeat="contribution in contributions">
 
                 <div class="panel-heading" data-toggle="collapse" href="#contribution{{$index}}">
-                    {{ contribution.contributor.getFullName() }}<a class="pull-right" ng-click="remove($index)">
+                    {{ contribution.contributor.getFullName() }}<span ng-bind="contribution.role"></span><a class="pull-right" ng-click="remove($index)">
                         <i class="glyphicon glyphicon-remove text-danger"></i>
                     </a>
                 </div>
 
-                <div id="contribution{{$index}}" class="collapse">
+                <div id="contribution{{$index}}" ng-class="{collapse: true, in: collapsed[$index] == false}">
                     <div class="panel-body" >
                         <div class="row">
                             <div class="form-group col-sm-6">

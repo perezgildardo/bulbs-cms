@@ -8,6 +8,7 @@ angular.module('bulbsCmsApp')
   {
     $scope.contentId = parseInt($routeParams.id, 10);
     $scope.contributions = [];
+    $scope.collapsed = [];
 
     $scope.save = save;
     $scope.add = add;
@@ -16,7 +17,6 @@ angular.module('bulbsCmsApp')
 
     function save() {
       console.log($scope.contributions);
-      return;
       ContentService.one($scope.contentId).all('contributions').post($scope.contributions).then(function(contributions){
         getContributions();
       });
@@ -28,6 +28,7 @@ angular.module('bulbsCmsApp')
         content: $scope.contentId,
         role: null
       });
+      $scope.collapsed.push(false);
     }
 
     function getRoles() {
@@ -52,12 +53,16 @@ angular.module('bulbsCmsApp')
           }
         }
         $scope.contributions = contributions;
-
+        $scope.collapsed = new Array(contributions.length);
+        $scope.contributions.forEach(function(item, index){
+          $scope.collapsed[index] = true;
+        });
       });
     }
 
     function remove(index) {
       $scope.contributions.splice(index, 1);
+      $scope.collapsed.splice(index, 1);
     }
 
     getRoles();
