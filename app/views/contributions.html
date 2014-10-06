@@ -23,7 +23,7 @@
                                     placeholder="Search for author"></autocomplete>
                             </div>
                             <div class="role col-sm-6">
-                                <select name="role" class="form-control form-group" ng-options="role.name for role in roles" ng-model="contribution.role">
+                                <select name="role" class="form-control form-group" ng-options="name for (id, name) in roles" ng-model="contribution.role">
                                 </select>
                             </div>
                         </div>
