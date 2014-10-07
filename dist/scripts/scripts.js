@@ -654,7 +654,7 @@ angular.module('bulbsCmsApp')
   .controller('ContributionsCtrl', function (
     $scope, $routeParams, $http, $window,
     $location, $timeout, $compile, $q, $modal,
-    $, routes, ContributionRoleService, ContentService)
+    _, routes, ContributionRoleService, ContentService)
   {
 
     $scope.NAV_LOGO = routes.NAV_LOGO;
@@ -665,11 +665,12 @@ angular.module('bulbsCmsApp')
     $scope.save = save;
     $scope.add = add;
     $scope.remove = remove;
-    $scope.roles = {};
+    $scope.roles = [];
 
     function save() {
       // I know, I'm not supposed to do DOM manipulation in controllers. TOO BAD.
       angular.element('#save-btn').html('<i class="glyphicon glyphicon-refresh fa-spin"></i> Saving');
+      console.log($scope.contributions);
       ContentService.one($scope.contentId).all('contributions').post($scope.contributions).then(function(contributions){
         getContributions();
         angular.element('#save-btn').html('<i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
@@ -687,10 +688,7 @@ angular.module('bulbsCmsApp')
 
     function getRoles() {
       return ContributionRoleService.getList().then(function(roles){
-        $scope.roles = {};
-        roles.forEach(function(role) {
-          $scope.roles[role.id] = role.name;
-        });
+        $scope.roles = roles;
         getContributions();
       });
     }
@@ -702,8 +700,12 @@ angular.module('bulbsCmsApp')
             continue;
           }
           var roleId = contributions[i].role.id;
-          if (roleId && $scope.roles.hasOwnProperty(roleId)) {
-            contributions[i].role = $scope.roles[roleId];
+          var role = _.find($scope.roles, function(role){
+            return role.id == roleId;
+          });
+
+          if (role) {
+            contributions[i].role = role;
           }
         }
         $scope.contributions = contributions;
