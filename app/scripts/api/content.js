@@ -25,5 +25,14 @@ angular.module('bulbs.api').
       return obj;
     });
 
+    Restangular.extendCollection('contributions', function(collection) {
+      collection.save = function(data) {
+        return collection.post(data).then(function(contributions) {
+          return Restangular.restangularizeCollection('contributions', contributions);
+        });
+      }
+      return collection;
+    });
+
     return Restangular.service('content');
   });

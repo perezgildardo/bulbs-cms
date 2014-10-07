@@ -20,9 +20,7 @@ angular.module('bulbsCmsApp')
     function save() {
       // I know, I'm not supposed to do DOM manipulation in controllers. TOO BAD.
       angular.element('#save-btn').html('<i class="glyphicon glyphicon-refresh fa-spin"></i> Saving');
-      console.log($scope.contributions);
-      ContentService.one($scope.contentId).all('contributions').post($scope.contributions).then(function(contributions){
-        getContributions();
+      $scope.contributions.save($scope.contributions).then(function(contributions){
         angular.element('#save-btn').html('<i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
       });
     }
@@ -49,14 +47,6 @@ angular.module('bulbsCmsApp')
           if (contributions[i] === null || contributions[i].role === undefined) {
             continue;
           }
-          // var roleId = contributions[i].role.id;
-          // var role = _.find($scope.roles, function(role){
-          //   return role.id == roleId;
-          // });
-
-          // if (role) {
-          //   contributions[i].role = role;
-          // }
         }
         $scope.contributions = contributions;
         $scope.collapsed = new Array(contributions.length);

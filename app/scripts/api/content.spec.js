@@ -50,6 +50,30 @@ describe('ContentService', function () {
     $httpBackend.flush();
   });
 
+  it('should update the contributions for content', function() {
+    data = [{
+      id: 7,
+      content: 1234,
+      contributor: {
+        id: 3,
+        first_name: 'Shawn',
+        last_name: 'Cook',
+        username: 'scook'
+      },
+      role: {
+        id: 3,
+        name: 'Programmer'
+      }
+    }];
+    // console.log(ContentService.one(6).all('contributions').getList());
+    // console.log(ContentService.one(6).all('contributions').post(data));
+    ContentService.one(6).all('contributions').save(data).then(function(contributions){
+      expect(contributions.length).toBe(1);
+      expect(contributions).toEqual(data);
+    });
+    $httpBackend.flush();
+  });
+
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
