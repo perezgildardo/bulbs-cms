@@ -49,14 +49,14 @@ angular.module('bulbsCmsApp')
           if (contributions[i] === null || contributions[i].role === undefined) {
             continue;
           }
-          var roleId = contributions[i].role.id;
-          var role = _.find($scope.roles, function(role){
-            return role.id == roleId;
-          });
+          // var roleId = contributions[i].role.id;
+          // var role = _.find($scope.roles, function(role){
+          //   return role.id == roleId;
+          // });
 
-          if (role) {
-            contributions[i].role = role;
-          }
+          // if (role) {
+          //   contributions[i].role = role;
+          // }
         }
         $scope.contributions = contributions;
         $scope.collapsed = new Array(contributions.length);

@@ -53,10 +53,7 @@ angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
         last_name: 'Sinchok',
         username: 'csinchok'
       },
-      role: {
-        id: 1,
-        name: 'Author'
-      }
+      role: 1
     },
     {
       id: 1,
@@ -67,10 +64,7 @@ angular.module('bulbs.api.mock', []).run(function ($httpBackend) {
         last_name: 'Wentz',
         username: 'awentz'
       },
-      role: {
-        id: 2,
-        name: 'Editor'
-      }
+      role: 2
     },
   ]);
   // Contribution Service
