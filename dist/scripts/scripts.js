@@ -1659,7 +1659,7 @@ angular.module('bulbsCmsApp')
 
         function queryData(query) {
           var searchParams = {}
-          searchParams[attrs.searchParam] = query;
+          searchParams[attrs.searchParam || search] = query;
           $scope['service'].getList(searchParams).then(function (results) {
 
             menuScope.items = results;
