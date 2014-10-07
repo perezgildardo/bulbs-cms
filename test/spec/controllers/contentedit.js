@@ -13,13 +13,13 @@ describe('Controller: ContenteditCtrl', function () {
     routeParams,
     mockArticle,
     contentApi,
-    localStorageBackup,
+    VersionStorageApiMock,
     modalService;
     
   var contentApiUrl = '/cms/api/v1/content/1/'; 
 
   // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope, $httpBackend, _$routeParams_, mockApiData, ContentApi, Localstoragebackup, $modal) {
+  beforeEach(inject(function ($controller, $rootScope, $httpBackend, _$routeParams_, mockApiData, ContentApi, $modal) {
     controller = $controller;
     mockArticle = mockApiData['content.list'].results[0];
     scope = $rootScope.$new();
@@ -27,8 +27,16 @@ describe('Controller: ContenteditCtrl', function () {
     routeParams = _$routeParams_;
     routeParams.id = 1;
     contentApi = ContentApi;
-    localStorageBackup = Localstoragebackup;
     modalService = $modal;
+
+    VersionStorageApiMock = {
+      $create: function() {
+        return true;
+      }
+    };
+
+    spyOn(VersionStorageApiMock, '$create');
+
   }));
 
   describe('on instantiation', function () {
@@ -49,7 +57,7 @@ describe('Controller: ContenteditCtrl', function () {
       ContenteditCtrl = controller('ContenteditCtrl', {
         $scope: scope,
         $routeParams: routeParams,
-        Localstoragebackup: localStorageBackup,
+        VersionStorageApi: VersionStorageApiMock,
         $modal: modalService
       });
       scope.$digest();
@@ -100,18 +108,18 @@ describe('Controller: ContenteditCtrl', function () {
     });
     
     describe('function: saveArticle', function () {
-      it('should call Localstoragebackup.backupToLocalStorage', function () {
-        spyOn(localStorageBackup, 'backupToLocalStorage');
-        scope.saveArticle();
-        expect(localStorageBackup.backupToLocalStorage).toHaveBeenCalled();
-      });
-    
-      it('should call postValidationSaveArticle if no last_modified discrepancy', function () {
+
+      it('should call postValidationSaveArticle and create a version if no last_modified discrepancy', function () {
         httpBackend.expect('GET', '/cms/api/v1/content/1/').respond(mockArticle);
-        spyOn(scope, 'postValidationSaveArticle')
+        httpBackend.expect('PUT', '/cms/api/v1/content/1/').respond(mockArticle);
+
+        spyOn(scope, 'postValidationSaveArticle').andCallThrough();
+
         scope.saveArticle();
         httpBackend.flush();
+
         expect(scope.postValidationSaveArticle).toHaveBeenCalled();
+        expect(VersionStorageApiMock.$create).toHaveBeenCalled();
       });
     
       it('should open a modal if there is a last modified conflict', function () {
