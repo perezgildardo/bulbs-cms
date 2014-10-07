@@ -12,18 +12,19 @@
         </div>
     </div>
 
-    <div class="row">
-        <ul class="nav nav-pills">
-            <li class="active">
-                <a href="/cms/app/edit/{{ article.id }}/" >Content</a>
-            </li>
-            <li>
-                <a href="/cms/{{ article.id }}/contributions/" >Contributions</a>
-            </li>
-        </ul>
+    <div class="row content-nav">
+        <div class="container col-xs-12 col-sm-pull-1 col-sm-push-1 col-sm-10 col-md-pull-2 col-md-push-2 col-md-8">
+            <ul class="nav nav-pills">
+                <li class="active">
+                    <a href="/cms/app/edit/{{ article.id }}/" >Content</a>
+                </li>
+                <li>
+                    <a href="/cms/{{ article.id }}/contributions/" >Contributions</a>
+                </li>
+            </ul>
+        </div>
     </div>
     
-
     <div class="edit-page row">
         <div id="content-wrapper" class="container">
             <div ng-if="article.polymorphic_ctype" ng-include="CONTENT_PARTIALS_URL + article.polymorphic_ctype + '.html' + CACHEBUSTER"></div>
