@@ -1,13 +1,36 @@
-<div class="navbar navbar-default navbar-fixed-top" role="navigation" ></div>
-
+<div class="navbar navbar-default navbar-fixed-top" role="navigation" >
+  <div class="navbar-header">
+    <a id="logo" class="navbar-brand" href="/cms/app/list"><img ng-src="{{ NAV_LOGO }}"></a>
+  </div>
+  <ul class="nav navbar-nav navbar-left">
+    <li><a href="/cms/app/edit/{{ contentId }}/">"{{ content.title }}"</a></li>
+  </ul>
+  <ul class="nav navbar-nav navbar-right">
+      <li>
+        <button id="save-btn" class="navbar-save btn btn-success btn-sm navbar-btn" href="" ng-click="save();">
+          <i class="glyphicon glyphicon-floppy-disk"></i> Save</button></li>
+  </ul>
+</div>
 
 <div class="container">
+
+    <div class="row">
+        <ul class="nav nav-pills">
+            <li>
+                <a href="/cms/app/edit/{{ contentId }}/" >Content</a>
+            </li>
+            <li class="active">
+                <a href="/cms/{{ contentId }}/contributions/" >Contributions</a>
+            </li>
+        </ul>
+    </div>
+
     <div class="row">
         <div id="contributions" class="container col-xs-12 col-sm-pull-1 col-sm-push-1 col-sm-10 col-md-pull-2 col-md-push-2 col-md-8">
             <div class="contribution panel panel-default" ng-repeat="contribution in contributions">
 
                 <div class="panel-heading" data-toggle="collapse" href="#contribution{{$index}}">
-                    {{ contribution.contributor.getFullName() }}<span ng-bind="contribution.role"></span><a class="pull-right" ng-click="remove($index)">
+                    <b>{{ contribution.contributor.getFullName() }} </b><span class="label label-default" ng-bind="contribution.role"></span><a class="pull-right" ng-click="remove($index)">
                         <i class="glyphicon glyphicon-remove text-danger"></i>
                     </a>
                 </div>
@@ -36,10 +59,6 @@
 
             <div class="form-group pull-right">
                 <button class="btn btn-success" ng-click="add()">Add Contributor</button>
-            </div>
-
-            <div class="form-group pull-left">
-                <button class="btn btn-success" ng-click="save()">Save</button>
             </div>
 
         </div>

@@ -6,6 +6,8 @@ angular.module('bulbsCmsApp')
     $location, $timeout, $compile, $q, $modal,
     $, routes, ContributionRoleService, ContentService)
   {
+
+    $scope.NAV_LOGO = routes.NAV_LOGO;
     $scope.contentId = parseInt($routeParams.id, 10);
     $scope.contributions = [];
     $scope.collapsed = [];
@@ -16,9 +18,11 @@ angular.module('bulbsCmsApp')
     $scope.roles = {};
 
     function save() {
-      console.log($scope.contributions);
+      // I know, I'm not supposed to do DOM manipulation in controllers. TOO BAD.
+      angular.element('#save-btn').html('<i class="glyphicon glyphicon-refresh fa-spin"></i> Saving');
       ContentService.one($scope.contentId).all('contributions').post($scope.contributions).then(function(contributions){
         getContributions();
+        angular.element('#save-btn').html('<i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
       });
     }
 
@@ -60,11 +64,18 @@ angular.module('bulbsCmsApp')
       });
     }
 
+    function getContent() {
+      ContentService.one($scope.contentId).get().then(function(content) {
+        $scope.content = content;
+      })
+    }
+
     function remove(index) {
       $scope.contributions.splice(index, 1);
       $scope.collapsed.splice(index, 1);
     }
 
     getRoles();
+    getContent();
 
   });

@@ -14,7 +14,6 @@ angular.module('bulbs.api').
       return obj;
     });
 
-
     Restangular.extendModel('contributions', function (obj) {
       if (obj && obj.contributor) {
         obj.contributor = angular.extend(obj.contributor, {
