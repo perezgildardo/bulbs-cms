@@ -22,6 +22,9 @@
             </p>
         </div>
         <div class="col-md-2">
+            <select class="form-control" ng-options="option as option.label for option in orderOptions" ng-model="orderBy" ng-change="orderingChange()"></select>
+        </div>
+        <div class="col-md-2">
             <a href="{{ downloadURL }}" target="_blank" class="btn btn-primary">Download</a>
         </div>
     </div>

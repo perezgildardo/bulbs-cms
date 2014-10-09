@@ -8,13 +8,25 @@ angular.module('bulbsCmsApp')
     $scope.reports = {
       "Contributions": {
         service: ContributionReportingService,
-        headings: ['id', 'role', 'notes', 'content', 'user'],
-        downloadURL: '/cms/api/v1/contributions/reporting/'
+        headings: ['user', 'role', 'content', 'notes'],
+        downloadURL: '/cms/api/v1/contributions/reporting/',
+        orderOptions: [
+          {
+            label: 'Order by User',
+            key: 'user'
+          },
+          {
+            label: 'Order by Content',
+            key: 'content'
+          },
+        ]
       }
     };
     $scope.downloadURL;
     $scope.items = []
     $scope.headings = [];
+    $scope.orderBy;
+    $scope.orderOptions = [];
 
     $scope.start;
     $scope.end;
@@ -34,36 +46,54 @@ angular.module('bulbsCmsApp')
       $scope.endOpen = true;
     }
 
-    $scope.$watchCollection('[report, start, end]', function(params){
-      var report = params[0];
-      var start = params[1];
-      var end = params[2];
-      if (report) {
-        $scope.headings = report.headings;
-        $scope.items = [];
+    $scope.orderingChange = function() {
+      loadReport($scope.report, $scope.start, $scope.end, $scope.orderBy)
+    }
 
-        var reportParams = {};
-        $scope.downloadURL = report.downloadURL + '?format=csv'
-
-        // End is only gonna work if you specify a start
-        if (end) {
-          var endParam = $filter('date')(end, 'yyyy-MM-dd');
-          reportParams['end'] = endParam;
-          $scope.downloadURL += ('&end=' + endParam)
-        }
-
-        if (start) {
-          var startParam = $filter('date')(start, 'yyyy-MM-dd');
-          reportParams['start'] = startParam;
-          $scope.downloadURL += ('&start=' + startParam)
-        }
-
-        report.service.getList(reportParams).then(function(data){
-          $scope.items = data;
-        })
+    $scope.$watch('report', function(report){
+      if (!report) {
+        return;
       }
+      $scope.orderOptions = report.orderOptions;
+      $scope.orderBy = report.orderOptions[0];
+      $scope.headings = report.headings;
+
+      loadReport(report, $scope.start, $scope.end, $scope.orderBy)
+    });
+
+    $scope.$watchCollection('[start, end]', function(params){
+      if (!$scope.report) {
+        return;
+      }
+      var start = params[0];
+      var end = params[1];
+
+      loadReport($scope.report, start, end, $scope.orderBy)
     });
 
 
+    function loadReport(report, start, end, order) {
+      $scope.items = [];
+      var reportParams = {};
+      $scope.downloadURL = report.downloadURL + '?format=csv'
+      if (end) {
+        var endParam = $filter('date')(end, 'yyyy-MM-dd');
+        reportParams['end'] = endParam;
+        $scope.downloadURL += ('&end=' + endParam)
+      }
+
+      if (start) {
+        var startParam = $filter('date')(start, 'yyyy-MM-dd');
+        reportParams['start'] = startParam;
+        $scope.downloadURL += ('&start=' + startParam)
+      }
+
+      $scope.downloadURL += ('&ordering=' + order.key)
+      reportParams['ordering'] = order.key
+
+      report.service.getList(reportParams).then(function(data){
+        $scope.items = data;
+      });
+    }
 
   });
