@@ -536,6 +536,7 @@ module.exports = function (grunt) {
     'shell:bower_update',
     'bowerInstall',
     'ngtemplates',
+    'injector:local_dependencies',
     'useminPrepare',
     'concurrent:dist',
     'less',
