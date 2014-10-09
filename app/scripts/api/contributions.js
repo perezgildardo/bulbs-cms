@@ -5,7 +5,7 @@ angular.module('bulbs.api').
       RestangularConfigurer.setRequestSuffix('/');
     }).service('role');
   }).
-  factory('ContributionReportingService', function(Restangular) {
+  factory('ContributionReportingService', function(Restangular, moment) {
 
     Restangular.extendModel('reporting', function (obj) {
       obj.user = angular.extend(obj.user, {
@@ -15,7 +15,7 @@ angular.module('bulbs.api').
       });
       obj.content = angular.extend(obj.content, {
         toString: function() {
-          return obj.content.title;
+          return obj.content.title + ' (' + moment(obj.content.published).format('MM/DD/YYYY h:mm a') + ')';
         },
       });
       return obj;

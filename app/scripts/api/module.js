@@ -1,1 +1,1 @@
-angular.module('bulbs.api', ['restangular']);
+angular.module('bulbs.api', ['restangular', 'moment']);
