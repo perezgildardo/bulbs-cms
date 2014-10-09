@@ -384,7 +384,7 @@ module.exports = function (grunt) {
         files: {
           'app/index.html': [
             'app/scripts/directives/*.js',
-            // 'scripts/directives/autocomplete/*.js',
+            'app/scripts/directives/autocomplete/*.js',
             'app/scripts/controllers/*.js',
             'app/scripts/services/*.js',
             'app/scripts/filters/*.js',
