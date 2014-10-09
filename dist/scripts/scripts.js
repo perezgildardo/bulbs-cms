@@ -2525,7 +2525,7 @@ angular.module('bulbsCmsApp')
               });
               break;
             case 13: // RETURN
-              if (menuScope.index) {
+              if (menuScope.index >= 0) {
                 ngModel.$setViewValue(menuScope.items[menuScope.index]);
                 reset();
               }
