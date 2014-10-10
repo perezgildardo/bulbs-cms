@@ -3028,12 +3028,14 @@ angular.module('bulbsCmsApp')
     $scope.NAV_LOGO = routes.NAV_LOGO;
     $scope.contentId = parseInt($routeParams.id, 10);
     $scope.contributions = [];
+    $scope.contributionLabels = [];
+    $scope.roles = [];
     $scope.collapsed = [];
 
     $scope.save = save;
     $scope.add = add;
     $scope.remove = remove;
-    $scope.roles = [];
+    $scope.updateLabel = updateLabel;
 
     function save() {
       // I know, I'm not supposed to do DOM manipulation in controllers. TOO BAD.
@@ -3069,6 +3071,9 @@ angular.module('bulbsCmsApp')
         $scope.contributions = contributions;
         $scope.collapsed = new Array(contributions.length);
         $scope.contributions.forEach(function(item, index){
+          $scope.contributionLabels[index] = _.find($scope.roles, function(role) {
+            return role.id == item.role;
+          }).name;
           $scope.collapsed[index] = true;
         });
       });
@@ -3083,6 +3088,12 @@ angular.module('bulbsCmsApp')
     function remove(index) {
       $scope.contributions.splice(index, 1);
       $scope.collapsed.splice(index, 1);
+    }
+
+    function updateLabel(index) {
+      $scope.contributionLabels[index] = _.find($scope.roles, function(role) {
+        return role.id == $scope.contributions[index].role;
+      }).name;
     }
 
     getRoles();
