@@ -31,7 +31,7 @@
             <div class="contribution panel panel-default" ng-repeat="contribution in contributions">
 
                 <div class="panel-heading" data-toggle="collapse" href="#contribution{{$index}}">
-                    <b>{{ contribution.contributor.getFullName() }} </b><span class="label label-default" ng-bind="contribution.role.name"></span><a class="pull-right" ng-click="remove($index)">
+                    <b>{{ contribution.contributor.getFullName() }} </b><span class="label label-default" ng-bind="contributionLabels[$index]"></span><a class="pull-right" ng-click="remove($index)">
                         <i class="glyphicon glyphicon-remove text-danger"></i>
                     </a>
                 </div>
@@ -48,7 +48,7 @@
                                     placeholder="Search for author"></autocomplete>
                             </div>
                             <div class="role col-sm-6">
-                                <select name="role" class="form-control form-group" ng-options="role.id as role.name for role in roles" ng-model="contribution.role">
+                                <select name="role" class="form-control form-group" ng-change="updateLabel($index)" ng-options="role.id as role.name for role in roles" ng-model="contribution.role">
                                 </select>
                             </div>
                         </div>
