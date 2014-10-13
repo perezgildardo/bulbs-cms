@@ -28,7 +28,6 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.openMenu = function(e) {
-          // appendMenu();
           inputEl.removeAttr('disabled');
           inputEl[0].focus();
         }
@@ -104,7 +103,11 @@ angular.module('bulbsCmsApp')
           searchParams[attrs.searchParam || search] = query;
           $scope['service'].getList(searchParams).then(function (results) {
 
-            menuScope.items = results;
+            if(results.length > 5) {
+              menuScope.items = results.slice(0, 5);
+            } else {
+              menuScope.items = results;
+            }
             timeoutId = null;
           });
         }
