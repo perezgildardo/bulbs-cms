@@ -265,7 +265,7 @@ angular.module('bulbsCmsApp', [
       controller: 'ContenteditCtrl',
       reloadOnSearch: false
     })
-    .when('/cms/:id/contributions/', {
+    .when('/cms/app/edit/:id/contributions/', {
       templateUrl: routes.PARTIALS_URL + 'contributions.html',
       controller: 'ContributionsCtrl'
     })
@@ -2627,6 +2627,7 @@ angular.module('bulbsCmsApp')
     $scope.PARTIALS_URL = routes.PARTIALS_URL;
     $scope.CONTENT_PARTIALS_URL = routes.CONTENT_PARTIALS_URL;
     $scope.MEDIA_ITEM_PARTIALS_URL = routes.MEDIA_ITEM_PARTIALS_URL;
+    $scope.page = 'edit';
 
     /*note on cachebuster:
       contentedit ng-includes templates served by django
@@ -3034,6 +3035,8 @@ angular.module('bulbsCmsApp')
     $scope.contributionLabels = [];
     $scope.roles = [];
     $scope.collapsed = [];
+    $scope.page = 'contributions';
+    $scope.article;
 
     $scope.save = save;
     $scope.add = add;
@@ -3085,6 +3088,9 @@ angular.module('bulbsCmsApp')
     function getContent() {
       ContentService.one($scope.contentId).get().then(function(content) {
         $scope.content = content;
+        $scope.article = {
+          id: content.id
+        };
       })
     }
 

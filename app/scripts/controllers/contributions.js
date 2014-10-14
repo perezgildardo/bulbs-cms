@@ -13,6 +13,8 @@ angular.module('bulbsCmsApp')
     $scope.contributionLabels = [];
     $scope.roles = [];
     $scope.collapsed = [];
+    $scope.page = 'contributions';
+    $scope.article;
 
     $scope.save = save;
     $scope.add = add;
@@ -64,6 +66,9 @@ angular.module('bulbsCmsApp')
     function getContent() {
       ContentService.one($scope.contentId).get().then(function(content) {
         $scope.content = content;
+        $scope.article = {
+          id: content.id
+        };
       })
     }
 
