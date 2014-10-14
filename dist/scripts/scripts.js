@@ -2464,7 +2464,6 @@ angular.module('bulbsCmsApp')
         }
 
         $scope.openMenu = function(e) {
-          // appendMenu();
           inputEl.removeAttr('disabled');
           inputEl[0].focus();
         }
@@ -2540,7 +2539,11 @@ angular.module('bulbsCmsApp')
           searchParams[attrs.searchParam || search] = query;
           $scope['service'].getList(searchParams).then(function (results) {
 
-            menuScope.items = results;
+            if(results.length > 5) {
+              menuScope.items = results.slice(0, 5);
+            } else {
+              menuScope.items = results;
+            }
             timeoutId = null;
           });
         }
@@ -3616,14 +3619,20 @@ angular.module('bulbsCmsApp')
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('ReportingCtrl', function ($scope, $window, $, $location, $filter, Login, routes, ContributionReportingService) {
+  .controller('ReportingCtrl', function ($scope, $window, $, $location, $filter, $interpolate, Login, routes, ContributionReportingService) {
     $window.document.title = routes.CMS_NAMESPACE + ' | Reporting'; // set title
 
     $scope.report;
     $scope.reports = {
       "Contributions": {
         service: ContributionReportingService,
-        headings: ['user', 'role', 'content', 'notes'],
+        headings: [
+          {'title': 'Date', 'expression': 'content.published'},
+          {'title': 'Headline', 'expression': 'content.title'},
+          {'title': 'User', 'expression': 'user.full_name'},
+          {'title': 'Role', 'expression': 'role'},
+          {'title': 'Notes', 'expression': 'notes'},
+        ],
         downloadURL: '/cms/api/v1/contributions/reporting/',
         orderOptions: [
           {
@@ -3671,7 +3680,10 @@ angular.module('bulbsCmsApp')
       }
       $scope.orderOptions = report.orderOptions;
       $scope.orderBy = report.orderOptions[0];
-      $scope.headings = report.headings;
+      $scope.headings = [];
+      report.headings.forEach(function(heading){
+        $scope.headings.push(heading.title);
+      });
 
       loadReport(report, $scope.start, $scope.end, $scope.orderBy)
     });
@@ -3707,7 +3719,16 @@ angular.module('bulbsCmsApp')
       reportParams['ordering'] = order.key
 
       report.service.getList(reportParams).then(function(data){
-        $scope.items = data;
+        $scope.items = [];
+        data.forEach(function(lineItem){
+          var item = [];
+          report.headings.forEach(function(heading) {
+            var exp = $interpolate('{{item.' + heading.expression + '}}');
+            var value = exp({item: lineItem});
+            item.push(value);
+          });
+          $scope.items.push(item);
+        });
       });
     }
 
