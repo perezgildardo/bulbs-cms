@@ -1,7 +1,9 @@
 {
   "name": "bulbs-cms",
   "version": "0.9.72",
-  "dependencies": {},
+  "dependencies": {
+    "moment-timezone": "~0.2.3"
+  },
   "devDependencies": {
     "angular": "=1.2.18",
     "angular-resource": "=1.2.18",

@@ -6,10 +6,20 @@ angular.module('underscore', []).value('_', window._);
 angular.module('NProgress', []).value('NProgress', window.NProgress);
 angular.module('URLify', []).value('URLify', window.URLify);
 angular.module('jquery', []).value('$', window.$);
-angular.module('moment', []).value('moment', window.moment);
 angular.module('PNotify', []).value('PNotify', window.PNotify);
 angular.module('keypress', []).value('keypress', window.keypress);
 angular.module('Raven', []).value('Raven', window.Raven);
+angular.module('moment', [])
+  .service('moment', function (TIMEZONE_NAME) {
+    function service(v) {
+      if (v) {
+        return window.moment.tz(v, TIMEZONE_NAME);
+      }
+      return window.moment.tz(TIMEZONE_NAME);
+    }
+    return service;
+  })
+  .constant('TIMEZONE_NAME', 'America/Chicago');
 
 // ****** App Config ****** \\
 
@@ -24,9 +34,9 @@ angular.module('bulbsCmsApp', [
   'BettyCropper',
   'jquery',
   'underscore',
+  'moment',
   'NProgress',
   'URLify',
-  'moment',
   'PNotify',
   'keypress',
   'Raven',
@@ -104,4 +114,3 @@ angular.module('bulbsCmsApp', [
   deleteHeaders['X-CSRFToken'] = $cookies.csrftoken;
   $http.defaults.headers.delete = deleteHeaders;
 });
-
