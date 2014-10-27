@@ -2,9 +2,8 @@
 
 angular.module('bulbsCmsApp')
   .controller('ContentworkflowCtrl', function ($scope, $http, $modal, $window, moment, routes,
-                                               VersionBrowserModalOpener, TemporaryUrlModalOpener,
-                                               TIMEZONE_LABEL) {
-    $scope.TIMEZONE_LABEL = TIMEZONE_LABEL;
+                                               VersionBrowserModalOpener, TemporaryUrlModalOpener) {
+    $scope.TIMEZONE_LABEL = moment().format('z');
 
     $scope.trashContentModal = function (articleId) {
       return $modal.open({

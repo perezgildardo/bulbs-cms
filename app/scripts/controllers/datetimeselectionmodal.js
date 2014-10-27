@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, TIMEZONE_OFFSET, TIMEZONE_LABEL) {
+  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, moment) {
 
     // ensure that we can't choose a time if date is invalid
     $scope.dateValid = false;
@@ -12,10 +12,10 @@ angular.module('bulbsCmsApp')
     // copy date temporarily so user has to actually verify change to the date
     $scope.tempDatetime = angular.copy($scope.modDatetime);
 
-    $scope.TIMEZONE_LABEL = TIMEZONE_LABEL;
+    $scope.TIMEZONE_LABEL = moment().format('z');
 
-    var timeNowWithOffset = function () {
-      return moment().zone(TIMEZONE_OFFSET);
+    var timeNow = function () {
+      return moment();
     };
 
     // callback function for using datetime calendar because it doesn't work at all in a sensible way
@@ -24,21 +24,21 @@ angular.module('bulbsCmsApp')
     };
 
     $scope.setDateToday = function () {
-      var now = timeNowWithOffset();
+      var now = timeNow();
       $scope.tempDatetime = moment().year(now.year()).month(now.month()).date(now.date());
     };
 
     $scope.setDateTomorrow = function () {
-      var now = timeNowWithOffset();
+      var now = timeNow();
       $scope.tempDatetime = moment().year(now.year()).month(now.month()).date(now.date() + 1);
     };
 
     $scope.setTimeNow = function () {
-      $scope.tempDatetime = timeNowWithOffset();
+      $scope.tempDatetime = timeNow();
     };
 
     $scope.setTimeMidnight = function () {
-      $scope.tempDatetime = timeNowWithOffset().hour(24).minute(0);
+      $scope.tempDatetime = timeNow().hour(24).minute(0);
     };
 
     $scope.chooseDatetime = function () {
