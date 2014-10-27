@@ -224,10 +224,20 @@ angular.module('underscore', []).value('_', window._);
 angular.module('NProgress', []).value('NProgress', window.NProgress);
 angular.module('URLify', []).value('URLify', window.URLify);
 angular.module('jquery', []).value('$', window.$);
-angular.module('moment', []).value('moment', window.moment);
 angular.module('PNotify', []).value('PNotify', window.PNotify);
 angular.module('keypress', []).value('keypress', window.keypress);
 angular.module('Raven', []).value('Raven', window.Raven);
+angular.module('moment', [])
+  .service('moment', function (TIMEZONE_NAME) {
+    function service(v) {
+      if (v) {
+        return window.moment.tz(v, TIMEZONE_NAME);
+      }
+      return window.moment.tz(TIMEZONE_NAME);
+    }
+    return service;
+  })
+  .constant('TIMEZONE_NAME', 'America/Chicago');
 
 // ****** App Config ****** \\
 
@@ -242,9 +252,9 @@ angular.module('bulbsCmsApp', [
   'BettyCropper',
   'jquery',
   'underscore',
+  'moment',
   'NProgress',
   'URLify',
-  'moment',
   'PNotify',
   'keypress',
   'Raven',
@@ -322,7 +332,6 @@ angular.module('bulbsCmsApp', [
   deleteHeaders['X-CSRFToken'] = $cookies.csrftoken;
   $http.defaults.headers.delete = deleteHeaders;
 });
-
 
 angular.module('bulbs.api', ['restangular', 'moment']);
 angular.module('bulbs.api').
@@ -3300,9 +3309,8 @@ angular.module('bulbsCmsApp')
 
 angular.module('bulbsCmsApp')
   .controller('ContentworkflowCtrl', function ($scope, $http, $modal, $window, moment, routes,
-                                               VersionBrowserModalOpener, TemporaryUrlModalOpener,
-                                               TIMEZONE_LABEL) {
-    $scope.TIMEZONE_LABEL = TIMEZONE_LABEL;
+                                               VersionBrowserModalOpener, TemporaryUrlModalOpener) {
+    $scope.TIMEZONE_LABEL = moment().format('z');
 
     $scope.trashContentModal = function (articleId) {
       return $modal.open({
@@ -3509,7 +3517,7 @@ angular.module('bulbsCmsApp')
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, TIMEZONE_OFFSET, TIMEZONE_LABEL) {
+  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, moment) {
 
     // ensure that we can't choose a time if date is invalid
     $scope.dateValid = false;
@@ -3520,10 +3528,10 @@ angular.module('bulbsCmsApp')
     // copy date temporarily so user has to actually verify change to the date
     $scope.tempDatetime = angular.copy($scope.modDatetime);
 
-    $scope.TIMEZONE_LABEL = TIMEZONE_LABEL;
+    $scope.TIMEZONE_LABEL = moment().format('z');
 
-    var timeNowWithOffset = function () {
-      return moment().zone(TIMEZONE_OFFSET);
+    var timeNow = function () {
+      return moment();
     };
 
     // callback function for using datetime calendar because it doesn't work at all in a sensible way
@@ -3532,21 +3540,21 @@ angular.module('bulbsCmsApp')
     };
 
     $scope.setDateToday = function () {
-      var now = timeNowWithOffset();
+      var now = timeNow();
       $scope.tempDatetime = moment().year(now.year()).month(now.month()).date(now.date());
     };
 
     $scope.setDateTomorrow = function () {
-      var now = timeNowWithOffset();
+      var now = timeNow();
       $scope.tempDatetime = moment().year(now.year()).month(now.month()).date(now.date() + 1);
     };
 
     $scope.setTimeNow = function () {
-      $scope.tempDatetime = timeNowWithOffset();
+      $scope.tempDatetime = timeNow();
     };
 
     $scope.setTimeMidnight = function () {
-      $scope.tempDatetime = timeNowWithOffset().hour(24).minute(0);
+      $scope.tempDatetime = timeNow().hour(24).minute(0);
     };
 
     $scope.chooseDatetime = function () {
@@ -3950,7 +3958,7 @@ angular.module('bulbsCmsApp')
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('PubtimemodalCtrl', function ($scope, $http, $modal, $modalInstance, $, moment, Login, routes, article, TIMEZONE_OFFSET, Raven) {
+  .controller('PubtimemodalCtrl', function ($scope, $http, $modal, $modalInstance, $, moment, Login, routes, article, Raven) {
     $scope.article = article;
 
     $scope.pubButton = {
@@ -3961,7 +3969,7 @@ angular.module('bulbsCmsApp')
     };
 
     $scope.$watch('pickerValue', function (newVal) {
-      var pubTimeMoment = moment(newVal).zone(TIMEZONE_OFFSET);
+      var pubTimeMoment = moment(newVal);
       $scope.datePickerValue = moment()
         .year(pubTimeMoment.year())
         .month(pubTimeMoment.month())
@@ -3976,17 +3984,17 @@ angular.module('bulbsCmsApp')
 
     $scope.setTimeShortcut = function (shortcut) {
       if (shortcut === 'now') {
-        var now = moment().zone(TIMEZONE_OFFSET);
+        var now = moment();
         $scope.pickerValue = now;
       }
       if (shortcut === 'midnight') {
-        var midnight = moment().zone(TIMEZONE_OFFSET).hour(24).minute(0);
+        var midnight = moment().hour(24).minute(0);
         $scope.pickerValue = midnight;
       }
     };
 
     $scope.setDateShortcut = function (shortcut) {
-      var today = moment().zone(TIMEZONE_OFFSET);
+      var today = moment();
       if (shortcut === 'today') {
         $scope.datePickerValue = moment().year(today.year()).month(today.month()).date(today.date());
       }
@@ -4008,7 +4016,7 @@ angular.module('bulbsCmsApp')
 
       var newDate = moment($scope.datePickerValue);
       var newTime = moment($scope.timePickerValue);
-      var newDateTime = moment().zone(TIMEZONE_OFFSET)
+      var newDateTime = moment()
         .year(newDate.year())
         .month(newDate.month())
         .date(newDate.date())
@@ -5823,16 +5831,13 @@ angular.module('bulbsCmsApp')
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .filter('tzDate', function (dateFilter, moment, TIMEZONE_OFFSET, TIMEZONE_LABEL) {
+  .filter('tzDate', function (dateFilter, moment) {
     return function (input, format) {
       if (!input) {
         return '';
       }
-      var newdate = moment(input).zone(TIMEZONE_OFFSET).format('YYYY-MM-DDTHH:mm');
+      var newdate = moment(input).format('YYYY-MM-DDTHH:mm z');
       var formattedDate = dateFilter(newdate, format);
-      if (format.toLowerCase().indexOf('h') > -1) {
-        formattedDate += ' ' + TIMEZONE_LABEL;
-      }
       return formattedDate;
     };
   });
