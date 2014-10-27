@@ -6,8 +6,12 @@ angular.module('bulbsCmsApp')
       if (!input) {
         return '';
       }
-      var newdate = moment(input).format('YYYY-MM-DDTHH:mm z');
+      var inputDate = moment(input);
+      var newdate = inputDate.format('YYYY-MM-DDTHH:mm');
       var formattedDate = dateFilter(newdate, format);
+      if (format.toLowerCase().indexOf('h') > -1) {
+        formattedDate += ' ' + inputDate.format('z');
+      }
       return formattedDate;
     };
   });
