@@ -12,7 +12,8 @@ describe('Controller: PubtimemodalCtrl', function () {
     modal,
     modalService,
     httpBackend,
-    mockmoment;
+    mockmoment,
+    timezoneName;
 
   var articleWithNoFeatureType = {
     id: 1,
@@ -31,9 +32,9 @@ describe('Controller: PubtimemodalCtrl', function () {
   }
 
   // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope, $httpBackend, $modal, moment, routes) {
+  beforeEach(inject(function ($controller, $rootScope, $httpBackend, $modal, moment, routes, TIMEZONE_NAME) {
     httpBackend = $httpBackend;
-
+    timezoneName = TIMEZONE_NAME;
     var modalUrl = routes.PARTIALS_URL + 'modals/publish-date-modal.html';
     modal = $modal.open({
       templateUrl: modalUrl
@@ -52,7 +53,7 @@ describe('Controller: PubtimemodalCtrl', function () {
     }
     mockmoment.tz = function () {
       if (arguments.length == 1) {
-        return moment.tz('Fri Apr 25 2014 14:22:00', 'America/Chicago');
+        return moment.tz('Fri Apr 25 2014 14:22:00', timezoneName);
       }
       return moment.tz.apply(this, arguments);
     }
@@ -162,7 +163,7 @@ describe('Controller: PubtimemodalCtrl', function () {
         }
         mockmoment.tz = function () {
           if (arguments.length == 1) {
-            return moment.tz('Fri Apr 25 2014 12:22:00 GMT-0700', 'America/Chicago');
+            return moment.tz('Fri Apr 25 2014 12:22:00 GMT-0700', timezoneName);
           }
             return moment.tz.apply(this, arguments);
         }
