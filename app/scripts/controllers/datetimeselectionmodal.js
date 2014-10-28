@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('bulbsCmsApp')
-  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, TIMEZONE_OFFSET, TIMEZONE_LABEL) {
+  .controller('DatetimeSelectionModalCtrl', function ($scope, $modalInstance, TIMEZONE_NAME, TIMEZONE_LABEL) {
 
     // ensure that we can't choose a time if date is invalid
     $scope.dateValid = false;
@@ -15,7 +15,7 @@ angular.module('bulbsCmsApp')
     $scope.TIMEZONE_LABEL = TIMEZONE_LABEL;
 
     var timeNowWithOffset = function () {
-      return moment().zone(TIMEZONE_OFFSET);
+      return moment().tz(TIMEZONE_NAME);
     };
 
     // callback function for using datetime calendar because it doesn't work at all in a sensible way
