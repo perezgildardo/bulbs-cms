@@ -47,8 +47,14 @@ describe('Controller: PubtimemodalCtrl', function () {
       if(param){
         return moment(param);
       }else{
-        return moment("Fri Apr 25 2014 14:22:00 GMT-0500 (UTC)");
+        return moment("Fri Apr 25 2014 14:22:00");
       }
+    }
+    mockmoment.tz = function () {
+      if (arguments.length == 1) {
+        return moment.tz('Fri Apr 25 2014 14:22:00', 'America/Chicago');
+      }
+      return moment.tz.apply(this, arguments);
     }
 
     scope = $rootScope.$new();
@@ -151,8 +157,14 @@ describe('Controller: PubtimemodalCtrl', function () {
           if(param){
             return moment(param);
           }else{
-            return moment("Fri Apr 25 2014 12:22:10 GMT-0700 (UTC)");
+            return moment('Fri Apr 25 2014 12:22:10 GMT-0700');
           }
+        }
+        mockmoment.tz = function () {
+          if (arguments.length == 1) {
+            return moment.tz('Fri Apr 25 2014 12:22:00 GMT-0700', 'America/Chicago');
+          }
+            return moment.tz.apply(this, arguments);
         }
 
         PubtimemodalCtrl = $controller('PubtimemodalCtrl', {
@@ -169,7 +181,7 @@ describe('Controller: PubtimemodalCtrl', function () {
           scope.setTimeShortcut('now');
           scope.$apply();
 
-          expect(scope.timePickerValue.hour()).toBe(14);
+          expect(scope.timePickerValue.hour()).toBe(12);
           expect(scope.timePickerValue.minute()).toBe(22);
         });
 

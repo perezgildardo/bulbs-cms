@@ -12,7 +12,7 @@ angular.module('bulbsCmsApp')
     };
 
     $scope.$watch('pickerValue', function (newVal) {
-      var pubTimeMoment = moment(newVal).tz(TIMEZONE_NAME);
+      var pubTimeMoment = moment(newVal);
       $scope.datePickerValue = moment()
         .year(pubTimeMoment.year())
         .month(pubTimeMoment.month())
@@ -27,11 +27,11 @@ angular.module('bulbsCmsApp')
 
     $scope.setTimeShortcut = function (shortcut) {
       if (shortcut === 'now') {
-        var now = moment.tz(TIMEZONE_NAME);
+        var now = moment();
         $scope.pickerValue = now;
       }
       if (shortcut === 'midnight') {
-        var midnight = moment.tz(TIMEZONE_NAME).hour(24).minute(0);
+        var midnight = moment().hour(24).minute(0);
         $scope.pickerValue = midnight;
       }
     };
@@ -59,7 +59,7 @@ angular.module('bulbsCmsApp')
 
       var newDate = moment($scope.datePickerValue);
       var newTime = moment($scope.timePickerValue);
-      var newDateTime = moment().tz(TIMEZONE_NAME)
+      var newDateTime = moment.tz(TIMEZONE_NAME)
         .year(newDate.year())
         .month(newDate.month())
         .date(newDate.date())
@@ -123,7 +123,7 @@ angular.module('bulbsCmsApp')
     };
 
     if ($scope.article.published) {
-      $scope.pickerValue = moment($scope.article.published);
+      $scope.pickerValue = moment.tz($scope.article.published, TIMEZONE_NAME);
     } else {
       $scope.setTimeShortcut('now');
     }
