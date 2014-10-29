@@ -12,10 +12,10 @@ angular.module('bulbsCmsApp')
     // copy date temporarily so user has to actually verify change to the date
     $scope.tempDatetime = angular.copy($scope.modDatetime);
 
-    $scope.TIMEZONE_LABEL = moment.tz(TIMEZONE_NAME).format('a');
+    $scope.TIMEZONE_LABEL = moment.tz(TIMEZONE_NAME).format('z');
 
     var timeNowWithOffset = function () {
-      return moment().tz(TIMEZONE_NAME);
+      return moment.tz(TIMEZONE_NAME);
     };
 
     // callback function for using datetime calendar because it doesn't work at all in a sensible way
