@@ -15,6 +15,8 @@ angular.module('bulbsCmsApp')
     $scope.collapsed = [];
     $scope.page = 'contributions';
 
+    $scope.clean = true;
+
     $scope.save = save;
     $scope.add = add;
     $scope.remove = remove;
@@ -25,6 +27,10 @@ angular.module('bulbsCmsApp')
       angular.element('#save-btn').html('<i class="glyphicon glyphicon-refresh fa-spin"></i> Saving');
       $scope.contributions.save($scope.contributions).then(function (contributions) {
         angular.element('#save-btn').html('<i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
+        $scope.clean = true;
+      }, function(res) {
+        angular.element('#save-btn').addClass('btn-danger').removeClass('btn-success');
+        angular.element('#save-btn').html('<i class="glyphicon glyphicon-remove"></i> Error</button>');
       });
     }
 
@@ -36,6 +42,12 @@ angular.module('bulbsCmsApp')
       });
       $scope.collapsed.push(false);
     }
+
+      $scope.$watch('contributions', function(newContributions, oldContributions) {
+        if (oldContributions.length > 0) {
+          $scope.clean = false;
+        }
+      }, true);
 
     function getRoles() {
       return ContributionRoleService.getList().then(function (roles) {
