@@ -3511,6 +3511,7 @@ angular.module('bulbsCmsApp')
       // I know, I'm not supposed to do DOM manipulation in controllers. TOO BAD.
       angular.element('#save-btn').html('<i class="glyphicon glyphicon-refresh fa-spin"></i> Saving');
       $scope.contributions.save($scope.contributions).then(function (contributions) {
+        angular.element('#save-btn').addClass('btn-success').removeClass('btn-danger');
         angular.element('#save-btn').html('<i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
         $scope.clean = true;
       }, function(res) {
