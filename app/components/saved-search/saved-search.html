@@ -1,0 +1,20 @@
+<ng-form name="savedSearch">
+
+  <div class="form-group">
+    <label for="savedSearchName">Name This List</label>
+    <input type="text" class="form-control" id="savedSearchName" placeholder="e.g. This Week in Photos">
+  </div>
+
+  <div>
+    <button>Clear All Search Parameters</button>
+
+    <!-- TODO : ng-repeat saved-search-query -->
+    <saved-search-query></saved-search-query>
+
+    <button>Add Another Query</button>
+  </div>
+
+  <saved-search-simple-content-search></saved-search-simple-content-search>
+</ng-form>
+
+<saved-search-content-list></saved-search-content-list>
