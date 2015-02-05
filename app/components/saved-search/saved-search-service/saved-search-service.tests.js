@@ -17,66 +17,87 @@ describe('Service: SavedSearchService', function () {
   });
 
   it('should provide functionality to execute a search', function () {
-    SavedSearchService.newQuery();
-
-    expect(SavedSearchService._serviceData.groups[0] instanceof SavedSearchServiceQuery).toBe(true);
+// TODO : fill this in
+    throw 'Not implemented yet.';
   });
 
   describe('query functionality', function () {
 
     it('should provide a function to add a new query', function () {
-
-
-// TODO : fill this in
-      throw 'Not implemented yet.';
+      SavedSearchService.newQuery();
+      expect(SavedSearchService._query.groups[0] instanceof SavedSearchServiceQuery).toBe(true);
+      expect(SavedSearchService._content.group_counts.length).toBe(1);
     });
 
     it('should provide a function to remove a query', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
+      var objToRemove = {'something': 123};
+
+      SavedSearchService._query.groups.push(objToRemove, {});
+      SavedSearchService._content.group_counts.push(0, 0);
+
+      var removed = SavedSearchService.removeQuery(0);
+
+      expect(SavedSearchService._query.groups.length).toBe(1);
+      expect(SavedSearchService._query.groups[0]).not.toEqual(objToRemove);
+      expect(removed).toBe(true);
+      expect(SavedSearchService._content.group_counts.length).toBe(1);
     });
 
-    it('should provide a function to add a condition to a query', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
+    it('should return false from remove query function if query was not removed successfully', function () {
+      SavedSearchService._query.groups = [];
+
+      var removed = SavedSearchService.removeQuery(10);
+
+      expect(removed).toBe(false);
+      expect(SavedSearchService._query.groups.length).toBe(0);
     });
 
-    it('should provide a function to remove a condition from a query', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
+    it('should provide a function to retrieve a query', function () {
+      var objToRetrieve = {'something': 123};
+
+      SavedSearchService._query.groups.push(objToRetrieve);
+
+      var retrieved = SavedSearchService.getQuery(0);
+
+      expect(retrieved).toEqual(objToRetrieve);
     });
 
     it('should provide a function to retreive queries', function () {
-    // TODO : fill this in
-      throw 'Not implemented yet.';
+      var item1 = {'something': 123};
+      var item2 = {'another thing': 456};
+
+      SavedSearchService._query.groups.push(item1, item2);
+
+      var queries = SavedSearchService.getQueries();
+
+      expect(queries[0]).toEqual(item1);
+      expect(queries[1]).toEqual(item2);
     });
 
     it('should provide a function to clear all queries', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
+      var item1 = {'something': 123};
+      var item2 = {'another thing': 456};
+
+      SavedSearchService._query.groups.push(item1, item2);
+
+      SavedSearchService.clearQueries();
+
+      expect(SavedSearchService._query.groups.length).toBe(0);
     });
   });
 
   describe('content list functionality', function () {
 
     it('should provide a function to access the current content list', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
-    });
+      var item1 = {'something': 123};
+      var item2 = {'another thing': 456};
 
-    it('should provide a function to manually add content to the content list', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
-    });
+      SavedSearchService._content.items.push(item1, item2);
 
-    it('should provide a function to manually remove content from the content list', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
-    });
+      var content = SavedSearchService.getContentItems();
 
-    it('should provide a function to pin content to the top of the content list', function () {
-// TODO : fill this in
-      throw 'Not implemented yet.';
+      expect(content[0]).toEqual(item1);
+      expect(content[1]).toEqual(item2);
     });
 
     it('should ensure content list is ordered by pins, then by published date', function () {
