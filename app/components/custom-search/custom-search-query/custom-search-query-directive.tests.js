@@ -8,6 +8,7 @@ describe('Directive: customSearchQuery', function () {
   beforeEach(function () {
     module('bulbsCmsApp');
     module('bulbsCmsApp.mockApi');
+    module('jsTemplates');
 
     inject(function(_$rootScope_, $compile) {
        $scope = _$rootScope_.$new();

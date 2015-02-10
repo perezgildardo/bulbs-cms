@@ -106,7 +106,7 @@ angular.module('customSearch.service', [])
     CustomSearchService.prototype.removeCondition = function (queryIndex, conditionIndex) {
       var spliced = false;
       if (queryIndex >= 0 && queryIndex < this._query.groups.length) {
-        var spliced = this._query
+        spliced = this._query
           .groups[queryIndex]
           .conditions.splice(conditionIndex, 1);
         spliced = spliced.length > 0;
