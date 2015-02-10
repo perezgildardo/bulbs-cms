@@ -41,7 +41,7 @@ angular.module('bulbsCmsApp', [
   // components
   'filterWidget',
   'promotedContent',
-  'savedSearch',
+  'customSearch',
   'statusFilter'
 ])
 .config(function ($locationProvider, $routeProvider, $sceProvider, routes) {

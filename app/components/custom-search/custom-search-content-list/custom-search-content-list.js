@@ -1,6 +1,6 @@
 'use strict';
 
 angular.module('customSearch.contentList', [
-  'savedSearch.contentList.directive',
+  'customSearch.contentList.directive',
   'customSearch.contentListItem'
 ]);

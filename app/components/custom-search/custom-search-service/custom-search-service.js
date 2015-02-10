@@ -1,18 +1,16 @@
 'use strict';
 
 angular.module('customSearch.service', [])
-  .factory('CustomSearchService', function (_, $q, ContentFactory) {
-
-// TODO : make time periods customizable
-    var timePeriods = {
-      NONE: '',
-      ONE_DAY: '1 day'
-    };
-    var conditionTypes = {
-      NONE_OF: 'none',
-      ALL_OF: 'all',
-      ANY_OF: 'any'
-    };
+  .value('TIME_PERIODS', {
+    NONE: '',
+    ONE_DAY: '1 day'
+  })
+  .value('CONDITION_TYPES', {
+    NONE_OF: 'none',
+    ALL_OF: 'all',
+    ANY_OF: 'any'
+  })
+  .factory('CustomSearchService', function (_, $q, CONDITION_TYPES, ContentFactory, TIME_PERIODS) {
 
     /**
      * Create custom search service.
@@ -31,7 +29,7 @@ angular.module('customSearch.service', [])
       this._queryCountEndpoint = ContentFactory.service('custom-search-content/count/');
     };
 
-    var CustomSearchService.prototype._$getContent = function (contentQuery) {
+    CustomSearchService.prototype._$getContent = function (contentQuery) {
       return this._contentEndpoint.post(contentQuery)
         .then(function (data) {
           this._content = data;
@@ -41,7 +39,7 @@ angular.module('customSearch.service', [])
     CustomSearchService.prototype.newCondition = function (index) {
       this._query.groups[index].conditions.push({
         field: '',
-        type: conditionTypes.ANY_OF,
+        type: CONDITION_TYPES.ANY_OF,
         values: []
       });
     };
@@ -56,13 +54,22 @@ angular.module('customSearch.service', [])
     CustomSearchService.prototype.newQuery = function () {
       this._query.groups.push({
         conditions: [],
-        time: timePeriods.NONE
+        result_count: 0,
+        time: TIME_PERIODS.NONE
       });
+    };
+
+    CustomSearchService.prototype.getQueries = function () {
+      return this._query.groups;
     };
 
     CustomSearchService.prototype.removeQuery = function (index) {
       var spliced = this._query.groups.splice(index, 1);
       return spliced.length > 0;
+    };
+
+    CustomSearchService.prototype.clearQueries = function () {
+      this._query.groups = [];
     };
 
     CustomSearchService.prototype.$filterContentByIncluded = function () {
@@ -87,19 +94,20 @@ angular.module('customSearch.service', [])
     };
 
     CustomSearchService.prototype.$updateQueryCount = function (index) {
+      var self = this;
+
       return (function (index) {
         // wrap to maintain index value for this call after async completes
         var defer = $q.defer();
 
         if (index < self._query.groups.length) {
-          var self = this;
           var oneGroupQuery = _.clone(self._query);
 
           oneGroupQuery.groups = _.pullAt(oneGroupQuery.groups, index);
           this._queryCountEndpoint.post(oneGroupQuery)
             .then(function (data) {
               if (index < self._query.groups.length) {
-                self._query.groups[index].resultCount = data.count;
+                self._query.groups[index].result_count = data.count;
                 defer.resolve(data.count);
               } else {
                 defer.reject('Group at index ' + index + ' no longer exists!');

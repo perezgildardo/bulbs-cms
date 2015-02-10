@@ -2,7 +2,7 @@
 
 angular.module('customSearch.directive', [
   'bulbsCmsApp.settings',
-  'customSearch.service'
+  'customSearch.service',
   'customSearch.contentList',
   'customSearch.query',
   'customSearch.simpleContentSearch'
