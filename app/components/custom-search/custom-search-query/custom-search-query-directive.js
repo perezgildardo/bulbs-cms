@@ -7,7 +7,10 @@ angular.module('customSearch.query.directive', [
     return {
       controller: function ($scope) {},
       restrict: 'E',
-      scope: {},
+      scope: {
+        model: '=',
+        remove: '&'
+      },
       templateUrl: routes.COMPONENTS_URL + 'custom-search/custom-search-query/custom-search-query.html'
     };
   });

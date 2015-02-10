@@ -58,6 +58,7 @@ module.exports = function(config) {
       'app/bower_components/Keypress/keypress.js',
       'app/bower_components/zeroclipboard/dist/ZeroClipboard.min.js',
       'app/bower_components/ng-clip/dest/ng-clip.min.js',
+      'app/bower_components/bulbs-autocomplete/dist/bulbs-autocomplete.js',
 
       'app/mocks/app.js',
       'app/mocks/api.js',

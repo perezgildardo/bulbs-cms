@@ -1,4 +1,20 @@
-CUSTOM SEARCH QUERY
-
-<!-- TODO : ng-repeat these conditions -->
-<custom-search-query-condition></custom-search-query-condition>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span>Total Results from this Query: <strong>{{ model.result_count || 0 }}</strong></span>
+    <button
+        class="btn btn-danger btn-xs"
+        ng-click="customSearchService.removeQuery(queryIndex)">
+      <i class="glyphicon glyphicon-remove"></i>
+    </button>
+  </div>
+  <div class="panel-body">
+    <custom-search-query-condition
+        ng-repeat="condition in model.conditions"
+        remove="model.removeCondition($index)"
+        model="condition"></custom-search-query-condition>
+    <button
+        ng-click="model.newCondition()">
+      Add a Condition
+    </button>
+  </div>
+</div>

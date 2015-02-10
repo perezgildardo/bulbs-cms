@@ -1,10 +1,12 @@
 <div>
   <button>Clear All Search Parameters</button>
 
-  <!-- TODO : ng-repeat custom-search-query -->
-  <custom-search-query></custom-search-query>
+  <custom-search-query
+      ng-repeat="group in customSearchService.groups"
+      remove="customSearchService.removeQuery($index)"
+      model="group"></custom-search-query>
 
-  <button>Add Another Query</button>
+  <button ng-click="customSearchService.newQuery()">Add Another Query</button>
 </div>
 
 <custom-search-simple-content-search></custom-search-simple-content-search>

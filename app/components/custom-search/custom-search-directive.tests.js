@@ -24,8 +24,18 @@ describe('Directive: customSearch', function () {
     throw 'Not implemented yet.';
   });
 
+  it('should provide a button to clear all queries', function () {
+// TODO : fill this in
+    throw 'Not implemented yet.';
+  });
+
+  it('should provide a button to add a new query', function () {
+// TODO : fill this in
+    throw 'Not implemented yet.';
+  });
+
   it('should automatically requery when something has changed with query parameters', function () {
-  // TODO : fill this in
+// TODO : fill this in
     throw 'Not implemented yet.';
   });
 });

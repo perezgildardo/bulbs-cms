@@ -12,29 +12,29 @@ describe('Directive: customSearchQuery', function () {
 
     inject(function(_$rootScope_, $compile) {
        $scope = _$rootScope_.$new();
-
+// TODO : need to fill in its attributes
       var element = $compile('<custom-search-query></custom-search-query>')($scope.$new());
       _$rootScope_.$digest();
       $directiveScope = element.isolateScope();
     });
   });
 
-  it('should provide a function to add a condition', function () {
+  it('should provide a button to add a condition', function () {
 // TODO : fill this in
     throw 'Not implemented yet.';
   });
 
-  it('should provide a function to remove a condition', function () {
+  it('should provide a button to remove itself', function () {
 // TODO : fill this in
     throw 'Not implemented yet.';
   });
 
-  it('should provide a function to summarize it\'s data as JSON', function () {
+  it('should be able to validate itself along with its conditions', function () {
 // TODO : fill this in
     throw 'Not implemented yet.';
   });
 
-  it('should provide a scope variable for the number of results provided by this query', function () {
+  it('should auto refresh its result count when something is changed', function () {
 // TODO : fill this in
     throw 'Not implemented yet.';
   });

@@ -39,9 +39,9 @@ angular.module('bulbsCmsApp', [
   // shared
   'contentServices',
   // components
+  'editorsPick',
   'filterWidget',
   'promotedContent',
-  'customSearch',
   'statusFilter'
 ])
 .config(function ($locationProvider, $routeProvider, $sceProvider, routes) {

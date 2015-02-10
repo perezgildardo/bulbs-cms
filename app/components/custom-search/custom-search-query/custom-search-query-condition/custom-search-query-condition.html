@@ -1,1 +1,38 @@
-CUSTOM SEARCH QUERY CONDITION
+<select
+    ng-model="model.field"
+    ng-options="field.endpoint as field.name for field in fieldTypes">
+</select>
+
+<select
+    ng-model="model.type"
+    ng-options="condition.value as condition.name for condition in conditionTypes">
+</select>
+
+<div>
+  <input
+      type="text"
+      ng-model="searchTerm"
+      ng-change="updateAutocomplete()"
+      ng-keydown="handleKeypress($event)"
+      placeholder="Enter a search term...">
+  <bulbs-autocomplete-suggest
+    formatter="suggestFormatter"
+    items="autocompleteItems"
+    on-select="model.addValue(selection)">
+  </bulbs-autocomplete-suggest>
+</div>
+
+<span ng-repeat="value in model.values">
+  <span>{{ value.name }}</span>
+  <button
+      class="btn btn-xs btn-danger"
+      ng-click="model.removeValue($index)">
+    <i class="glyphicon glyphicon-remove"></i>
+  </button>
+</span>
+
+<button
+    class="btn btn-xs btn-danger"
+    ng-click="remove()">
+  <i class="glyphicon glyphicon-remove"></i>
+</button>
