@@ -33,7 +33,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'app/cms-image.js',
-      'app/bower_components/lodash/dist/lodash.js',
+      'app/bower_components/lodash/lodash.js',
       'app/bower_components/jquery/dist/jquery.js',
       'app/bower_components/jcrop/js/jquery.Jcrop.js',
       'app/bower_components/bootstrap/dist/js/bootstrap.js',
