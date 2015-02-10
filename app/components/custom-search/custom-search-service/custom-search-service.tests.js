@@ -3,6 +3,7 @@
 describe('Service: CustomSearchService', function () {
   var
     $httpBackend,
+    $rootScope,
     moment,
     customSearchService;
 
@@ -11,8 +12,9 @@ describe('Service: CustomSearchService', function () {
     module('bulbsCmsApp.mockApi');
     module('customSearch.service');
 
-    inject(function (_$httpBackend_, _moment_, CustomSearchService) {
+    inject(function (_$httpBackend_, _$rootScope_, _moment_, CustomSearchService) {
       $httpBackend = _$httpBackend_;
+      $rootScope = _$rootScope_;
       moment = _moment_;
       customSearchService = new CustomSearchService();
     });
@@ -25,12 +27,13 @@ describe('Service: CustomSearchService', function () {
 
   describe('query functionality', function () {
 
-    it('should provide a function to add a new query', function () {
-      customSearchService.newQuery();
+    it('should be able to add a new query', function () {
+      var newQuery = customSearchService.newQuery();
       expect(customSearchService._query.groups.length).toBe(1);
+      expect(customSearchService._query.groups[0]).toBe(newQuery);
     });
 
-    it('should provide a function to remove a query', function () {
+    it('should be able to remove a query', function () {
       var objToRemove = {'something': 123};
 
       customSearchService._query.groups.push(objToRemove, {});
@@ -51,7 +54,7 @@ describe('Service: CustomSearchService', function () {
       expect(customSearchService._query.groups.length).toBe(0);
     });
 
-    it('should provide a function to retreive queries', function () {
+    it('should be able to retreive queries', function () {
       var item1 = {'something': 123};
       var item2 = {'another thing': 456};
 
@@ -63,7 +66,7 @@ describe('Service: CustomSearchService', function () {
       expect(queries[1]).toEqual(item2);
     });
 
-    it('should provide a function to clear all queries', function () {
+    it('should be able to clear all queries', function () {
       var item1 = {'something': 123};
       var item2 = {'another thing': 456};
 
@@ -74,23 +77,55 @@ describe('Service: CustomSearchService', function () {
       expect(customSearchService._query.groups.length).toBe(0);
     });
 
-    it('should provide a function to retrieve the content count for a query', function () {
+    it('should be able to retrieve the content count for a query', function () {
       var count = 5;
 
       customSearchService.newQuery();
       customSearchService.$updateQueryCount(0);
 
-      $httpBackend.expectPOST('/cms/api/v1/custom-search-contnt/count/').respond(200, {count: count});
+      $httpBackend.expectPOST('/cms/api/v1/custom-search-content/count/').respond(200, {count: count});
       $httpBackend.flush();
 
-    // TODO : fill this in
-      throw 'Not implemented yet.';
+      expect(customSearchService._query.groups[0].result_count).toBe(count);
     });
 
     it('should not allow a content count update if query index is nonexistent', function () {
+      var rejected = false;
+      customSearchService.$updateQueryCount(10)
+        .catch(function () {
+          rejected = true;
+        });
 
-    // TODO : fill this in
-      throw 'Not implemented yet.';
+      $rootScope.$digest();
+
+      expect(rejected).toBe(true);
+    });
+  });
+
+  describe('query condition functionality', function () {
+
+    it('should be able to add a condition to a query', function () {
+      customSearchService.newQuery();
+
+      var newCondition = customSearchService.newCondition(0);
+
+      expect(customSearchService._query.groups[0].conditions[0]).toBe(newCondition);
+    });
+
+    it('should return undefined when attempting to add a condition to a non-existant query', function () {
+      var newCondition = customSearchService.newCondition(0);
+
+      expect(newCondition).toBeUndefined();
+    });
+
+    it('should be able to remove a condition from a query', function () {
+      customSearchService.newQuery();
+      customSearchService.newCondition(0);
+
+      var removed = customSearchService.removeCondition(0, 0);
+
+      expect(customSearchService._query.groups[0].conditions.length).toBe(0);
+      expect(removed).toBe(true);
     });
   });
 

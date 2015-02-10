@@ -36,27 +36,14 @@ angular.module('customSearch.service', [])
         });
     };
 
-    CustomSearchService.prototype.newCondition = function (index) {
-      this._query.groups[index].conditions.push({
-        field: '',
-        type: CONDITION_TYPES.ANY_OF,
-        values: []
-      });
-    };
-
-    CustomSearchService.prototype.removeCondition = function (queryIndex, conditionIndex) {
-      var spliced = this._query
-        .groups[queryIndex]
-        .conditions.splice(conditionIndex, 1);
-      return spliced.length > 0;
-    };
-
     CustomSearchService.prototype.newQuery = function () {
-      this._query.groups.push({
+      var newQuery = {
         conditions: [],
         result_count: 0,
         time: TIME_PERIODS.NONE
-      });
+      };
+      this._query.groups.push(newQuery);
+      return newQuery;
     };
 
     CustomSearchService.prototype.getQueries = function () {
@@ -70,6 +57,61 @@ angular.module('customSearch.service', [])
 
     CustomSearchService.prototype.clearQueries = function () {
       this._query.groups = [];
+    };
+
+    CustomSearchService.prototype.$updateQueryCount = function (index) {
+      var self = this;
+
+      return (function (index) {
+        // wrap to maintain index value for this call after async completes
+        var defer = $q.defer();
+
+        if (index < self._query.groups.length) {
+          var oneGroupQuery = _.cloneDeep(self._query);
+
+          oneGroupQuery.groups = _.pullAt(oneGroupQuery.groups, index);
+          self._queryCountEndpoint.post(oneGroupQuery)
+            .then(function (data) {
+              if (index < self._query.groups.length) {
+                self._query.groups[index].result_count = data.count;
+                defer.resolve(data.count);
+              } else {
+                defer.reject('Group at index ' + index + ' no longer exists!');
+              }
+            })
+            .catch(function (err) {
+              defer.reject(err);
+            });
+        } else {
+          defer.reject('Group at index ' + index + ' no longer exists!');
+        }
+
+        return defer.promise;
+      })(index);
+    };
+
+    CustomSearchService.prototype.newCondition = function (index) {
+      var newCondition;
+      if (index >= 0 && index < this._query.groups.length) {
+        newCondition = {
+          field: '',
+          type: CONDITION_TYPES.ANY_OF,
+          values: []
+        };
+        this._query.groups[index].conditions.push(newCondition);
+      }
+      return newCondition;
+    };
+
+    CustomSearchService.prototype.removeCondition = function (queryIndex, conditionIndex) {
+      var spliced = false;
+      if (queryIndex >= 0 && queryIndex < this._query.groups.length) {
+        var spliced = this._query
+          .groups[queryIndex]
+          .conditions.splice(conditionIndex, 1);
+        spliced = spliced.length > 0;
+      }
+      return spliced;
     };
 
     CustomSearchService.prototype.$filterContentByIncluded = function () {
@@ -91,37 +133,6 @@ angular.module('customSearch.service', [])
           })
           .value();
       return this._$getContent(contentQuery);
-    };
-
-    CustomSearchService.prototype.$updateQueryCount = function (index) {
-      var self = this;
-
-      return (function (index) {
-        // wrap to maintain index value for this call after async completes
-        var defer = $q.defer();
-
-        if (index < self._query.groups.length) {
-          var oneGroupQuery = _.clone(self._query);
-
-          oneGroupQuery.groups = _.pullAt(oneGroupQuery.groups, index);
-          this._queryCountEndpoint.post(oneGroupQuery)
-            .then(function (data) {
-              if (index < self._query.groups.length) {
-                self._query.groups[index].result_count = data.count;
-                defer.resolve(data.count);
-              } else {
-                defer.reject('Group at index ' + index + ' no longer exists!');
-              }
-            })
-            .catch(function (err) {
-              defer.reject(err);
-            });
-        } else {
-          defer.reject('Group at index ' + index + ' no longer exists!');
-        }
-
-        return defer.promise;
-      })(index);
     };
 
     CustomSearchService.prototype.include = function (id) {
