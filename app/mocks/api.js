@@ -119,6 +119,48 @@ angular.module('bulbsCmsApp.mockApi').run([
       return [200];
     });
 
+    // query count
+    $httpBackend.whenPOST('/cms/api/v1/custom-search-content/count/').respond(function () {
+      return [200, {count: Math.floor(Math.random() * 1000)}];
+    });
+
+    // feature types
+    mockApiData.feature_types = [{
+      slug: 'quiz',
+      id: 5,
+      name: 'Quiz'
+    }, {
+      slug: 'slideshow',
+      id: 6,
+      name: 'Slideshow'
+    }, {
+      slug: 'article',
+      id: 7,
+      name: 'Article'
+    }, {
+      slug: 'they-said-what',
+      id: 8,
+      name: 'They Said What?!'
+    }, {
+      slug: 'some-super-long-feature-type-some-super-long-feature-type-some-super-long-feature-type-some-super-long-feature-typesome-super-long-feature-type',
+      id: 8,
+      name: 'Some Super Long Feature Type Some Super Long Feature Type Some Super Long Feature Type Some Super Long Feature Type Some Super Long Feature Type'
+    }];
+    $httpBackend.whenGET(/\/cms\/api\/v1\/feature-type\/(\?search=.*)?/).respond(mockApiData.feature_types);
+
+    // content types
+    mockApiData.content_types = [{
+      name: 'Video',
+      doctype: 'video'
+    }, {
+      name: 'Clickventure',
+      doctype: 'clickventure'
+    }, {
+      name: 'Some Super Long Content Type Some Super Long Content Type Some Super Long Content Type Some Super Long Content Type Some Super Long Content Type',
+      doctype: 'some-super-long-content-type-some-super-long-content-type-some-super-long-content-type-some-super-long-content-type-some-super-long-content-type'
+    }];
+    $httpBackend.whenGET(/\/cms\/api\/v1\/content-type\/(\?search=.*)?/).respond(mockApiData.content_types);
+
     // notifications
     mockApiData.notifications = [{
         id: 0,

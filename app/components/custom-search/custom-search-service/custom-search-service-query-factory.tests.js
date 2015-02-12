@@ -24,9 +24,7 @@ describe('Factory: CustomSearchServiceQuery', function () {
   });
 
   it('should be able to summarize itself as a plain object', function () {
-    var condition = {
-      asQueryData: function () {}
-    };
+    var condition = new CustomSearchServiceCondition();
 
     spyOn(condition, 'asQueryData');
 

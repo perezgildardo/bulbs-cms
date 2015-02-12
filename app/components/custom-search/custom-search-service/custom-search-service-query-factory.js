@@ -26,11 +26,9 @@ angular.module('customSearch.service.query.factory', [
 
     CustomSearchServiceQuery.prototype.$updateResultCount = function () {
       var self = this;
-
       return self._countEndpoint.post(self.asQueryData())
         .then(function (data) {
           self.result_count = data.count;
-          return data.count;
         });
     };
 

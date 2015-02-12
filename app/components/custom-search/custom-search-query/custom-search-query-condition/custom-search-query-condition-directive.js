@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('customSearch.query.condition.directive', [
+  'contentServices.factory',
   'customSearch.settings',
   'customSearch.service.condition.factory',
   'BulbsAutocomplete',
@@ -9,58 +10,33 @@ angular.module('customSearch.query.condition.directive', [
   .directive('customSearchQueryCondition', function (routes) {
     return {
       controller: function (_, $q, $scope, BULBS_AUTOCOMPLETE_EVENT_KEYPRESS,
-          BulbsAutocomplete, CUSTOM_SEARCH_CONDITION_FIELDS, CUSTOM_SEARCH_CONDITION_TYPES,
-          CUSTOM_SEARCH_TIME_PERIODS) {
+          BulbsAutocomplete, ContentFactory, CUSTOM_SEARCH_CONDITION_FIELDS,
+          CUSTOM_SEARCH_CONDITION_TYPES) {
 
         $scope.conditionTypes = CUSTOM_SEARCH_CONDITION_TYPES;
-        $scope.timePeriods = CUSTOM_SEARCH_TIME_PERIODS;
         $scope.fieldTypes = CUSTOM_SEARCH_CONDITION_FIELDS;
 
         $scope.searchTerm = '';
         $scope.autocompleteItems = [];
 
         var getAutocompleteItems = function () {
-          var defer = $q.defer();
+          return ContentFactory.all($scope.model.field)
+            .getList({search: $scope.searchTerm})
+            .then(function (items) {
+              var field = _.find($scope.fieldTypes, function (type) {
+                return type.endpoint === $scope.model.field;
+              });
 
-          if ($scope.searchTerm) {
-            defer.resolve([{
-              name: 'item1',
-              value: 10
-            }, {
-              name: 'item11',
-              value: 20
-            }, {
-              name: 'item21',
-              value: 30
-            }, {
-              name: 'item31',
-              value: 40
-            }, {
-              name: 'item41',
-              value: 50
-            }, {
-              name: 'item51',
-              value: 60
-            }, {
-              name: 'item61',
-              value: 70
-            }]);
-          } else {
-            defer.resolve([]);
-          }
-
-          return defer.promise;
+              return _.map(items, function (item) {
+                return {
+                  name: item[field.value_structure.name],
+                  value: item[field.value_structure.value]
+                };
+              });
+            });
         };
 
         var autocomplete = new BulbsAutocomplete(getAutocompleteItems);
-
-        $scope.suggestFormatter = function (item) {
-          return item.name + ' - ' + item.value;
-        };
-
-        $scope.addValue = function (item) {
-          $scope.model.addValue(item);
-        };
 
         $scope.updateAutocomplete = function () {
           autocomplete.$retrieve().then(function (results) {
@@ -68,14 +44,32 @@ angular.module('customSearch.query.condition.directive', [
           });
         };
 
+        $scope.delayClearAutocomplete = function () {
+          _.delay(function () {
+            $scope.clearAutocomplete();
+            $scope.$digest();
+          }, 200);
+        };
+
+        $scope.clearAutocomplete = function () {
+          $scope.searchTerm = '';
+          $scope.autocompleteItems = [];
+        };
+
         $scope.handleKeypress = function ($event) {
-          $scope.$broadcast(BULBS_AUTOCOMPLETE_EVENT_KEYPRESS, $event);
+          if ($event.keyCode === 27) {
+            // esc, close dropdown
+            $scope.clearAutocomplete();
+          } else {
+            $scope.$broadcast(BULBS_AUTOCOMPLETE_EVENT_KEYPRESS, $event);
+          }
         };
       },
       restrict: 'E',
       scope: {
-        remove: '&',
-        model: '='
+        model: '=',
+        onUpdate: '&',
+        remove: '&'
       },
       templateUrl: routes.COMPONENTS_URL + 'custom-search/custom-search-query/custom-search-query-condition/custom-search-query-condition.html'
     };

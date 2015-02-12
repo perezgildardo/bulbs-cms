@@ -45,7 +45,7 @@ angular.module('customSearch.service', [
       return this.groups.splice(index, 1).length > 0;
     };
 
-    CustomSearchService.prototype.clearQueries = function () {
+    CustomSearchService.prototype.clearAllQueries = function () {
       this.groups = [];
     };
 

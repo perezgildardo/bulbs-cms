@@ -447,3 +447,32 @@ nav.navbar {
 .btn-clean {
   opacity: .5;
 }
+
+.glyphicon {
+  top: 2px;
+}
+
+.btn-minimalized {
+  background: none;
+  border: 0;
+  outline: none;
+
+  &:hover {
+    color: #337ab7;
+
+    .glyphicon {
+      background-color: #337ab7  
+    }
+  }
+
+  .glyphicon {
+    background-color: #000;
+    border-radius: 50%;
+    color: #fff;
+    height: 2em;
+    line-height: 2em;
+    padding-left: 1px;
+    text-align: center;
+    width: 2em;
+  }
+}

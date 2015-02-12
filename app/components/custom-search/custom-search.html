@@ -1,5 +1,5 @@
 <div>
-  <button>Clear All Search Parameters</button>
+  <button ng-click="customSearchService.clearAllQueries()">Clear All Search Parameters</button>
 
   <custom-search-query
       ng-repeat="group in customSearchService.groups"

@@ -77,7 +77,7 @@ describe('Service: CustomSearchService', function () {
 
       customSearchService.groups.push(item1, item2);
 
-      customSearchService.clearQueries();
+      customSearchService.clearAllQueries();
 
       expect(customSearchService.groups.length).toBe(0);
     });

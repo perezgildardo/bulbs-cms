@@ -48,4 +48,9 @@ describe('Directive: customSearchQueryCondition', function () {
 // TODO : fill this in
     throw 'Not implemented yet.';
   });
+
+  it('should clear out values if either field or type change', function () {
+// TODO : fill this in
+    throw 'Not implemented yet.';
+  });
 });

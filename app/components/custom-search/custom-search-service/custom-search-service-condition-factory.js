@@ -13,11 +13,15 @@ angular.module('customSearch.service.condition.factory', [
     };
 
     CustomSearchServiceCondition.prototype.asQueryData = function () {
-      return _.pick(this, ['field', 'type', 'values'])
+      return _.pick(this, ['field', 'type', 'values']);
     };
 
     CustomSearchServiceCondition.prototype.addValue = function (value) {
-      if (!_.isUndefined(value) && !_.includes(this.values, value)) {
+      var matches = _.find(this.values, function (existingValue) {
+        return existingValue.name === value.name && existingValue.value === value.value;
+      });
+
+      if (!matches) {
         this.values.push(value);
       }
     };

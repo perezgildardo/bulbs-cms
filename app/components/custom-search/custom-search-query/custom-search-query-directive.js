@@ -1,11 +1,17 @@
 'use strict';
 
 angular.module('customSearch.query.directive', [
-  'customSearch.query.condition'
+  'customSearch.settings',
+  'customSearch.query.condition',
+  'uuid4'
 ])
   .directive('customSearchQuery', function (routes) {
     return {
-      controller: function ($scope) {},
+      controller: function ($scope, CUSTOM_SEARCH_TIME_PERIODS, uuid4) {
+        $scope.timePeriods = CUSTOM_SEARCH_TIME_PERIODS;
+
+        $scope.uuid = uuid4.generate();
+      },
       restrict: 'E',
       scope: {
         model: '=',

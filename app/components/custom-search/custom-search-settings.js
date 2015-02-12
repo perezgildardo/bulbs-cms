@@ -3,13 +3,25 @@
 angular.module('customSearch.settings', [])
   .value('CUSTOM_SEARCH_CONDITION_FIELDS', [{
     name: 'Content Type',
-    endpoint: 'content-type'
+    endpoint: 'content-type',
+    value_structure: {
+      name: 'name',
+      value: 'doctype'
+    }
   }, {
     name: 'Feature Type',
-    endpoint: 'feature-type'
+    endpoint: 'feature-type',
+    value_structure: {
+      name: 'name',
+      value: 'slug'
+    }
   }, {
     name: 'Tag',
-    endpoint: 'tag'
+    endpoint: 'tag',
+    value_structure: {
+      name: 'name',
+      value: 'slug'
+    }
   }])
   .value('CUSTOM_SEARCH_CONDITION_TYPES', [{
     name: 'is none of',
@@ -27,8 +39,4 @@ angular.module('customSearch.settings', [])
   }, {
     name: 'Past Week',
     value: '1 week'
-  }])
-  .value('CUSTOM_SEARCH_CONDITION_FIELD_TIME_PERIOD', {
-    name: 'Time Period',
-    endpoint: 'time-period'
-  });
+  }]);
