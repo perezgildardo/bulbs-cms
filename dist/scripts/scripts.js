@@ -1382,7 +1382,7 @@ angular.module('promotedContent.service', [
       var defer = $q.defer();
 
       if (_data.unsavedOperations.length > 0) {
-        var operation = _data.unsavedOperations[0];
+        var operation = _data.unsavedOperations.shift();
         // use preview time, or send null if immediate
         operation.when = _data.previewTime ? _data.previewTime.toISOString() : null;
         // remove client side client_id
@@ -1392,6 +1392,7 @@ angular.module('promotedContent.service', [
       } else {
         PromotedContentService.$refreshOperations()
           .then(function () {
+            unsavedOperations.
             PromotedContentService.clearUnsavedOperations();
             defer.resolve(_data.selectedPZone);
           });
