@@ -1374,32 +1374,6 @@ angular.module('promotedContent.service', [
     };
 
     /**
-     * Saves a simple operation, and then the *next* unsaved opration, util they've all been saved.
-     * We're chaining the saves like this so that we save the oprations in order. At some point, we
-     * should maybe save them all at once to a new endpoint?
-     */
-    PromotedContentService.saveOperation = function () {
-      var defer = $q.defer();
-
-      if (_data.unsavedOperations.length > 0) {
-        var operation = _data.unsavedOperations.shift();
-        // use preview time, or send null if immediate
-        operation.when = _data.previewTime ? _data.previewTime.toISOString() : null;
-        // remove client side client_id
-        delete operation.client_id;
-        _data.operations.post(operation)
-          .then(PromotedContentService.saveOperation);
-      } else {
-        PromotedContentService.$refreshOperations()
-          .then(function () {
-            unsavedOperations.
-            PromotedContentService.clearUnsavedOperations();
-            defer.resolve(_data.selectedPZone);
-          });
-      }
-    };
-
-    /**
      * Save the currently selected pzone by posting all operations at currently
      *  selected time. If no time is selected, pzone will be immediately updated.
      *
@@ -1410,7 +1384,34 @@ angular.module('promotedContent.service', [
 
       if (_data.previewTime && _data.previewTime.isAfter(moment())) {
         // save operations to be done in the future
-        PromotedContentService.saveOperation();
+        var trackSaves = _.after(_data.unsavedOperations.length, function () {
+          // refresh operations after save is done
+          PromotedContentService.$refreshOperations()
+            .then(function () {
+              PromotedContentService.clearUnsavedOperations();
+              defer.resolve(_data.selectedPZone);
+            });
+        });
+
+        // grab operations out of unsaved operations and post them into operations list
+        _.each(_data.unsavedOperations, function (operation) {
+
+          // use preview time, or send null if immediate
+          operation.when = _data.previewTime ? _data.previewTime.toISOString() : null;
+          // remove client side client_id
+          delete operation.client_id;
+
+          // _data.operations.post(operation)
+          //   .finally(trackSaves);
+        });
+        _data.operations.post(_data.unsavedOperations).then(function () {
+          PromotedContentService.$refreshOperations()
+            .then(function () {
+              PromotedContentService.clearUnsavedOperations();
+              defer.resolve(_data.selectedPZone);
+            });
+        });
+
       } else if (!_data.previewTime){
         // no preview time is set, post pzone immediately
         _data.selectedPZone.put()
